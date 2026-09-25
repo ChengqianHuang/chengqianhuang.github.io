@@ -4,9 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chengqian Huang</title>
+  <script>
+    // 主题预设：在任何渲染前设置，避免闪烁
+    (function () {
+      var t = localStorage.getItem('theme')
+        || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
   <header class="site-header">
     <div class="container">
       <a class="site-title" href="/">Chengqian Huang</a>
@@ -14,13 +24,14 @@
         <a href="/">文章</a>
         <a href="/about.html">关于</a>
         <a href="https://github.com/ChengqianHuang" target="_blank" rel="noopener">GitHub</a>
+        <button id="theme-toggle" type="button"></button>
       </nav>
     </div>
   </header>
 
   <main class="container">
     <section class="intro">
-      <p>开发者。这里记录技术笔记与项目进展。</p>
+      <p><span id="typed"></span><span class="cursor" aria-hidden="true"></span></p>
     </section>
 
     <section id="post-list">
@@ -37,6 +48,11 @@
     </div>
   </footer>
 
+  <button id="back-to-top" type="button" title="返回顶部" aria-label="返回顶部">↑</button>
+
+  <script src="theme.js"></script>
   <script src="main.js"></script>
+  <script src="particles.js"></script>
+  <script src="scroll.js"></script>
 </body>
 </html>

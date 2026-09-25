@@ -1,4 +1,4 @@
-// 首页：加载 posts.json 并渲染文章列表
+// 首页：加载 posts.json 渲染列表 + intro 打字机
 (async () => {
   const list = document.getElementById('posts');
   try {
@@ -22,8 +22,26 @@
   }
 })();
 
+// 打字机效果：逐字打出 intro 文案
+(() => {
+  const el = document.getElementById('typed');
+  if (!el) return;
+  const text = '开发者。这里记录技术笔记与项目进展。';
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    el.textContent = text;
+    return;
+  }
+  let i = 0;
+  (function type() {
+    if (i <= text.length) {
+      el.textContent = text.slice(0, i++);
+      setTimeout(type, 90);
+    }
+  })();
+})();
+
 function escapeHtml(s) {
-  return s.replace(/[&<>"']/g, c => ({
+  return String(s).replace(/[&<>"']/g, c => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   }[c]));
 }

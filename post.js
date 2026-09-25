@@ -1,4 +1,4 @@
-// 文章页：?post=<file> 加载 posts/<file>.md，marked 渲染
+// 文章页：?post=<file> 加载 posts/<file>.md，marked 渲染 + highlight.js 代码高亮
 (async () => {
   const el = document.getElementById('content');
   const params = new URLSearchParams(location.search);
@@ -22,6 +22,11 @@
       ${html}
       <p style="margin-top:48px"><a href="/">← 返回首页</a></p>`;
     document.title = (meta.title ? meta.title + ' - ' : '') + 'Chengqian Huang';
+
+    // 代码高亮（CDN 加载失败时静默降级为纯文本代码块）
+    if (window.hljs) {
+      el.querySelectorAll('pre code').forEach(block => hljs.highlightElement(block));
+    }
   } catch (err) {
     el.innerHTML = '<p>文章加载失败。</p><p><a href="/">← 返回首页</a></p>';
     console.error(err);
