@@ -19,7 +19,7 @@ async function renderPosts() {
     list.innerHTML = posts
       .map(p => `
         <li class="tilt reveal">
-          <a href="post.html?post=${encodeURIComponent(p.file)}">${escapeHtml(p.title)}</a>
+          <a href="post.html?post=${encodeURIComponent(p.file.endsWith('.md') ? p.file : p.file + '.md')}">${escapeHtml(p.title)}</a>
           <span class="post-meta">${escapeHtml(p.date)}</span>
         </li>`)
       .join('');
@@ -52,13 +52,24 @@ async function renderPosts() {
 }
 
 // 终端启动序列：逐条敲命令，输出即时打印
-function terminalBoot() {
+async function terminalBoot() {
   const el = document.getElementById('typed');
   if (!el) return;
 
+  // ls ./posts 的输出从 posts.json 动态生成，避免每加一篇文章都要改这里
+  let lsOut = '';
+  try {
+    const res = await fetch('posts.json', { cache: 'no-cache' });
+    if (res.ok) {
+      lsOut = (await res.json())
+        .map(p => (p.file.endsWith('.md') ? p.file : p.file + '.md'))
+        .join('  ');
+    }
+  } catch { /* 取不到就留空，不影响启动序列其余部分 */ }
+
   const LINES = [
     { cmd: 'whoami', out: 'chengqian — developer · shenzhen' },
-    { cmd: 'ls ./posts', out: 'blog-v3.md  hello-world.md' },
+    { cmd: 'ls ./posts', out: lsOut },
     { cmd: 'uptime --passion', out: 'shipping since forever, load average: rising' },
   ];
 

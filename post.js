@@ -4,14 +4,16 @@
   const params = new URLSearchParams(location.search);
   const file = params.get('post') || '';
 
-  // 只允许字母数字、连字符、下划线、点，防路径穿越
-  if (!/^[A-Za-z0-9_-]+\.md$/.test(file)) {
+  // 只允许字母数字、连字符、下划线，.md 后缀可省略，防路径穿越
+  const m = file.match(/^([A-Za-z0-9_-]+?)(?:\.md)?$/);
+  if (!m || !file) {
     el.innerHTML = '<p>无效的文章地址。</p><p><a href="/">← 返回首页</a></p>';
     return;
   }
+  const mdFile = m[1] + '.md';
 
   try {
-    const res = await fetch(`posts/${file}`, { cache: 'no-cache' });
+    const res = await fetch(`posts/${mdFile}`, { cache: 'no-cache' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const md = await res.text();
     const { meta, body } = parseFrontMatter(md);
