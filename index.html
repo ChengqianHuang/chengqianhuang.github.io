@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chengqian Huang</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚒️</text></svg>">
   <script>
     // 主题预设：在任何渲染前设置，避免闪烁
     (function () {
@@ -15,6 +16,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <canvas id="shader-canvas" aria-hidden="true"></canvas>
   <canvas id="bg-canvas" aria-hidden="true"></canvas>
 
   <header class="site-header">
@@ -29,12 +31,16 @@
     </div>
   </header>
 
-  <main class="container">
-    <section class="intro">
-      <p><span id="typed"></span><span class="cursor" aria-hidden="true"></span></p>
+  <main>
+    <section class="hero">
+      <pre id="donut" aria-hidden="true"></pre>
+      <div class="hero-text">
+        <h1 id="hero-name" data-text="Chengqian Huang">Chengqian Huang</h1>
+        <p class="terminal"><span id="typed"></span><span class="cursor" aria-hidden="true"></span></p>
+      </div>
     </section>
 
-    <section id="post-list">
+    <section id="post-list" class="container">
       <h2>文章</h2>
       <ul id="posts" class="post-list">
         <li class="loading">加载中…</li>
@@ -44,15 +50,18 @@
 
   <footer class="site-footer">
     <div class="container">
-      <p>© 2026 Chengqian Huang · <a href="https://github.com/ChengqianHuang/chengqianhuang.github.io" target="_blank" rel="noopener">本站源码</a></p>
+      <p>© 2026 Chengqian Huang · <a href="https://github.com/ChengqianHuang/chengqianhuang.github.io" target="_blank" rel="noopener">本站源码</a> · <span class="hint" title="↑↑↓↓←→←→BA">↑↑↓↓←→←→BA</span></p>
     </div>
   </footer>
 
   <button id="back-to-top" type="button" title="返回顶部" aria-label="返回顶部">↑</button>
 
   <script src="theme.js"></script>
-  <script src="main.js"></script>
+  <script src="shader.js"></script>
   <script src="particles.js"></script>
+  <script src="donut.js"></script>
+  <script src="main.js"></script>
+  <script src="easter-egg.js"></script>
   <script src="scroll.js"></script>
 </body>
 </html>

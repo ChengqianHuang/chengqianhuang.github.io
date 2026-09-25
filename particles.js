@@ -1,6 +1,8 @@
 // 粒子网络背景：canvas 固定在底层，鼠标附近粒子被轻微吸引并连线
 (() => {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // WebGL shader 可用时让位
+  if (document.documentElement.classList.contains('webgl')) return;
 
   const canvas = document.getElementById('bg-canvas');
   if (!canvas) return;
