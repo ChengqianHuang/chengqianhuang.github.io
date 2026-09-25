@@ -70,7 +70,7 @@ async function terminalBoot() {
   const LINES = [
     { cmd: 'whoami', out: 'chengqian — developer · shenzhen' },
     { cmd: 'ls ./posts', out: lsOut },
-    { cmd: 'uptime --passion', out: 'shipping since forever, load average: rising' },
+    { cmd: 'cat ./stack', out: 'HTML · CSS · JavaScript · GitHub Pages' },
   ];
 
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) {

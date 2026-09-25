@@ -145,11 +145,11 @@
 
   const commands = {
     help: () => '可用命令：help · about · posts · theme · donut · surprise · clear',
-    about: () => 'Chengqian / developer in Shenzhen. 喜欢把网页当成可以玩的画布。',
+    about: () => 'Chengqian Huang 的个人博客。记录文章和前端实验。',
     posts: () => { document.getElementById('post-list').scrollIntoView({ behavior: reducedMotion.matches ? 'auto' : 'smooth' }); return '正在打开文章列表 ↗'; },
     theme: () => { document.getElementById('theme-toggle').click(); return '主题已切换。'; },
-    donut: () => { document.querySelector('.donut-window').scrollIntoView({ behavior: reducedMotion.matches ? 'auto' : 'smooth' }); return '那个甜甜圈不是 GIF，是数学。'; },
-    surprise: () => { pulse(); setTimeout(() => pulse(width * .25, height * .55), 180); setTimeout(() => pulse(width * .75, height * .45), 360); return '✦ 宇宙收到你的信号了。'; },
+    donut: () => { document.querySelector('.donut-window').scrollIntoView({ behavior: reducedMotion.matches ? 'auto' : 'smooth' }); return 'ASCII 甜甜圈由 JavaScript 实时绘制。'; },
+    surprise: () => { pulse(); setTimeout(() => pulse(width * .25, height * .55), 180); setTimeout(() => pulse(width * .75, height * .45), 360); return '已触发 3 次粒子脉冲。'; },
     clear: () => { output.replaceChildren(); return ''; },
   };
 
