@@ -15,7 +15,7 @@
   </script>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="home">
   <canvas id="shader-canvas" aria-hidden="true"></canvas>
   <canvas id="bg-canvas" aria-hidden="true"></canvas>
 
@@ -32,16 +32,51 @@
   </header>
 
   <main>
-    <section class="hero">
-      <pre id="donut" aria-hidden="true"></pre>
+    <section class="hero container" aria-labelledby="hero-name">
       <div class="hero-text">
+        <p class="eyebrow"><span class="status-light"></span> PERSONAL INTERNET OUTPOST <span class="eyebrow-separator">/</span> SHENZHEN, CN</p>
         <h1 id="hero-name" data-text="Chengqian Huang">Chengqian Huang</h1>
+        <p class="hero-lead">把想法写成代码，再把代码变成一点好玩的东西。</p>
         <p class="terminal"><span id="typed"></span><span class="cursor" aria-hidden="true"></span></p>
+        <div class="hero-actions">
+          <a class="primary-action" href="#post-list">阅读文章 <span aria-hidden="true">↗</span></a>
+          <a class="text-action" href="#playground">进入实验台 <span aria-hidden="true">↓</span></a>
+        </div>
+      </div>
+      <div class="donut-window" aria-label="正在旋转的 ASCII 甜甜圈">
+        <div class="window-bar"><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span><span>donut.exe</span><span>LIVE ●</span></div>
+        <pre id="donut" aria-hidden="true">[ loading delicious pixels... ]</pre>
+        <div class="window-footer"><span>42 × 18 characters</span><span>rendered with math, not magic</span></div>
       </div>
     </section>
 
+    <section id="playground" class="playground container" aria-labelledby="playground-title">
+      <div class="section-heading">
+        <div><p class="section-kicker">01 / INTERACTIVE LAB</p><h2 id="playground-title">别只看，动手玩。</h2></div>
+        <p>移动指针，制造引力；敲一条命令，看看会发生什么。</p>
+      </div>
+      <div class="lab-grid">
+        <div class="lab-panel orbit-panel">
+          <div class="lab-panel-head"><span><span class="status-light"></span> GRAVITY FIELD</span><span id="orbit-status">LIVE</span></div>
+          <canvas id="orbit-canvas" aria-label="互动粒子引力场，移动指针吸引粒子，点击制造脉冲"></canvas>
+          <div class="lab-panel-foot"><span>MOVE TO ATTRACT · CLICK TO PULSE</span><button id="pulse-button" type="button">制造脉冲 ↗</button></div>
+        </div>
+        <div class="lab-panel console-panel">
+          <div class="lab-panel-head"><span>~/chengqian <span class="console-branch">⌁ main</span></span><span>TERMINAL</span></div>
+          <div id="console-output" class="console-output" role="log" aria-live="polite" aria-relevant="additions text"><p class="console-welcome">欢迎进入实验台。试试 <code>help</code>，或点击下面的快捷命令。</p></div>
+          <form id="console-form" class="console-form" autocomplete="off">
+            <label for="console-input">❯</label>
+            <input id="console-input" name="command" type="text" spellcheck="false" autocapitalize="off" maxlength="40" aria-label="输入命令" placeholder="输入 help 查看命令">
+            <button type="submit" aria-label="执行命令">↵</button>
+          </form>
+          <div class="command-chips" aria-label="快捷命令"><button type="button" data-command="help">help</button><button type="button" data-command="about">about</button><button type="button" data-command="surprise">surprise</button></div>
+        </div>
+      </div>
+      <p class="lab-note">没有框架，没有音效。只有浏览器、数学，和一点好奇心。</p>
+    </section>
+
     <section id="post-list" class="container">
-      <h2>文章</h2>
+      <div class="section-heading posts-heading"><div><p class="section-kicker">02 / WRITING</p><h2>最近写的</h2></div><p>偶尔记录，长期折腾。</p></div>
       <ul id="posts" class="post-list">
         <li class="loading">加载中…</li>
       </ul>
@@ -61,6 +96,7 @@
   <script src="particles.js"></script>
   <script src="donut.js"></script>
   <script src="main.js"></script>
+  <script src="playground.js"></script>
   <script src="easter-egg.js"></script>
   <script src="scroll.js"></script>
 </body>
