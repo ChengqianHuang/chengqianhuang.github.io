@@ -3,47 +3,45 @@ title: 基于 DSH 构建个人助理
 date: 2026-09-26
 ---
 
-我基于 [DeepSeek Harness（DSH）](https://github.com/ChengqianHuang/deepseek-harness) 做了一个个人助理插件 `@deepseek-ai/dsh-personal`。用户可以用自然语言记录电影、项目进展、待办、想法和博客选题；Agent 选择对应工具，把数据写入 SQLite。以后查询这些记录时，助理从数据库读取，换一个会话也能查到。
+我在 [DeepSeek Harness（DSH）](https://github.com/ChengqianHuang/deepseek-harness) 中实现了 `@deepseek-ai/dsh-personal`。它把电影、项目进展、任务、博客选题和想法存到一个 SQLite 数据库，再用工具从数据库查询。本文沿着一次写入、一次查询和一次重启，说明这个插件实际怎么工作。
 
-## 一句话可以拆成几条记录
+## 插件如何接入 DSH
 
-比如我说：
+入口是 `PersonalService`，它继承 Cordis 的 `Service`，向 `ctx.personal` 提供确定性的业务方法，并依赖已有的 `ctx.tools`。插件初始化时先调用 `ready()` 打开数据库、执行待处理的 migration，再注册模型可见的工具。注册属于 Cordis effect；插件卸载时工具随 effect 注销，数据库连接也会关闭。DSH 的 Agent Loop 不需要因个人助理而修改。
 
-> 今天修完 Forge UI bug；看了《鲁滨逊漂流记》，7.5 分；想研究一下 harness；周末记得更新博客证书。
-
-这句话里其实有四种东西：项目进展、电影、研究兴趣、待办。助理要分别选 `record_project_log`、`record_movie`、`create_idea` 和 `create_task`，再把每项填进对应的参数。这里的“想研究”只是兴趣；如果我说“明天研究”，才是带行动安排的任务。
-
-这样的拆解由模型完成，写入则走固定路径：
+工具分成三组：11 个记录与修改工具、6 个查询工具、2 个回顾工具，分别定义在 `tools/write.ts`、`tools/query.ts` 和 `tools/review.ts`。`record_movie`、`record_project_log`、`create_task` 等名称对应具体业务动作。工具定义包含参数 schema、执行函数和结果展示，执行函数再调用 `PersonalService`。模型能选择动作并填参数，不能拿到一个任意执行 SQL 的入口。
 
 ```text
-用户的话
-  → DSH Agent 理解意图并选择语义工具
-  → dsh-personal Tool
-  → PersonalService 校验和处理业务规则
-  → Store
-  → SQLite
+用户输入 → Agent 选择工具 → PersonalService → Store → SQLite
+             参数 schema       业务规则       参数化 SQL
 ```
 
-模型不能直接执行 SQL，也不能自行决定数据库列怎么填。工具提供的是“记录电影”“创建任务”这样的动作，而不是 `insert_row` 或 `execute_sql`。目前有 19 个语义工具，分为记录与修改、查询、每日和每周回顾三组。工具多一些，换来的是每个入口都有明确的参数和用途。
+## 写入一条记录时发生了什么
 
-## 数据库才是记忆
+以“Forge 今天定位了 streaming 中文错位问题”为例，`record_project_log` 接收项目名和日志标题，调用 `PersonalService.recordProjectLog()`。服务先查项目；第一次提到 Forge 时会创建项目。随后它写入带日期、状态和内容的日志，更新项目的修改时间，并在 `relations` 表中建立日志属于项目的关联。没有给日期时，日期取插件配置时区里的“今天”。
 
-插件使用一个独立的 `personal.db`。其中九张表分别存项目、网站、电影、项目日志、任务、博客文章、想法、日记和对象之间的关系。SQLite 的 `STRICT` 表、外键和 `CHECK` 约束挡住不合法的数据；版本化 migration 负责以后升级。文件里没有 Agent 运行状态，卸载插件后仍能用普通 SQLite 工具读取。
+电影走另一条明确的规则。`record_movie` 的评分参数是 0 到 10 的 `number`；`recordMovie()` 拒绝非有限数和越界值，保留 7.5、8.25 这样的输入，不做四舍五入。数据库最初的 `movies.rating` 是 `INTEGER`，第二版 migration 重建 `movies` 表并把这一列改为 `REAL`，复制旧记录后恢复索引。这样已有整数评分仍在，之后的小数也能保存。
 
-查询走另一条确定的路径。问“我最近看了什么电影？”，模型调用 `query_movies`；问“Forge 最近做了什么？”，它调用 `query_project_logs`。每日回顾也先从数据库取项目日志、已完成任务、电影、想法等事实，再由模型组织语言。模型负责表达，事实来源仍是数据库。
+任务的相对期限也由程序计算。工具让模型把“明天”“下周”“周末”填成 `due_in` 枚举，`PersonalService.createTask()` 再调用 `dates.ts` 的 `resolveDueDate()`，按配置时区得到 ISO 日期。代码对“本周末”的约定是本周六；如果今天已是周六或周日，就取今天，避免得到过去的截止日。用户直接说出 `YYYY-MM-DD` 时才用 `due_at`，且它优先于 `due_in`。这样模型负责识别“周末”，不负责心算星期。
 
-这个区别在重启后最明显：关掉 DSH，开启新会话，旧对话上下文已经不在，电影记录依然能查到。我们用真实模型和 Headless DSH 跑过这条从自然语言写入、查询到冷启动再查询的路径。
+工具描述还区分了两种容易混淆的记录：“想研究一下 harness”是没有行动承诺的 `create_idea`；“明天研究 harness”是 `create_task`。`record_daily_log` 则只用于明确要求保存自由文本日记的输入。对一条列了几件事的消息，工具描述要求分别写入结构化记录，避免再保存内容重复的日记摘要。这些选择仍需靠真实模型输入做回归，因为工具描述只能引导模型，不能替它作确定性判断。
 
-## 日期和数字不能交给模型猜
+## SQLite 文件怎样建立和升级
 
-真实使用比演示更容易发现问题。输入“7.5 分”，如果工具只接受整数，模型可能把它改成 8；输入“周末”，如果要求模型自己推算日期和星期，也可能出现日期对、星期错的回答。还有“想研究”被记成任务，以及一条结构化记录之外又生成一份内容重复的日记。
+默认数据库在 `~/.dsh/personal/personal.db`，路径和时区都可配置。`openPersonalDatabase()` 创建目录与文件时使用仅所有者可访问的权限；打开后先核对 SQLite 的 `application_id`。只有空库或标记为 `PERS` 的库可以继续，避免把个人表写进别的应用数据库。
 
-这些问题提醒我们：自然语言理解可以交给模型，数值保真和日历计算必须由程序负责。评分应按用户给出的 7.5 保存；相对日期应由服务按时区和日历计算；Idea 与 Task 的描述要讲清行动承诺的区别；只有明确要记自由文本日记时才写 DailyLog。日常使用中的这些校准，正在逐项落实到工具定义和回归测试里。
+通过身份检查后，连接启用 WAL、外键和五秒写锁等待，再按 `PRAGMA user_version` 运行 migration。每一步 migration 和版本号更新在同一事务内；中途失败就回滚到上一版。九张表使用 SQLite `STRICT`，状态和评分有 `CHECK`，标签列有 `json_valid`，项目与任务等关系使用外键。库里保存的是个人数据行，不包含 Cordis Context、Session 或 Agent 运行状态，所以 SQLite 文件可以独立读取。
 
-## 为什么先保持简单
+## 查询与回顾读的是哪些数据
 
-现在的数据量和查询方式不需要向量数据库、Embedding 或独立的 Memory Engine。电影有观影日期，任务有状态和截止日期，项目日志有项目与发生日期；用结构化列就能回答大多数问题。以后真遇到“我模糊记得写过一段什么”的检索需求，再判断是否需要新的索引。
+问“最近看了什么电影”时，Agent 调用 `query_movies`。这个工具将日期窗口、标签和返回条数交给 `MovieStore.list()`；Store 使用预编译语句和绑定参数查询 `movies`，按观影日期倒序返回。未指定条数时返回最多 20 条，上限 200 条。查询窗口可以给具体的 `from`、`to`，也可以用 `today`、`this-week`、`this-month`、`this-year`；周按周一到周日计算。
 
-DSH 的 Agent 运行机制也不用为个人助理改写。`dsh-personal` 作为 Cordis 插件注册服务和工具，卸载时注销工具并关闭数据库。个人助理的业务规则留在插件内，DSH Core 继续只做它原本负责的事。
+跨类型的问题使用 `search_personal_data`。它把搜索分派给电影、项目、日志、任务、博客等各自的 Store，使用转义后的 SQLite `LIKE` 做大小写不敏感的子串匹配，再按类型组织结果。这不是向量检索，也没有把八类对象塞进一张通用 JSON 表。
 
-目前先把记录、查询和回顾做好。接下来继续用真实输入校准工具选择、日期计算和数据保真，确保保存的事实准确、可查、不重复。
+`generate_daily_review` 和 `generate_weekly_review` 在 `review.ts` 中组装事实。每日回顾把当天项目日志按项目归组；每周回顾从本周日志找出活跃项目。两者都读取已完成与未完成的任务、电影、博客文章、想法和有未完成任务的网站。每日回顾还读取明确保存的 DailyLog。组装过程没有让模型查询或改写数据库；工具返回事实集合和可读文本，模型再据此生成叙述。
+
+## 如何验证它没有只靠聊天记忆
+
+测试分几层。Store 与 Service 测试覆盖数据约束、日期和 migration；Loader 组合测试检查服务与 19 个工具的注册、卸载和数据库句柄释放。真实 Provider 的 Headless E2E 则发送自然语言，检查 SQLite 行和 session log 里的工具调用；随后以同一数据库启动新进程、新会话，再问电影记录。如果新会话仍调用 `query_movies` 并读出旧记录，答案就不是靠上一段聊天上下文。
+
+当前实现刻意只处理单用户的结构化记录与子串查询。没有自动定时回顾、全文检索或多用户隔离。后续需求出现时再扩展对应能力；现阶段更重要的是让每次工具选择、日期计算和数据写入都能用具体输入验证。
