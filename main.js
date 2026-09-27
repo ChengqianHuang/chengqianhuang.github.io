@@ -20,7 +20,7 @@ async function renderPosts() {
       .map(p => `
         <li class="tilt reveal">
           <a href="post.html?post=${encodeURIComponent(p.file.endsWith('.md') ? p.file : p.file + '.md')}">${escapeHtml(p.title)}</a>
-          <span class="post-meta">${escapeHtml(p.date)}</span>
+          <span class="post-meta">${escapeHtml(p.date)}${p.author ? ' · 作者：' + escapeHtml(p.author) : ''}</span>
         </li>`)
       .join('');
     // 重新触发 reveal 观察与倾斜绑定

@@ -10,6 +10,7 @@
    ---
    title: 文章标题
    date: YYYY-MM-DD
+   author: 作者名
    ---
 
    正文（Markdown）……
@@ -18,8 +19,10 @@
 2. 在 `posts.json` 数组**开头**加一条：
 
    ```json
-   { "title": "文章标题", "date": "YYYY-MM-DD", "file": "your-post" }
+   { "title": "文章标题", "date": "YYYY-MM-DD", "author": "作者名", "file": "your-post" }
    ```
+
+   `author` 可省略；填写后会显示在首页列表和文章页。
 
 3. push 到 `main`，GitHub Pages 自动发布，约 1 分钟生效。
 

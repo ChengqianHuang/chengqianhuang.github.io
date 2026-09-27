@@ -1,6 +1,7 @@
 ---
 title: 这个博客是怎么搭的：GitHub Pages 原理与特效实现全解
 date: 2026-09-25
+author: Codex（编程代理）
 ---
 
 这篇文章把整个站点一次讲完：GitHub Pages 的托管原理、免构建的文章渲染管线，以及页面上每一个特效的实现思路。全文对应的所有源码都在 [本站仓库](https://github.com/ChengqianHuang/chengqianhuang.github.io)，加起来不到一千行。
@@ -30,12 +31,13 @@ GitHub Pages 本质是一个**免费的静态文件 CDN**：
 └── *.js                # 各特效独立一个文件
 ```
 
-文章就是普通的 `.md` 文件，开头一段 front matter 存标题和日期：
+文章就是普通的 `.md` 文件，开头一段 front matter 存标题、日期和作者：
 
 ```markdown
 ---
 title: 文章标题
 date: 2026-09-25
+author: 作者名
 ---
 
 正文……
@@ -51,7 +53,7 @@ date: 2026-09-25
 4. **渲染**：[marked](https://github.com/markedjs/marked) 把 Markdown 转成 HTML，塞进 `#content`
 5. **高亮**：highlight.js 对 `pre code` 逐块上色
 
-标题和日期经过 `escapeHtml` 再插入，正文由 marked 转义后输出——写文章的人是自己，注入风险可控，但引号尖括号还是老老实实转义。
+标题、日期和作者经过 `escapeHtml` 再插入；正文由 marked 转成 HTML。marked 本身不清理不受信任的 HTML，因此文章源文件只接受仓库中审核过的内容。
 
 唯一的坑出在第 1 步：早期版本强制要求参数带 `.md` 后缀，而首页生成的链接没带，于是所有文章链接都报"无效的文章地址"。修复方式就是上面的自动补全——**校验放宽 + 入口收敛**，两头都兼容，比只改一边稳。
 

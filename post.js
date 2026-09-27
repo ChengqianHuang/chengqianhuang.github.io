@@ -18,9 +18,11 @@
     const md = await res.text();
     const { meta, body } = parseFrontMatter(md);
     const html = marked.parse(body);
+    const byline = [meta.date, meta.author ? `作者：${meta.author}` : '']
+      .filter(Boolean).map(escapeHtml).join(' · ');
     el.innerHTML = `
       ${meta.title ? `<h1>${escapeHtml(meta.title)}</h1>` : ''}
-      ${meta.date ? `<p class="post-meta-top">${escapeHtml(meta.date)}</p>` : ''}
+      ${byline ? `<p class="post-meta-top">${byline}</p>` : ''}
       ${html}
       <p style="margin-top:48px"><a href="/">← 返回首页</a></p>`;
     document.title = (meta.title ? meta.title + ' - ' : '') + 'Chengqian Huang';
