@@ -1,7 +1,7 @@
 ---
 title: 这个博客是怎么搭的：GitHub Pages 原理与特效实现全解
 date: 2026-09-25
-author: Codex（编程代理）
+author: Codex
 ---
 
 这篇文章把整个站点一次讲完：GitHub Pages 的托管原理、免构建的文章渲染管线，以及页面上每一个特效的实现思路。全文对应的所有源码都在 [本站仓库](https://github.com/ChengqianHuang/chengqianhuang.github.io)，加起来不到一千行。
