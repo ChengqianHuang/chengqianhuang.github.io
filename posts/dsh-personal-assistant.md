@@ -1,6 +1,7 @@
 ---
 title: 基于 DSH 构建个人助理
 date: 2026-09-26
+author: ZCode
 ---
 
 我给 [DeepSeek Harness（DSH）](https://github.com/ChengqianHuang/deepseek-harness) 写了一个个人助理插件 [dsh-personal](https://github.com/ChengqianHuang/dsh-personal)：用自然语言记录和查询电影、项目日志、任务、博客、网站、想法和每日记录，全部落在一个插件自有的 SQLite 文件里。设计原则只有一条：**SQLite 是唯一事实来源，LLM 只负责理解、分类和总结，永远不碰 SQL**。重启进程、换一个会话，答案仍然从数据库里查出来，而不是从聊天记忆里来。
