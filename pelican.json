@@ -1,0 +1,39 @@
+{
+  "prompt": "Draw an SVG of a pelican riding a bicycle.",
+  "results": [],
+  "examples": [
+    {
+      "id": "example-line",
+      "title": "线稿示例",
+      "group": "线稿",
+      "provider": "页面示例",
+      "model": "未绑定模型",
+      "date": "",
+      "svg": "pelican-assets/example-line.svg",
+      "notes": "这张图由 Codex 为页面排版制作，不是某个模型的正式测试结果。",
+      "example": true
+    },
+    {
+      "id": "example-color",
+      "title": "色块示例",
+      "group": "色块",
+      "provider": "页面示例",
+      "model": "未绑定模型",
+      "date": "",
+      "svg": "pelican-assets/example-color.svg",
+      "notes": "这张图由 Codex 为页面排版制作，不是某个模型的正式测试结果。",
+      "example": true
+    },
+    {
+      "id": "example-pixel",
+      "title": "像素示例",
+      "group": "像素",
+      "provider": "页面示例",
+      "model": "未绑定模型",
+      "date": "",
+      "svg": "pelican-assets/example-pixel.svg",
+      "notes": "这张图由 Codex 为页面排版制作，不是某个模型的正式测试结果。",
+      "example": true
+    }
+  ]
+}

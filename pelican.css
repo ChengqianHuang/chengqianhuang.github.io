@@ -1,0 +1,84 @@
+/* 鹈鹕画廊：图片在固定的浅色画布上展示，便于比较 SVG 本身。 */
+.pelican-home, .pelican-page .container { max-width: 1160px; }
+.pelican-home { padding-bottom: 86px; scroll-margin-top: 90px; }
+.pelican-all, .pelican-back { color: var(--accent); text-decoration: none; font-size: 14px; font-weight: 600; }
+.pelican-all:hover, .pelican-back:hover { text-decoration: underline; }
+.pelican-intro { color: var(--fg-muted); margin: 0 0 24px; font-size: 15px; }
+.pelican-notice { padding: 12px 16px; margin: 0 0 24px; border: 1px solid #e8d4a6; border-radius: 8px; background: #fff8e8; color: #775419; font-size: 13px; }
+:root[data-theme="dark"] .pelican-notice { background: #282219; border-color: #54472d; color: #dfc288; }
+.pelican-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+.pelican-card { min-width: 0; display: block; color: var(--fg); text-decoration: none; border: 1px solid var(--border); border-radius: 14px; background: var(--bg); overflow: hidden; transition: border-color .2s, transform .2s, box-shadow .2s; }
+.pelican-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 12px 28px rgba(30,40,80,.09); }
+.pelican-card:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+.pelican-picture { position: relative; background: #f6f5f1; aspect-ratio: 4 / 3; }
+.pelican-picture img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.pelican-tag { display: inline-block; font-size: 11px; line-height: 1.5; padding: 3px 8px; color: #775419; background: #fff4d9; border: 1px solid #ead6a9; border-radius: 5px; }
+.pelican-picture .pelican-tag { position: absolute; top: 14px; left: 14px; }
+.pelican-tag.result { background: #e7f5ed; color: #246b49; border-color: #badcc9; }
+.pelican-card-caption { padding: 18px 18px 16px; }
+.pelican-card-caption h3 { font-size: 17px; line-height: 1.4; margin: 0 0 7px; }
+.pelican-card-caption p { display: flex; justify-content: space-between; gap: 10px; color: var(--fg-muted); font-size: 12px; margin: 0; }
+.pelican-card-caption p span:last-child { color: var(--accent); flex-shrink: 0; }
+.pelican-page .site-header nav a[aria-current] { color: var(--accent); }
+.pelican-main { padding-top: 44px; padding-bottom: 90px; min-height: 70vh; }
+.pelican-back { display: inline-block; margin-bottom: 32px; }
+.pelican-page-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 14px; }
+.pelican-page-heading h1 { font-size: clamp(34px, 5vw, 52px); letter-spacing: -.04em; line-height: 1.2; margin: 0; }
+.pelican-count { color: var(--fg-muted); font: 12px/1.5 "SF Mono", Menlo, Consolas, monospace; }
+.pelican-prompt { display: flex; align-items: center; justify-content: space-between; gap: 24px; border: 1px solid var(--border); background: var(--code-bg); border-radius: 10px; padding: 20px 22px; margin-bottom: 28px; }
+.pelican-prompt span { color: var(--fg-muted); font-size: 12px; }
+.pelican-prompt p { font: 14px/1.6 "SF Mono", Menlo, Consolas, monospace; margin: 6px 0 0; overflow-wrap: anywhere; }
+.pelican-prompt button, .pelican-filters button, .pelican-detail-nav button { font: inherit; color: var(--fg); background: var(--bg); border: 1px solid var(--border); padding: 8px 12px; border-radius: 7px; cursor: pointer; }
+.pelican-prompt button { font-size: 12px; flex-shrink: 0; }
+.pelican-prompt button:hover, .pelican-detail-nav button:hover { border-color: var(--accent); color: var(--accent); }
+.pelican-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+.pelican-filters button { font-size: 13px; padding: 6px 13px; }
+.pelican-filters button[aria-pressed="true"] { color: white; background: var(--accent); border-color: var(--accent); }
+.pelican-empty { grid-column: 1 / -1; padding: 40px; border: 1px dashed var(--border); border-radius: 12px; color: var(--fg-muted); text-align: center; }
+.pelican-detail { width: min(1060px, calc(100% - 32px)); max-height: calc(100svh - 40px); padding: 0; border: 1px solid var(--border); border-radius: 16px; background: var(--bg); color: var(--fg); overflow: auto; box-shadow: 0 24px 100px rgba(0,0,0,.3); }
+.pelican-detail::backdrop { background: rgba(12,17,29,.7); backdrop-filter: blur(5px); }
+.pelican-detail-head { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 22px 26px; border-bottom: 1px solid var(--border); }
+.pelican-detail-head h2 { font-size: 23px; line-height: 1.3; margin: 9px 0 0; }
+.pelican-close { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border); background: var(--code-bg); color: var(--fg); font-size: 24px; cursor: pointer; flex-shrink: 0; }
+.pelican-detail-body { display: grid; grid-template-columns: 1.6fr 1fr; }
+.pelican-detail-picture { background: #f6f5f1; align-self: start; }
+.pelican-detail-picture > img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: contain; }
+.pelican-detail-nav { display: flex; justify-content: center; align-items: center; gap: 24px; padding: 14px; color: #52566b; font-size: 12px; border-top: 1px solid #e5e5e5; }
+.pelican-detail-nav button { background: white; color: #303540; border-color: #ddd; }
+.pelican-detail-info { padding: 24px; border-left: 1px solid var(--border); }
+.pelican-detail-info dl { margin: 0; display: grid; grid-template-columns: 60px minmax(0,1fr); column-gap: 12px; row-gap: 12px; font-size: 13px; }
+.pelican-detail-info dt { color: var(--fg-muted); }
+.pelican-detail-info dd { margin: 0; overflow-wrap: anywhere; }
+.pelican-detail-note { font-size: 13px; color: var(--fg-muted); padding-top: 20px; border-top: 1px solid var(--border); margin: 22px 0; }
+.pelican-detail-prompt h3 { font-size: 12px; color: var(--fg-muted); margin: 0 0 8px; }
+.pelican-detail-prompt p { font: 12px/1.7 "SF Mono", Menlo, Consolas, monospace; margin: 0; overflow-wrap: anywhere; }
+.pelican-download { display: inline-block; margin-top: 22px; font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; }
+.pelican-source { padding: 18px 26px; border-top: 1px solid var(--border); font-size: 13px; }
+.pelican-source summary { cursor: pointer; }
+.pelican-source pre { background: var(--code-bg); padding: 16px; border-radius: 8px; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 260px; overflow: auto; font: 11px/1.6 "SF Mono", Menlo, Consolas, monospace; }
+@media (max-width: 760px) {
+  .pelican-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+  .pelican-detail-body { grid-template-columns: 1fr; }
+  .pelican-detail-info { border-left: 0; border-top: 1px solid var(--border); }
+  .pelican-page .site-header .container, .home .site-header .container { flex-wrap: wrap; gap: 10px; }
+  .pelican-page .site-header nav { gap: 14px; }
+  .pelican-page .site-header nav a { font-size: 13px; }
+  .pelican-page .site-title { font-size: 15px; }
+}
+@media (max-width: 480px) {
+  .pelican-grid { grid-template-columns: 1fr; }
+  .pelican-page-heading { align-items: end; }
+  .pelican-prompt { display: block; padding: 16px; }
+  .pelican-prompt button { margin-top: 12px; }
+  .pelican-home .section-heading { display: flex; align-items: end; }
+  .pelican-main { padding-top: 28px; }
+  .pelican-detail-head, .pelican-source { padding: 16px; }
+  .pelican-detail-info { padding: 18px; }
+}
+.pelican-page { --accent: #5265ee; }
+:root[data-theme="dark"] .pelican-page { --accent: #8a9aff; }
+:root[data-theme="dark"] .pelican-filters button[aria-pressed="true"] { color: #101529; }
+body.pelican-modal-open { overflow: hidden; }
+@media (prefers-reduced-motion: reduce) {
+  .pelican-card:hover { transform: none; }
+}

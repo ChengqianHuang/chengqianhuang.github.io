@@ -447,3 +447,9 @@ article th { background: var(--code-bg); }
 @media (prefers-reduced-motion: reduce) {
   .home .donut-window:hover, .home .primary-action:hover { transform: none; }
 }
+
+@media (max-width: 600px) {
+  .site-header .container { flex-wrap: wrap; gap: 10px; }
+  .site-header nav { gap: 12px; }
+  .site-header nav a { font-size: 13px; }
+}

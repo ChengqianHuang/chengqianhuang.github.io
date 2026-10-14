@@ -14,6 +14,7 @@
     })();
   </script>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="pelican.css">
 </head>
 <body class="home">
   <canvas id="shader-canvas" aria-hidden="true"></canvas>
@@ -24,6 +25,7 @@
       <a class="site-title" href="/">Chengqian Huang</a>
       <nav>
         <a href="/">文章</a>
+        <a href="/pelican.html">鹈鹕测试</a>
         <a href="/about.html">关于</a>
         <a href="https://github.com/ChengqianHuang" target="_blank" rel="noopener">GitHub</a>
         <button id="theme-toggle" type="button"></button>
@@ -73,8 +75,19 @@
       </div>
     </section>
 
+    <section id="pelican-preview" class="container pelican-home" aria-labelledby="pelican-home-title">
+      <div class="section-heading">
+        <div><p class="section-kicker">02</p><h2 id="pelican-home-title">鹈鹕测试</h2></div>
+        <a class="pelican-all" href="/pelican.html">查看全部 <span aria-hidden="true">→</span></a>
+      </div>
+      <p class="pelican-intro">各模型生成的鹈鹕骑自行车 SVG，点击查看完整图和测试信息。</p>
+      <p id="pelican-home-notice" class="pelican-notice" hidden></p>
+      <div id="pelican-home-grid" class="pelican-grid"><p>加载中…</p></div>
+      <noscript><p>请启用 JavaScript，或<a href="/pelican.html">打开鹈鹕测试页</a>。</p></noscript>
+    </section>
+
     <section id="post-list" class="container">
-      <div class="section-heading posts-heading"><div><p class="section-kicker">02</p><h2>文章</h2></div></div>
+      <div class="section-heading posts-heading"><div><p class="section-kicker">03</p><h2>文章</h2></div></div>
       <ul id="posts" class="post-list">
         <li class="loading">加载中…</li>
       </ul>
@@ -94,6 +107,7 @@
   <script src="particles.js"></script>
   <script src="donut.js"></script>
   <script src="main.js"></script>
+  <script src="pelican.js"></script>
   <script src="playground.js"></script>
   <script src="easter-egg.js"></script>
   <script src="scroll.js"></script>

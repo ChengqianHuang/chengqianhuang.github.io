@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>鹈鹕测试 - Chengqian Huang</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚒️</text></svg>">
+  <script>
+    // 主题预设：在任何渲染前设置，避免闪烁
+    (function () {
+      var t = localStorage.getItem('theme')
+        || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="pelican.css">
+</head>
+<body class="pelican-page">
+  <header class="site-header">
+    <div class="container">
+      <a class="site-title" href="/">Chengqian Huang</a>
+      <nav>
+        <a href="/">首页</a>
+        <a href="/pelican.html" aria-current="page">鹈鹕测试</a>
+        <a href="/about.html">关于</a>
+        <a href="https://github.com/ChengqianHuang" target="_blank" rel="noopener">GitHub</a>
+        <button id="theme-toggle" type="button"></button>
+      </nav>
+    </div>
+  </header>
+  <main class="container pelican-main">
+    <a class="pelican-back" href="/">← 返回首页</a>
+    <div class="pelican-page-heading"><div><p class="section-kicker">SVG 测试</p><h1>鹈鹕测试</h1></div><span id="pelican-count" class="pelican-count"></span></div>
+    <p class="pelican-intro">各模型生成的鹈鹕骑自行车 SVG。点击卡片查看完整图、提示词和原始文件。</p>
+    <p id="pelican-notice" class="pelican-notice" hidden></p>
+    <div class="pelican-prompt"><div><span id="pelican-prompt-label">统一提示词</span><p id="pelican-prompt-text"></p></div><button id="pelican-copy" type="button">复制提示词</button></div>
+    <div id="pelican-filters" class="pelican-filters" role="group" aria-label="筛选测试结果"></div>
+    <div id="pelican-gallery" class="pelican-grid"><p>加载中…</p></div>
+    <noscript><p>请启用 JavaScript 查看结果。当前页面用于收集 SVG 测试。</p></noscript>
+  </main>
+  <dialog id="pelican-detail" class="pelican-detail" aria-labelledby="pelican-detail-title">
+    <div class="pelican-detail-head"><div><span id="pelican-detail-tag" class="pelican-tag"></span><h2 id="pelican-detail-title"></h2></div><button id="pelican-close" class="pelican-close" type="button" aria-label="关闭详情">×</button></div>
+    <div class="pelican-detail-body"><div class="pelican-detail-picture"><img id="pelican-detail-image" alt=""><div class="pelican-detail-nav"><button id="pelican-previous" type="button" aria-label="上一张">←</button><span id="pelican-position"></span><button id="pelican-next" type="button" aria-label="下一张">→</button></div></div>
+      <div class="pelican-detail-info"><dl id="pelican-metadata"></dl><p id="pelican-detail-note" class="pelican-detail-note"></p><div class="pelican-detail-prompt"><h3>提示词</h3><p id="pelican-detail-prompt"></p></div><a id="pelican-download" class="pelican-download" download>下载 SVG ↓</a></div>
+    </div>
+    <details class="pelican-source"><summary>查看 SVG 源码</summary><pre><code id="pelican-source-code"></code></pre></details>
+  </dialog>
+  <footer class="site-footer">
+    <div class="container">
+      <p>© 2026 Chengqian Huang · <a href="https://github.com/ChengqianHuang/chengqianhuang.github.io" target="_blank" rel="noopener">本站源码</a></p>
+    </div>
+  </footer>
+  <script src="theme.js"></script>
+  <script src="pelican.js"></script>
+</body>
+</html>
