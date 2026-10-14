@@ -14,7 +14,7 @@
     })();
   </script>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="pelican.css?v=1.1.1">
+  <link rel="stylesheet" href="pelican.css?v=1.1.2">
 </head>
 <body class="home">
   <canvas id="shader-canvas" aria-hidden="true"></canvas>
@@ -93,6 +93,13 @@
     </section>
   </main>
 
+  <dialog id="pelican-detail" class="pelican-detail" aria-labelledby="pelican-detail-title">
+    <div class="pelican-detail-head"><div><h2 id="pelican-detail-title"></h2><p id="pelican-detail-harness"></p></div><button id="pelican-detail-motion" class="pelican-motion" type="button" hidden>暂停</button><button id="pelican-close" class="pelican-close" type="button" aria-label="关闭详情">×</button></div>
+    <div class="pelican-detail-body">
+      <div class="pelican-detail-picture"><div id="pelican-detail-image"></div><div id="pelican-detail-nav" class="pelican-detail-nav"><button id="pelican-previous" type="button" aria-label="上一张">←</button><button id="pelican-next" type="button" aria-label="下一张">→</button></div></div>
+      <div class="pelican-detail-info"><h3>提示词</h3><p id="pelican-detail-prompt"></p></div>
+    </div>
+  </dialog>
   <footer class="site-footer">
     <div class="container">
       <p>© 2026 Chengqian Huang · <a href="https://github.com/ChengqianHuang/chengqianhuang.github.io" target="_blank" rel="noopener">本站源码</a> · <span class="hint" title="↑↑↓↓←→←→BA">↑↑↓↓←→←→BA</span></p>
@@ -106,7 +113,7 @@
   <script src="particles.js"></script>
   <script src="donut.js"></script>
   <script src="main.js"></script>
-  <script src="pelican.js?v=1.1.1"></script>
+  <script src="pelican.js?v=1.1.2"></script>
   <script src="playground.js"></script>
   <script src="easter-egg.js"></script>
   <script src="scroll.js"></script>

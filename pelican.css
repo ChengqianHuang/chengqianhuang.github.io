@@ -30,7 +30,7 @@
 .pelican-close { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border); background: var(--code-bg); color: var(--fg); font-size: 24px; cursor: pointer; flex-shrink: 0; }
 .pelican-detail-body { display: grid; grid-template-columns: 1.6fr 1fr; }
 .pelican-detail-picture { background: #f6f5f1; align-self: start; }
-.pelican-detail-picture > img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: contain; }
+#pelican-detail-image img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: contain; }
 .pelican-detail-nav { display: flex; justify-content: center; gap: 24px; padding: 14px; border-top: 1px solid #e5e5e5; }
 .pelican-detail-nav button { font: inherit; color: #303540; background: white; border: 1px solid #ddd; padding: 8px 14px; border-radius: 7px; cursor: pointer; }
 .pelican-detail-info { padding: 28px; border-left: 1px solid var(--border); }

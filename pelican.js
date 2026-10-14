@@ -24,7 +24,7 @@
     let paused = reducedMotion.matches;
     const imagePath = item => paused && item.poster ? item.poster : item.svg;
     function motionState() {
-      document.querySelectorAll('img[data-motion-index]').forEach(img => { img.src=imagePath(entries[Number(img.dataset.motionIndex)]); });
+      document.querySelectorAll('img[data-motion-index]').forEach(img => { const path=imagePath(entries[Number(img.dataset.motionIndex)]); if (img.getAttribute('src')!==path) img.src=path; });
       for (const id of ['pelican-motion-toggle','pelican-detail-motion']) {
         const button=document.getElementById(id);
         if (!button) continue;
@@ -40,25 +40,37 @@
     motionButton.hidden=!entries.some(item=>item.animated);
     reducedMotion.addEventListener('change',event=>{ paused=event.matches; motionState(); });
     const cards=entries.slice(0,home ? 3 : entries.length).map((item,index)=>{
-      const href=home ? `pelican.html?v=1.1.1#result=${encodeURIComponent(item.id)}` : `#result=${encodeURIComponent(item.id)}`;
-      return `<a class="pelican-card" href="${esc(href)}" ${gallery ? `data-result-index="${index}"` : ''} aria-label="查看 ${esc(item.model)} / ${esc(item.harness)}">
+      const href=`#result=${encodeURIComponent(item.id)}`;
+      return `<a class="pelican-card" href="${esc(href)}" data-result-index="${index}" aria-label="查看 ${esc(item.model)} / ${esc(item.harness)}">
         <div class="pelican-picture"><img src="${esc(imagePath(item))}" ${item.animated ? `data-motion-index="${index}"` : ''} alt="${esc(item.model)} 生成的鹈鹕骑自行车" width="${item.width}" height="${item.height}" loading="lazy"></div>
         <div class="pelican-card-caption"><h3>${esc(item.model)}</h3><p>${esc(item.harness)}</p></div></a>`;
     }).join('');
     (home || gallery).innerHTML=cards || '<p class="pelican-empty">暂无结果。</p>';
     motionState();
-    if (home) return;
     const dialog=document.getElementById('pelican-detail');
     let activeIndex=-1;
+    let enlargedImage=null;
+    let originalPicture=null;
+    function restoreImage() {
+      if (enlargedImage && originalPicture) originalPicture.append(enlargedImage);
+      enlargedImage=null;
+      originalPicture=null;
+    }
     function show(index,updateHash=true) {
       const item=entries[index]; if (!item) return;
+      if (activeIndex!==index) restoreImage();
       activeIndex=index;
       document.getElementById('pelican-detail-title').textContent=item.model;
       document.getElementById('pelican-detail-harness').textContent=`Harness · ${item.harness}`;
       document.getElementById('pelican-detail-prompt').textContent=item.prompt;
-      const image=document.getElementById('pelican-detail-image');
-      image.src=imagePath(item); image.alt=`${item.model} 生成的鹈鹕骑自行车`;
-      if (item.animated) image.dataset.motionIndex=index; else delete image.dataset.motionIndex;
+      // Enlarge the existing image rather than load a second animation instance.
+      const card=(home || gallery).querySelector(`[data-result-index="${index}"]`);
+      const image=card.querySelector('img');
+      if (image) {
+        enlargedImage=image;
+        originalPicture=image.parentElement;
+        document.getElementById('pelican-detail-image').append(image);
+      }
       document.getElementById('pelican-detail-motion').hidden=!item.animated;
       document.getElementById('pelican-detail-nav').hidden=entries.length<2;
       motionState();
@@ -66,7 +78,7 @@
       if (updateHash) history.replaceState(null,'',`#result=${encodeURIComponent(item.id)}`);
     }
     function step(direction) { if (entries.length) show((activeIndex+direction+entries.length)%entries.length); }
-    gallery.addEventListener('click',event=>{
+    (home || gallery).addEventListener('click',event=>{
       const link=event.target.closest('[data-result-index]');
       if (!link || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
       event.preventDefault(); show(Number(link.dataset.resultIndex));
@@ -83,6 +95,8 @@
       if (event.clientX<r.left || event.clientX>r.right || event.clientY<r.top || event.clientY>r.bottom) dialog.close();
     });
     dialog.addEventListener('close',()=>{
+      restoreImage();
+      activeIndex=-1;
       document.body.classList.remove('pelican-modal-open');
       history.replaceState(null,'',location.pathname+location.search);
     });
