@@ -40,7 +40,7 @@ Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the
 
 ## 一份记录的形状
 
-完整实际例子见 [`pelican-results/gpt-6-codex-2026-10-14-01.json`](pelican-results/gpt-6-codex-2026-10-14-01.json)。结构如下：
+完整实际例子见 [`pelican-results/gpt-6-1-sol-codex-2026-10-14-animated-01.json`](pelican-results/gpt-6-1-sol-codex-2026-10-14-animated-01.json)。结构如下：
 
 ```json
 {

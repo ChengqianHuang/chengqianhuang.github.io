@@ -1,8 +1,7 @@
 {
   "prompt": "Draw an SVG of a pelican riding a bicycle.",
   "results": [
-    "pelican-results/gpt-6-1-sol-codex-2026-10-14-animated-01.json",
-    "pelican-results/gpt-6-codex-2026-10-14-01.json"
+    "pelican-results/gpt-6-1-sol-codex-2026-10-14-animated-01.json"
   ],
   "examples": [
     {
