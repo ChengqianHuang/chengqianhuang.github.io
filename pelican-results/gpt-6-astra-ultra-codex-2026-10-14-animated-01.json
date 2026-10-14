@@ -1,0 +1,53 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "gpt-6-astra-ultra-codex-2026-10-14-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "OpenAI",
+    "name": "GPT-6 Astra Ultra",
+    "id": "gpt-6-astra",
+    "identitySource": "user-reported"
+  },
+  "harness": {
+    "name": "Codex",
+    "version": null,
+    "mode": "agent",
+    "context": "existing-conversation",
+    "tools": [
+      "filesystem",
+      "python"
+    ]
+  },
+  "run": {
+    "generatedAt": "2026-10-14T22:08:50+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 1,
+    "totalAttempts": 1,
+    "selection": "first",
+    "parameters": {
+      "reasoning_effort": "ultra"
+    },
+    "postProcessing": "none",
+    "notes": "在当前对话中使用固定动画提示词首次生成全新的 SVG；上下文含此前测试。使用本地 Python 计算腿部关节和脚踏轨迹并输出 SVG，未使用外部图片或绘图模型。GPT-6 Astra 型号及 Ultra 推理档位由用户提供，未独立读取后端配置。暂停图从原 SVG 自动移除动画派生，原始绘图未修改。"
+  },
+  "artifact": {
+    "path": "pelican-assets/gpt-6-astra-ultra-codex-2026-10-14-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 960,
+    "height": 720,
+    "sha256": "90172fc5466d82f86684e7a2d47c9899f88a43bf5314e08d76dfd816a4eee5e4"
+  },
+  "source": null,
+  "animation": {
+    "mechanism": "css-smil",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/gpt-6-astra-ultra-codex-2026-10-14-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 960,
+    "height": 720,
+    "sha256": "21f452484c58aefb9d9c6be35f80aaddce20d465a789d626d14c447d40d46560"
+  }
+}
