@@ -9,7 +9,22 @@
     const response = await fetch('pelican.json', { cache: 'no-cache' });
     if (!response.ok) throw new Error('加载失败');
     const data = await response.json();
-    const formal = (data.results || []).filter(item => safeAsset(item.svg));
+    if (data.schemaVersion !== '1.0.0') throw new Error('不支持的测试数据版本');
+    const formal = await Promise.all((data.results || []).map(async reference => {
+      if (!/^pelican-results\/[a-z0-9][a-z0-9-]*\.json$/.test(reference)) throw new Error('无效的记录路径');
+      const response = await fetch(reference, {cache:'no-cache'});
+      if (!response.ok) throw new Error('测试记录加载失败');
+      const result = await response.json();
+      if (result.schemaVersion !== '1.0.0' || !safeAsset(result.artifact.path) || (result.source && !safeAsset(result.source.path))) throw new Error('无效的测试记录');
+      return {
+        id:result.id, title:result.model.name, model:result.model.name, provider:result.model.provider,
+        modelId:result.model.id, harness:result.harness, run:result.run,
+        svg:result.artifact.path, source:result.source?.path || result.artifact.path,
+        width:result.artifact.width, height:result.artifact.height, reference,
+        date:result.run.generatedAt.slice(0,10), prompt:result.run.prompt, notes:result.run.notes,
+        attempt:result.run.attempt, settings:JSON.stringify(result.run.parameters)
+      };
+    }));
     const examples = (data.examples || []).filter(item => safeAsset(item.svg)).map(item => ({...item, example:true}));
     const entries = formal.length ? formal.map(item => ({...item, example:false})) : examples;
     const notice = document.getElementById(home ? 'pelican-home-notice' : 'pelican-notice');
@@ -20,8 +35,8 @@
     const card = (item, index, detail) => {
       const href = detail ? `#result=${encodeURIComponent(item.id)}` : `pelican.html#result=${encodeURIComponent(item.id)}`;
       return `<a class="pelican-card" href="${esc(href)}" ${detail ? `data-result-index="${index}"` : ''} aria-label="查看${esc(item.title || item.model)}${item.example ? '（版式示例）' : ''}">
-        <div class="pelican-picture"><img src="${esc(item.svg)}" alt="${esc(item.title || item.model)}：鹈鹕骑自行车${item.example ? '，版式示例' : ''}" loading="lazy" width="640" height="480"><span class="pelican-tag ${item.example ? '' : 'result'}">${item.example ? '版式示例' : esc(item.provider || '测试结果')}</span></div>
-        <div class="pelican-card-caption"><h3>${esc(item.title || item.model)}</h3><p><span>${esc(item.example ? '非模型测试结果' : item.date || '日期未记录')}</span><span>查看 ${detail ? '↗' : '→'}</span></p></div></a>`;
+        <div class="pelican-picture"><img src="${esc(item.svg)}" alt="${esc(item.title || item.model)}：鹈鹕骑自行车${item.example ? '，版式示例' : ''}" loading="lazy" width="${item.width || 640}" height="${item.height || 480}"><span class="pelican-tag ${item.example ? '' : 'result'}">${item.example ? '版式示例' : esc(item.provider || '测试结果')}</span></div>
+        <div class="pelican-card-caption"><h3>${esc(item.title || item.model)}</h3>${item.harness ? `<div class="pelican-card-harness">${esc(item.harness.name)} · ${item.harness.context === 'fresh' ? '全新对话' : '当前对话'}</div>` : ''}<p><span>${esc(item.example ? '非模型测试结果' : item.date || '日期未记录')}</span><span>查看 ${detail ? '↗' : '→'}</span></p></div></a>`;
     };
     if (home) {
       home.innerHTML = entries.slice(0,3).map((item,index) => card(item,index,false)).join('') || '<p class="pelican-empty">暂无测试结果。</p>';
@@ -64,15 +79,28 @@
       tag.classList.toggle('result', !item.example);
       const image = document.getElementById('pelican-detail-image');
       image.src = item.svg; image.alt = `${item.title || item.model}：鹈鹕骑自行车`;
-      document.getElementById('pelican-metadata').innerHTML = [
-        ['模型',item.model || '未记录'], ['日期',item.date || '未记录'],
-        ['次数',item.example ? '不适用' : item.attempt ? `第 ${item.attempt} 次` : '未记录'],
-        ['参数',item.example ? '不适用' : item.settings || '未记录']
-      ].map(([label,value]) => `<dt>${esc(label)}</dt><dd>${esc(value)}</dd>`).join('');
+      const selections = {first:'首次结果', 'best-of-n':'多次择优', all:'全部保留'};
+      const processing = {none:'无', 'formatting-only':'仅格式整理', edited:'已修改绘图内容'};
+      const metadata = item.example ? [['模型','未绑定模型'],['类型','版式示例']] : [
+        ['模型',item.model], ['模型 ID',item.modelId || '未提供'],
+        ['Harness',`${item.harness.name} · ${item.harness.version || '版本未提供'}`],
+        ['运行模式',item.harness.mode],
+        ['上下文',item.harness.context === 'fresh' ? '全新对话' : '当前对话（含历史上下文）'],
+        ['工具',item.harness.tools.join('、') || '无'],
+        ['生成时间',item.run.generatedAt],
+        ['次数',`${item.run.attempt} / ${item.run.totalAttempts} · ${selections[item.run.selection]}`],
+        ['后处理',processing[item.run.postProcessing]],
+        ['参数',Object.keys(item.run.parameters).length ? JSON.stringify(item.run.parameters) : '未提供']
+      ];
+      document.getElementById('pelican-metadata').innerHTML = metadata
+        .map(([label,value]) => `<dt>${esc(label)}</dt><dd>${esc(value)}</dd>`).join('');
       document.getElementById('pelican-detail-note').textContent = item.notes || '';
       document.getElementById('pelican-detail-prompt').textContent = item.example ? '示例图片为页面排版制作，未执行正式模型测试。' : item.prompt || data.prompt;
       const download = document.getElementById('pelican-download');
-      download.href = item.svg; download.setAttribute('download', item.svg.split('/').pop());
+      download.href = item.source || item.svg; download.setAttribute('download', (item.source || item.svg).split('/').pop());
+      const recordLink = document.getElementById('pelican-record-download');
+      recordLink.hidden = !item.reference;
+      if (item.reference) { recordLink.href = item.reference; recordLink.setAttribute('download', item.reference.split('/').pop()); }
       const indexes = visibleIndexes();
       document.getElementById('pelican-position').textContent = `${indexes.indexOf(index) + 1} / ${indexes.length}`;
       document.getElementById('pelican-previous').disabled = indexes.length < 2;
@@ -86,7 +114,7 @@
       sourceCode.textContent = '加载中…';
       const request = ++sourceRequest;
       try {
-        const response = await fetch(item.svg);
+        const response = await fetch(item.source || item.svg);
         if (!response.ok) throw new Error('加载失败');
         const svg = await response.text();
         if (request === sourceRequest) sourceCode.textContent = svg;

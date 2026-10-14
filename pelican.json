@@ -1,6 +1,8 @@
 {
   "prompt": "Draw an SVG of a pelican riding a bicycle.",
-  "results": [],
+  "results": [
+    "pelican-results/gpt-6-codex-2026-10-14-01.json"
+  ],
   "examples": [
     {
       "id": "example-line",
@@ -35,5 +37,8 @@
       "notes": "这张图由 Codex 为页面排版制作，不是某个模型的正式测试结果。",
       "example": true
     }
-  ]
+  ],
+  "$schema": "schemas/pelican-manifest.schema.json",
+  "schemaVersion": "1.0.0",
+  "testId": "pelican-riding-bicycle-svg-v1"
 }

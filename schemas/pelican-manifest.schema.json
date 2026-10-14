@@ -1,0 +1,83 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "testId": {
+      "const": "pelican-riding-bicycle-svg-v1"
+    },
+    "prompt": {
+      "const": "Draw an SVG of a pelican riding a bicycle."
+    },
+    "results": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^pelican-results/[a-z0-9][a-z0-9-]*\\.json$"
+      }
+    },
+    "examples": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "group": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          },
+          "svg": {
+            "type": "string",
+            "pattern": "^pelican-assets/[a-z0-9][a-z0-9._-]*\\.svg$"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "example": {
+            "const": true
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "group",
+          "provider",
+          "model",
+          "date",
+          "svg",
+          "notes",
+          "example"
+        ]
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "testId",
+    "prompt",
+    "results"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://chengqianhuang.github.io/schemas/pelican-manifest.schema.json",
+  "title": "Pelican gallery manifest v1"
+}

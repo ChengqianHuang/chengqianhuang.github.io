@@ -1,0 +1,204 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,99}$"
+    },
+    "testId": {
+      "const": "pelican-riding-bicycle-svg-v1"
+    },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      },
+      "required": [
+        "provider",
+        "name",
+        "id"
+      ]
+    },
+    "harness": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "mode": {
+          "enum": [
+            "agent",
+            "chat",
+            "api"
+          ]
+        },
+        "context": {
+          "enum": [
+            "fresh",
+            "existing-conversation"
+          ]
+        },
+        "tools": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "name",
+        "version",
+        "mode",
+        "context",
+        "tools"
+      ]
+    },
+    "run": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "generatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "(Z|[+-]\\d\\d:\\d\\d)$"
+        },
+        "prompt": {
+          "const": "Draw an SVG of a pelican riding a bicycle."
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "totalAttempts": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "selection": {
+          "enum": [
+            "first",
+            "best-of-n",
+            "all"
+          ]
+        },
+        "parameters": {
+          "type": "object"
+        },
+        "postProcessing": {
+          "enum": [
+            "none",
+            "formatting-only",
+            "edited"
+          ]
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "generatedAt",
+        "prompt",
+        "attempt",
+        "totalAttempts",
+        "selection",
+        "parameters",
+        "postProcessing",
+        "notes"
+      ]
+    },
+    "artifact": {
+      "$ref": "#/$defs/artifact"
+    },
+    "source": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/artifact"
+        }
+      ]
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "id",
+    "testId",
+    "model",
+    "harness",
+    "run",
+    "artifact",
+    "source"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://chengqianhuang.github.io/schemas/pelican-result.schema.json",
+  "title": "Pelican SVG test submission v1",
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^pelican-assets/[a-z0-9][a-z0-9._-]*\\.svg$"
+        },
+        "mediaType": {
+          "const": "image/svg+xml"
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16384
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16384
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "path",
+        "mediaType",
+        "width",
+        "height",
+        "sha256"
+      ]
+    }
+  }
+}

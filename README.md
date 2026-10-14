@@ -32,3 +32,7 @@
 - 文章渲染：浏览器端 marked.js（CDN），front matter 在 `post.js` 内解析
 - `.nojekyll`：跳过 GitHub Pages 的 Jekyll 处理，保证 `_` 开头文件也能被服务
 - 暗色模式：CSS `prefers-color-scheme` 自动跟随系统
+
+## 鹈鹕测试
+
+提交图片与模型 / harness 信息前，请阅读 [PELICAN.md](PELICAN.md)。格式定义见 `schemas/`，校验器在 `scripts/validate_pelican.py`。

@@ -1,0 +1,13 @@
+{
+  "id": "pelican-riding-bicycle-svg-v1",
+  "prompt": "Draw an SVG of a pelican riding a bicycle.",
+  "outputFormat": "svg",
+  "recommendedConditions": {
+    "context": "fresh",
+    "attempts": 1,
+    "selection": "first",
+    "postProcessing": "none",
+    "tools": []
+  },
+  "notes": "推荐条件用于可比测试。其他条件允许提交，但必须如实记录；修改绘图内容时保留原结果并新增记录。"
+}

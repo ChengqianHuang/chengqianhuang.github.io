@@ -1,0 +1,38 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.0.0",
+  "id": "gpt-6-codex-2026-10-14-01",
+  "testId": "pelican-riding-bicycle-svg-v1",
+  "model": {
+    "provider": "OpenAI",
+    "name": "GPT-6",
+    "id": null
+  },
+  "harness": {
+    "name": "Codex",
+    "version": null,
+    "mode": "agent",
+    "context": "existing-conversation",
+    "tools": [
+      "filesystem"
+    ]
+  },
+  "run": {
+    "generatedAt": "2026-10-14T20:56:16+08:00",
+    "prompt": "Draw an SVG of a pelican riding a bicycle.",
+    "attempt": 1,
+    "totalAttempts": 1,
+    "selection": "first",
+    "parameters": {},
+    "postProcessing": "none",
+    "notes": "根据上述提示词在当前 Codex 对话中首次生成新的 SVG。当前对话包含画廊开发过程和之前的版式示例；未使用独立 API 调用，也未开启全新对话。模型名称 GPT-6 来自系统声明，具体模型 ID、Codex 版本及推理参数未提供。未对生成图进行人工或后续美术修改。"
+  },
+  "artifact": {
+    "path": "pelican-assets/gpt-6-codex-2026-10-14-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 800,
+    "height": 600,
+    "sha256": "b1f368fe108a54b28377e5c07222a0e170d79c3a8dba76677bd2ae1db5fc079b"
+  },
+  "source": null
+}
