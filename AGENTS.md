@@ -10,3 +10,5 @@ Read `PELICAN.md`, `pelican-test.json`, and `schemas/pelican-result.schema.json`
 - Use the exact test prompt. Never relabel layout examples as real test results.
 - Validate JSON schemas, file paths, SVG dimensions and byte hashes with `scripts/validate_pelican.py`, then run `scripts/test_pelican_validation.py` before committing a result.
 - Render the SVG to check the file actually displays; do not improve the drawing after generation and still report `postProcessing: none`.
+
+- Keep the public gallery minimal: model name, harness name, and prompt only. Provenance, attempt counts, protocol types and validation details stay in submission JSON and repository documentation, not gallery UI. Playback controls are allowed.

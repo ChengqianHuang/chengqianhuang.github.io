@@ -26,7 +26,7 @@ Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the
 
 动画记录使用 `schemaVersion: "1.1.0"`，增加 `animation`（`mechanism`: `css` / `smil` / `css-smil`，`respectsReducedMotion`: `true`）和 `poster`（与 `artifact` 相同的文件结构）。`poster` 必须是无动画的暂停图；可以自动从生成的 SVG 移除动画制作，原始 SVG 保持原样。页面提供暂停 / 播放，并在系统减少动态效果时展示暂停图。
 
-静态和动画结果分别标记并可筛选，各自使用固定提示词。v1.0 静态记录仍兼容。
+静态和动画结果在数据中使用各自的协议和固定提示词，页面统一展示图片、模型、harness 和提示词。v1.0 静态记录仍兼容。
 
 ## 文件组织
 
@@ -95,7 +95,7 @@ Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the
 | `artifact` | 实际展示文件的路径、媒体类型、像素尺寸和 SHA-256。 |
 | `source` | 没有另一个原始文件时填 `null`。如果展示文件经过修改，应在此使用与 `artifact` 相同的结构记录原始 SVG。`formatting-only` 与 `edited` 都必须保留独立的原始文件。 |
 
-SVG 图片的宽高必须与记录一致。支持像素尺寸，或者从 `viewBox` 取得宽高。文件哈希按原始字节计算；修改空格也会改变哈希。模型条件、prompt 或图形修改情况在详情中公开展示，JSON 记录可直接下载。
+SVG 图片的宽高必须与记录一致。支持像素尺寸，或者从 `viewBox` 取得宽高。文件哈希按原始字节计算；修改空格也会改变哈希。页面只展示模型、harness 和提示词；完整条件、次数与来源保存在仓库 JSON 中供校验和查阅。
 
 ## 提交与校验
 
