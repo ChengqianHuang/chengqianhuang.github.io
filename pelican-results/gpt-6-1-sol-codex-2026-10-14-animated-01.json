@@ -1,0 +1,50 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "gpt-6-1-sol-codex-2026-10-14-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "OpenAI",
+    "name": "GPT-6.1 Sol",
+    "id": "gpt-6.1-sol",
+    "identitySource": "user-reported"
+  },
+  "harness": {
+    "name": "Codex",
+    "version": null,
+    "mode": "agent",
+    "context": "existing-conversation",
+    "tools": [
+      "filesystem"
+    ]
+  },
+  "run": {
+    "generatedAt": "2026-10-14T21:13:03+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 1,
+    "totalAttempts": 1,
+    "selection": "first",
+    "parameters": {},
+    "postProcessing": "none",
+    "notes": "按动画测试提示词在当前 Codex 对话中首次生成新 SVG。使用 CSS 动画及 SVG 路径动画；未修改生成的绘图。预览暂停图由原 SVG 自动移除动画产生，仅用于播放控制。具体型号 gpt-6.1-sol 由用户提供，系统仅声明 GPT-6，未独立核实该 ID。上下文包含之前的静态结果；Codex 版本与推理参数未知。"
+  },
+  "artifact": {
+    "path": "pelican-assets/gpt-6-1-sol-codex-2026-10-14-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 800,
+    "height": 600,
+    "sha256": "3ac5cb7e1dcc7a4562a79d62d2f77886b62cb873a88a5c78158ba88b04b5db7c"
+  },
+  "source": null,
+  "animation": {
+    "mechanism": "css-smil",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/gpt-6-1-sol-codex-2026-10-14-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 800,
+    "height": 600,
+    "sha256": "033ca92e6797a7306ab6228d752e96649a2b8c9c4c54a2ca6fd11e99039d5e65"
+  }
+}

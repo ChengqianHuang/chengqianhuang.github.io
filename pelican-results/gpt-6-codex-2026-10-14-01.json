@@ -1,12 +1,13 @@
 {
   "$schema": "../schemas/pelican-result.schema.json",
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "id": "gpt-6-codex-2026-10-14-01",
   "testId": "pelican-riding-bicycle-svg-v1",
   "model": {
     "provider": "OpenAI",
-    "name": "GPT-6",
-    "id": null
+    "name": "GPT-6.1 Sol",
+    "id": "gpt-6.1-sol",
+    "identitySource": "user-reported"
   },
   "harness": {
     "name": "Codex",
@@ -25,7 +26,7 @@
     "selection": "first",
     "parameters": {},
     "postProcessing": "none",
-    "notes": "根据上述提示词在当前 Codex 对话中首次生成新的 SVG。当前对话包含画廊开发过程和之前的版式示例；未使用独立 API 调用，也未开启全新对话。模型名称 GPT-6 来自系统声明，具体模型 ID、Codex 版本及推理参数未提供。未对生成图进行人工或后续美术修改。"
+    "notes": "首次在当前 Codex 对话中生成 SVG，包含此前的画廊示例上下文。原图未修改。具体型号 gpt-6.1-sol 由用户在生成后提供；系统声明仅能确认 GPT-6，未独立核实具体模型 ID。Codex 版本和推理参数未提供。"
   },
   "artifact": {
     "path": "pelican-assets/gpt-6-codex-2026-10-14-01.svg",

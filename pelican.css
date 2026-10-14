@@ -88,3 +88,12 @@ body.pelican-modal-open { overflow: hidden; }
 .pelican-download + .pelican-download { margin-left: 16px; }
 .pelican-detail-info dl { grid-template-columns: 70px minmax(0,1fr); }
 .pelican-download[hidden] { display: none; }
+.pelican-motion { border: 1px solid var(--border); border-radius: 7px; background: var(--code-bg); color: var(--fg); font: inherit; font-size: 12px; padding: 8px 12px; cursor: pointer; }
+.pelican-motion[hidden] { display: none; }
+.pelican-main > .pelican-motion { float: right; }
+.pelican-detail-head > div { flex: 1; }
+.pelican-motion-badge { position: absolute; bottom: 12px; right: 12px; padding: 3px 8px; background: #243e40; color: white; border-radius: 5px; font-size: 11px; }
+.pelican-protocol { padding: 0 4px; margin: -10px 0 25px; font-size: 13px; color: var(--fg-muted); }
+.pelican-protocol summary { cursor: pointer; }
+.pelican-protocol p { font-family: monospace; overflow-wrap: anywhere; }
+.pelican-home .section-heading > div { flex: 1; }

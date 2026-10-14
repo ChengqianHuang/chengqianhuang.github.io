@@ -6,14 +6,20 @@
       "type": "string"
     },
     "schemaVersion": {
-      "const": "1.0.0"
+      "enum": [
+        "1.0.0",
+        "1.1.0"
+      ]
     },
     "id": {
       "type": "string",
       "pattern": "^[a-z0-9][a-z0-9-]{0,99}$"
     },
     "testId": {
-      "const": "pelican-riding-bicycle-svg-v1"
+      "enum": [
+        "pelican-riding-bicycle-svg-v1",
+        "pelican-riding-bicycle-animated-svg-v1"
+      ]
     },
     "model": {
       "type": "object",
@@ -33,6 +39,13 @@
             "null"
           ],
           "minLength": 1
+        },
+        "identitySource": {
+          "enum": [
+            "system-reported",
+            "api-reported",
+            "user-reported"
+          ]
         }
       },
       "required": [
@@ -96,7 +109,8 @@
           "pattern": "(Z|[+-]\\d\\d:\\d\\d)$"
         },
         "prompt": {
-          "const": "Draw an SVG of a pelican riding a bicycle."
+          "type": "string",
+          "minLength": 1
         },
         "attempt": {
           "type": "integer",
@@ -142,6 +156,36 @@
       "$ref": "#/$defs/artifact"
     },
     "source": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/artifact"
+        }
+      ]
+    },
+    "animation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mechanism",
+        "respectsReducedMotion"
+      ],
+      "properties": {
+        "mechanism": {
+          "enum": [
+            "css",
+            "smil",
+            "css-smil"
+          ]
+        },
+        "respectsReducedMotion": {
+          "const": true
+        }
+      }
+    },
+    "poster": {
       "anyOf": [
         {
           "type": "null"
@@ -200,5 +244,53 @@
         "sha256"
       ]
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "testId": {
+            "const": "pelican-riding-bicycle-svg-v1"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "run": {
+            "properties": {
+              "prompt": {
+                "const": "Draw an SVG of a pelican riding a bicycle."
+              }
+            }
+          }
+        },
+        "not": {
+          "required": [
+            "animation"
+          ]
+        }
+      },
+      "else": {
+        "required": [
+          "animation",
+          "poster"
+        ],
+        "properties": {
+          "schemaVersion": {
+            "const": "1.1.0"
+          },
+          "poster": {
+            "$ref": "#/$defs/artifact"
+          },
+          "run": {
+            "properties": {
+              "prompt": {
+                "const": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion."
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }

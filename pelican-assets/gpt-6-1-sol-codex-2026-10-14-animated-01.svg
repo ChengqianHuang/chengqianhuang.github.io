@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+<title>A pelican pedaling a bicycle</title>
+<desc>A white pelican pedals a teal bicycle. Spokes turn, legs pedal, and road markings pass underneath. Motion stops visually when reduced motion is requested.</desc>
+<style>
+.wheel-back{transform-origin:235px 450px;animation:spin 1.2s linear infinite}
+.wheel-front{transform-origin:575px 450px;animation:spin 1.2s linear infinite}
+.crank{transform-origin:420px 450px;animation:spin 1.2s linear infinite}
+.rider{animation:bob 1.2s ease-in-out infinite}
+.road{animation:travel 1.2s linear infinite}
+.still-leg{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes travel{to{transform:translateX(-80px)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}.moving-leg{display:none}.still-leg{display:inline}}
+</style>
+<rect width="800" height="600" fill="#ecf4ef"/>
+<circle cx="642" cy="113" r="47" fill="#f8d691"/>
+<path d="M0 479Q200 451 400 481T800 473V600H0Z" fill="#cddccc"/>
+<g class="road" stroke="#a5b8a5" stroke-width="4" stroke-dasharray="36 44"><path d="M0 565H880"/></g>
+<ellipse cx="403" cy="549" rx="290" ry="12" fill="#afc2ae" opacity=".6"/>
+<g fill="none" stroke="#273e40" stroke-width="12"><circle cx="235" cy="450" r="97"/><circle cx="575" cy="450" r="97"/></g>
+<g fill="none" stroke="#87a5a0" stroke-width="2.5">
+<g class="wheel-back"><path d="M235 355V545M140 450H330M168 383L302 517M168 517L302 383"/><circle cx="235" cy="450" r="87"/></g>
+<g class="wheel-front"><path d="M575 355V545M480 450H670M508 383L642 517M508 517L642 383"/><circle cx="575" cy="450" r="87"/></g>
+</g>
+<g fill="none" stroke="#278b8b" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><path d="M235 450L331 320L420 450H235L510 332L420 450M331 320L510 332L575 450M331 320L323 294M510 332L495 282"/></g>
+<path d="M493 282L487 261Q487 247 504 247H543" fill="none" stroke="#273e40" stroke-width="9" stroke-linecap="round"/>
+<path d="M300 293H351" stroke="#273e40" stroke-width="12" stroke-linecap="round"/>
+<g class="crank" stroke="#273e40" stroke-width="5" stroke-linecap="round"><path d="M387 450H453M387 440V460M453 440V460"/></g>
+<circle cx="420" cy="450" r="11" fill="#273e40"/>
+<g class="rider">
+<g stroke="#be8641" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round">
+<path class="moving-leg" d="M363 291L355 386L387 450"><animate attributeName="d" dur="1.2s" repeatCount="indefinite" values="M363 291L355 386L387 450;M363 291L358 350L420 417;M363 291L400 365L453 450;M363 291L372 395L420 483;M363 291L355 386L387 450"/></path>
+<path class="moving-leg" d="M331 286L349 364L453 450"><animate attributeName="d" dur="1.2s" repeatCount="indefinite" values="M331 286L349 364L453 450;M331 286L320 395L420 483;M331 286L302 382L387 450;M331 286L320 346L420 417;M331 286L349 364L453 450"/></path>
+<path class="still-leg" d="M363 291L355 386L387 450M331 286L349 364L453 450"/>
+</g>
+<g stroke="#34494a" stroke-width="3.5" stroke-linejoin="round">
+<path d="M258 226L214 204L225 252L262 270Z" fill="#e0e9dc"/>
+<path d="M250 236Q257 193 297 183Q344 169 380 217Q404 204 416 165L425 123Q420 87 441 74Q468 62 488 81Q509 102 489 131L472 150Q468 220 428 271Q394 311 329 296Q272 290 250 255Z" fill="#fffdf2"/>
+<path d="M278 222Q318 196 362 220Q348 256 295 269Z" fill="#d2e2d5"/>
+<path d="M387 224Q417 228 453 247L510 257Q523 267 509 274Q455 265 412 253" fill="#f7f6e9"/>
+<path d="M486 101L644 115L491 138Z" fill="#e9ab48"/>
+<path d="M491 137Q535 193 596 159L636 120Z" fill="#f4c66b"/>
+</g>
+<circle cx="472" cy="99" r="5" fill="#273e40"/>
+<circle cx="470" cy="97" r="1.5" fill="#fff"/>
+<path d="M438 79L429 67M448 74L442 61" stroke="#34494a" stroke-width="3" stroke-linecap="round"/>
+</g>
+</svg>

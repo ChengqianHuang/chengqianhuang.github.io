@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def load(path):
     return json.loads(path.read_text(encoding='utf-8'))
 
-def svg_check(root, item, display=True):
+def svg_check(root, item, display=True, animated=False):
     path = (root / item['path']).resolve()
     if not path.is_relative_to((root / 'pelican-assets').resolve()):
         raise ValueError('asset path escapes pelican-assets')
@@ -28,14 +28,21 @@ def svg_check(root, item, display=True):
         raise ValueError('root element must be an SVG in the SVG namespace')
     for node in svg.iter():
         tag = node.tag.split('}')[-1]
-        if display and tag.lower() in ('script', 'foreignobject', 'image', 'animate', 'animatetransform', 'set'):
+        if display and tag.lower() in ('script', 'foreignobject', 'image', 'animatemotion', 'set'):
             raise ValueError(f'unsupported active/embedded SVG element: {tag}')
+        if display and tag.lower() in ('animate', 'animatetransform'):
+            if not animated or node.get('attributeName') not in ('d', 'transform', 'opacity', 'cx', 'cy', 'x', 'y', 'r'):
+                raise ValueError(f'unsupported animation attribute: {node.get("attributeName")}')
         for key, value in node.attrib.items():
             name = key.split('}')[-1].lower()
             if display and (name.startswith('on') or (name == 'href' and not value.startswith('#'))):
                 raise ValueError(f'unsupported event or external reference: {name}')
     if display and re.search(r'@import|url\(\s*[\'"]?(?!#)[^\s\)\'"]', text, re.I):
         raise ValueError('external CSS resources are not allowed')
+    if display and not animated and re.search(r'@keyframes|animation(?:-name)?\s*:', text, re.I):
+        raise ValueError('static SVG must not contain animation')
+    if display and animated and 'prefers-reduced-motion' not in text:
+        raise ValueError('animated SVG must support reduced motion')
     viewbox = [float(v) for v in re.split(r'[\s,]+', svg.get('viewBox', '').strip()) if v]
     def dimension(key, fallback):
         raw = svg.get(key)
@@ -55,6 +62,9 @@ def validate(root=ROOT):
     try:
         manifest = load(root / 'pelican.json')
         protocol = load(root / 'pelican-test.json')
+        protocols = {protocol['id']: protocol}
+        animated_protocol = load(root / 'pelican-test-animated.json')
+        protocols[animated_protocol['id']] = animated_protocol
         schemas = {name: load(root / 'schemas' / f'pelican-{name}.schema.json') for name in ('manifest', 'result')}
         for schema in schemas.values():
             Draft202012Validator.check_schema(schema)
@@ -72,9 +82,9 @@ def validate(root=ROOT):
                 ids.add(record['id'])
                 if Path(reference).stem != record['id']:
                     raise ValueError('filename must match result id')
-                if record['testId'] != manifest['testId']:
+                if record['testId'] not in protocols:
                     raise ValueError('wrong testId')
-                if record['run']['prompt'] != protocol['prompt']:
+                if record['run']['prompt'] != protocols[record['testId']]['prompt']:
                     raise ValueError('this testId requires the exact protocol prompt; use another protocol for a different prompt')
                 run = record['run']
                 if run['attempt'] > run['totalAttempts']:
@@ -85,7 +95,9 @@ def validate(root=ROOT):
                     raise ValueError('modified results must preserve original source')
                 if run['postProcessing'] != 'none' and record['source']['path'] == record['artifact']['path']:
                     raise ValueError('original source must be a separate preserved file')
-                svg_check(root, record['artifact'])
+                svg_check(root, record['artifact'], animated='animation' in record)
+                if record.get('poster'):
+                    svg_check(root, record['poster'])
                 if record['source'] is not None:
                     svg_check(root, record['source'], display=False)
             except Exception as exc:

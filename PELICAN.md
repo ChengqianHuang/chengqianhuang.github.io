@@ -1,4 +1,4 @@
-# 鹈鹕测试提交规范（v1）
+# 鹈鹕测试提交规范（v1.1）
 
 任意模型或代理可以提交结果。每次提交包含 **SVG 图片、独立 JSON 测试记录，以及首页索引中的记录路径**。记录同时保存模型和 harness，不能把 Codex、ChatGPT 等运行工具当成具体模型版本。
 
@@ -14,7 +14,19 @@ Draw an SVG of a pelican riding a bicycle.
 
 建议在全新对话中生成一次、保存第一次结果、不使用外部绘图工具、不修改图形。这是建议的比较条件；代理模式、带历史上下文、多次生成或修改过的结果也可以提交，必须如实记录。
 
-这个测试的图片是 SVG 文件。页面使用 `<img>` 展示 SVG，源码使用纯文本展示。v1 不接收截图或其他模型画作的重新绘制。展示用 SVG 不允许脚本、外部资源、嵌入图片或交互动画；原始 SVG 若不符合规则，应保留原文件并如实记录修改后的展示文件。原始文件仅提供源码与下载，不作为预览图片。
+这两个测试的图片都是 SVG 文件。页面使用 `<img>` 展示 SVG，源码使用纯文本展示。v1 不接收截图或其他模型画作的重新绘制。展示用 SVG 不允许脚本、外部资源和嵌入图片；动画测试允许 CSS 与有限的 SVG 几何动画，静态测试不允许动画；原始 SVG 若不符合规则，应保留原文件并如实记录修改后的展示文件。原始文件仅提供源码与下载，不作为预览图片。
+
+## 动画协议
+
+动画使用独立测试 ID `pelican-riding-bicycle-animated-svg-v1`，协议位于 `pelican-test-animated.json`：
+
+```text
+Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.
+```
+
+动画记录使用 `schemaVersion: "1.1.0"`，增加 `animation`（`mechanism`: `css` / `smil` / `css-smil`，`respectsReducedMotion`: `true`）和 `poster`（与 `artifact` 相同的文件结构）。`poster` 必须是无动画的暂停图；可以自动从生成的 SVG 移除动画制作，原始 SVG 保持原样。页面提供暂停 / 播放，并在系统减少动态效果时展示暂停图。
+
+静态和动画结果分别标记并可筛选，各自使用固定提示词。v1.0 静态记录仍兼容。
 
 ## 文件组织
 
@@ -69,6 +81,7 @@ Draw an SVG of a pelican riding a bicycle.
 
 | 字段 | 填写规则 |
 | --- | --- |
+| `model.identitySource` | 型号来源：`system-reported`（系统声明）、`api-reported`（API 返回）、`user-reported`（用户提供）。用户提供但未独立核实的标识，应在备注说明。 |
 | `model.provider / name / id` | 提供商、可确认的模型名称、具体模型 ID。ID 不可确认就填 `null`；不要从 harness 名称或页面标题推断模型版本。 |
 | `harness.name / version` | 实际运行工具和版本；版本不明确填 `null`。 |
 | `harness.mode` | `agent`、`chat` 或 `api`。 |
@@ -86,7 +99,7 @@ SVG 图片的宽高必须与记录一致。支持像素尺寸，或者从 `viewB
 
 ## 提交与校验
 
-1. 按固定提示词生成新 SVG，先保存生成文件，再渲染检查。不要直接将画廊示例改名为正式结果。
+1. 选择静态或动画协议，按相应固定提示词生成新 SVG，先保存生成文件，再渲染检查。不要直接将画廊示例改名为正式结果。
 2. 建立记录，填写真实元信息。记录 ID、SVG 文件名建议包含模型、harness、日期和序号。
 3. 将 `pelican-results/<id>.json` 加入 `pelican.json` 的 `results` 数组。
 4. 安装校验依赖并运行：
@@ -100,4 +113,4 @@ python3 -m venv .venv
 
 5. 查看图片实际渲染，核对卡片和详情。校验通过后提交 PR。GitHub Actions 会再次检查 schema、文件引用、哈希、尺寸和 SVG 内容。
 
-Schema 格式版本与测试协议 ID 分开管理。需要不同的测试提示词时，请新建协议和相应 schema 版本，不要把不同提示词混进同一个测试 ID。Schema 的破坏性变更需升级版本并同步加载器与校验器。
+Schema 格式版本与测试协议 ID 分开管理。需要不同的测试提示词时，请注册新协议和相应 schema 规则，不要把不同提示词混进同一个测试 ID。Schema 的破坏性变更需升级版本并同步加载器与校验器。

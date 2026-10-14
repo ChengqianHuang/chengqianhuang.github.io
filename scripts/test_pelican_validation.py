@@ -12,9 +12,10 @@ class SubmissionValidation(unittest.TestCase):
         self.root = Path(self.temp.name)
         for directory in ('schemas', 'pelican-results', 'pelican-assets'):
             shutil.copytree(ROOT / directory, self.root / directory)
-        for file in ('pelican.json', 'pelican-test.json'):
+        for file in ('pelican.json', 'pelican-test.json', 'pelican-test-animated.json'):
             shutil.copy(ROOT / file, self.root / file)
-        reference = json.loads((self.root / 'pelican.json').read_text())['results'][0]
+        references = json.loads((self.root / 'pelican.json').read_text())['results']
+        reference = next(ref for ref in references if json.loads((self.root / ref).read_text())['testId'] == 'pelican-riding-bicycle-animated-svg-v1')
         self.record_path = self.root / reference
         self.record = json.loads(self.record_path.read_text())
     def tearDown(self):
@@ -23,6 +24,14 @@ class SubmissionValidation(unittest.TestCase):
         self.record_path.write_text(json.dumps(self.record))
     def test_real_submission_passes(self):
         self.assertEqual(validate(self.root), [])
+    def test_animation_requires_poster(self):
+        del self.record['poster']; self.save()
+        self.assertTrue(validate(self.root))
+    def test_animation_cannot_be_classified_static(self):
+        self.record['testId'] = 'pelican-riding-bicycle-svg-v1'
+        self.record['run']['prompt'] = 'Draw an SVG of a pelican riding a bicycle.'
+        self.save()
+        self.assertTrue(validate(self.root))
     def test_missing_harness_rejected(self):
         del self.record['harness']; self.save()
         self.assertTrue(validate(self.root))
@@ -35,7 +44,7 @@ class SubmissionValidation(unittest.TestCase):
         self.assertIn('first requires one attempt', '\n'.join(validate(self.root)))
     def test_wrong_prompt_rejected(self):
         self.record['run']['prompt'] += ' Make it beautiful.'; self.save()
-        self.assertIn('Draw an SVG', '\n'.join(validate(self.root)))
+        self.assertIn('prompt', '\n'.join(validate(self.root)))
     def test_script_in_svg_rejected_even_with_matching_hash(self):
         path = self.root / self.record['artifact']['path']
         content = path.read_bytes().replace(b'</svg>', b'<script>alert(1)</script></svg>')

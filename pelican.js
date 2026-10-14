@@ -9,18 +9,19 @@
     const response = await fetch('pelican.json', { cache: 'no-cache' });
     if (!response.ok) throw new Error('加载失败');
     const data = await response.json();
-    if (data.schemaVersion !== '1.0.0') throw new Error('不支持的测试数据版本');
+    if (!['1.0.0','1.1.0'].includes(data.schemaVersion)) throw new Error('不支持的测试数据版本');
     const formal = await Promise.all((data.results || []).map(async reference => {
       if (!/^pelican-results\/[a-z0-9][a-z0-9-]*\.json$/.test(reference)) throw new Error('无效的记录路径');
       const response = await fetch(reference, {cache:'no-cache'});
       if (!response.ok) throw new Error('测试记录加载失败');
       const result = await response.json();
-      if (result.schemaVersion !== '1.0.0' || !safeAsset(result.artifact.path) || (result.source && !safeAsset(result.source.path))) throw new Error('无效的测试记录');
+      if (!['1.0.0','1.1.0'].includes(result.schemaVersion) || !safeAsset(result.artifact.path) || (result.source && !safeAsset(result.source.path)) || (result.poster && !safeAsset(result.poster.path))) throw new Error('无效的测试记录');
       return {
         id:result.id, title:result.model.name, model:result.model.name, provider:result.model.provider,
         modelId:result.model.id, harness:result.harness, run:result.run,
         svg:result.artifact.path, source:result.source?.path || result.artifact.path,
         width:result.artifact.width, height:result.artifact.height, reference,
+        animation:result.animation, poster:result.poster?.path, identitySource:result.model.identitySource,
         date:result.run.generatedAt.slice(0,10), prompt:result.run.prompt, notes:result.run.notes,
         attempt:result.run.attempt, settings:JSON.stringify(result.run.parameters)
       };
@@ -32,19 +33,44 @@
       notice.hidden = false;
       notice.textContent = '版式预览：目前尚未录入正式测试结果，以下图片是页面示例，不代表任何模型的测试表现。';
     }
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    let paused = reducedMotion.matches;
+    const imagePath = item => paused && item.poster ? item.poster : item.svg;
+    function motionState() {
+      document.querySelectorAll('img[data-motion-index]').forEach(img => {
+        img.src = imagePath(entries[Number(img.dataset.motionIndex)]);
+      });
+      for (const id of ['pelican-motion-toggle','pelican-detail-motion']) {
+        const button = document.getElementById(id);
+        if (!button) continue;
+        button.textContent = reducedMotion.matches ? '系统减少动态效果' : paused ? '播放动画' : '暂停动画';
+        button.disabled = reducedMotion.matches;
+        button.setAttribute('aria-pressed', String(paused));
+      }
+    }
+    for (const id of ['pelican-motion-toggle','pelican-detail-motion']) {
+      document.getElementById(id)?.addEventListener('click', () => { paused = !paused; motionState(); });
+    }
+    const motionButton = document.getElementById('pelican-motion-toggle');
+    if (motionButton) motionButton.hidden = !entries.some(item => item.animation);
+    reducedMotion.addEventListener('change', event => { paused = event.matches; motionState(); });
+    motionState();
     const card = (item, index, detail) => {
       const href = detail ? `#result=${encodeURIComponent(item.id)}` : `pelican.html#result=${encodeURIComponent(item.id)}`;
       return `<a class="pelican-card" href="${esc(href)}" ${detail ? `data-result-index="${index}"` : ''} aria-label="查看${esc(item.title || item.model)}${item.example ? '（版式示例）' : ''}">
-        <div class="pelican-picture"><img src="${esc(item.svg)}" alt="${esc(item.title || item.model)}：鹈鹕骑自行车${item.example ? '，版式示例' : ''}" loading="lazy" width="${item.width || 640}" height="${item.height || 480}"><span class="pelican-tag ${item.example ? '' : 'result'}">${item.example ? '版式示例' : esc(item.provider || '测试结果')}</span></div>
+        <div class="pelican-picture"><img src="${esc(imagePath(item))}" ${item.animation ? `data-motion-index="${index}"` : ''} alt="${esc(item.title || item.model)}：鹈鹕骑自行车${item.example ? '，版式示例' : ''}" loading="lazy" width="${item.width || 640}" height="${item.height || 480}"><span class="pelican-tag ${item.example ? '' : 'result'}">${item.example ? '版式示例' : esc(item.provider || '测试结果')}</span>${item.example ? '' : `<span class="pelican-motion-badge">${item.animation ? '动画' : '静态'}</span>`}</div>
         <div class="pelican-card-caption"><h3>${esc(item.title || item.model)}</h3>${item.harness ? `<div class="pelican-card-harness">${esc(item.harness.name)} · ${item.harness.context === 'fresh' ? '全新对话' : '当前对话'}</div>` : ''}<p><span>${esc(item.example ? '非模型测试结果' : item.date || '日期未记录')}</span><span>查看 ${detail ? '↗' : '→'}</span></p></div></a>`;
     };
     if (home) {
       home.innerHTML = entries.slice(0,3).map((item,index) => card(item,index,false)).join('') || '<p class="pelican-empty">暂无测试结果。</p>';
       return;
     }
+    const protocolResponse = await fetch('pelican-test-animated.json');
+    if (!protocolResponse.ok) throw new Error('动画协议加载失败');
+    document.getElementById('pelican-animated-prompt').textContent = (await protocolResponse.json()).prompt;
     const count = document.getElementById('pelican-count');
     count.textContent = formal.length ? `${formal.length} 个结果` : `0 个正式结果 · ${examples.length} 张示例`;
-    document.getElementById('pelican-prompt-label').textContent = formal.length ? '统一提示词' : '预设提示词';
+    document.getElementById('pelican-prompt-label').textContent = formal.length ? '静态测试提示词' : '预设提示词';
     document.getElementById('pelican-prompt-text').textContent = data.prompt;
     const copy = document.getElementById('pelican-copy');
     copy.addEventListener('click', async () => {
@@ -54,9 +80,11 @@
     });
     const filters = document.getElementById('pelican-filters');
     const groups = [...new Set(entries.map(item => item.example ? item.group : item.provider || '其他'))];
-    let selectedGroup = '', activeIndex = -1;
-    const visibleIndexes = () => entries.map((item,index) => ({item,index})).filter(({item}) => !selectedGroup || (item.example ? item.group : item.provider || '其他') === selectedGroup).map(({index}) => index);
+    let selectedGroup = '', selectedKind = '', activeIndex = -1;
+    const kinds = document.getElementById('pelican-kinds');
+    const visibleIndexes = () => entries.map((item,index) => ({item,index})).filter(({item}) => (!selectedGroup || (item.example ? item.group : item.provider || '其他') === selectedGroup) && (!selectedKind || (item.animation ? 'animated' : 'static') === selectedKind)).map(({index}) => index);
     const render = () => {
+      kinds.innerHTML = [['','全部测试'],['static','静态'],['animated','动画']].map(([kind,label]) => `<button type="button" data-kind="${kind}" aria-pressed="${selectedKind === kind}">${label}</button>`).join('');
       filters.innerHTML = ['', ...groups].map(group => `<button type="button" data-group="${esc(group)}" aria-pressed="${selectedGroup === group}">${esc(group || '全部')}</button>`).join('');
       gallery.innerHTML = visibleIndexes().map(index => card(entries[index],index,true)).join('') || '<p class="pelican-empty">没有符合筛选条件的结果。</p>';
     };
@@ -65,6 +93,10 @@
       if (!button) return;
       selectedGroup = button.dataset.group; render();
       filters.querySelector('[aria-pressed="true"]').focus();
+    });
+    kinds.addEventListener('click', event => {
+      const button=event.target.closest('[data-kind]'); if (!button) return;
+      selectedKind=button.dataset.kind; render(); kinds.querySelector('[aria-pressed="true"]').focus();
     });
     const dialog = document.getElementById('pelican-detail');
     const sourceCode = document.getElementById('pelican-source-code');
@@ -75,14 +107,19 @@
       activeIndex = index;
       document.getElementById('pelican-detail-title').textContent = item.title || item.model;
       const tag = document.getElementById('pelican-detail-tag');
-      tag.textContent = item.example ? '版式示例 · 非正式测试' : item.provider || '测试结果';
+      tag.textContent = item.example ? '版式示例 · 非正式测试' : `${item.provider} · ${item.animation ? '动画' : '静态'}测试`;
       tag.classList.toggle('result', !item.example);
       const image = document.getElementById('pelican-detail-image');
-      image.src = item.svg; image.alt = `${item.title || item.model}：鹈鹕骑自行车`;
+      image.src = imagePath(item);
+      if (item.animation) image.dataset.motionIndex=index; else delete image.dataset.motionIndex;
+      document.getElementById('pelican-detail-motion').hidden = !item.animation;
+      motionState(); image.alt = `${item.title || item.model}：鹈鹕骑自行车`;
       const selections = {first:'首次结果', 'best-of-n':'多次择优', all:'全部保留'};
       const processing = {none:'无', 'formatting-only':'仅格式整理', edited:'已修改绘图内容'};
       const metadata = item.example ? [['模型','未绑定模型'],['类型','版式示例']] : [
         ['模型',item.model], ['模型 ID',item.modelId || '未提供'],
+        ['型号来源',({'user-reported':'用户提供','system-reported':'系统声明','api-reported':'API 返回'})[item.identitySource] || '未记录'],
+        ['测试类型',item.animation ? '动画 SVG' : '静态 SVG'],
         ['Harness',`${item.harness.name} · ${item.harness.version || '版本未提供'}`],
         ['运行模式',item.harness.mode],
         ['上下文',item.harness.context === 'fresh' ? '全新对话' : '当前对话（含历史上下文）'],
@@ -143,7 +180,7 @@
     function fromHash() {
       const id = new URLSearchParams(location.hash.slice(1)).get('result');
       const index = entries.findIndex(item => item.id === id);
-      if (index >= 0) { selectedGroup=''; render(); show(index,false); }
+      if (index >= 0) { selectedGroup=''; selectedKind=''; render(); show(index,false); }
       else if (dialog.open) dialog.close();
     }
     render(); fromHash(); addEventListener('hashchange', fromHash);

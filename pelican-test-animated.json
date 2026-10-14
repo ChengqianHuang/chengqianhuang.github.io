@@ -1,0 +1,13 @@
+{
+  "id": "pelican-riding-bicycle-animated-svg-v1",
+  "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+  "outputFormat": "animated-svg",
+  "recommendedConditions": {
+    "context": "fresh",
+    "attempts": 1,
+    "selection": "first",
+    "postProcessing": "none",
+    "tools": []
+  },
+  "notes": "动画测试独立于静态测试；要求轮子与踩踏运动，并尊重减少动态效果偏好。"
+}
