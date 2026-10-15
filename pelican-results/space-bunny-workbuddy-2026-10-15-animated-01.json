@@ -1,0 +1,52 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "space-bunny-workbuddy-2026-10-15-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "unknown",
+    "name": "Space-Bunny",
+    "id": null,
+    "identitySource": "user-reported"
+  },
+  "harness": {
+    "name": "WorkBuddy",
+    "version": null,
+    "mode": "agent",
+    "context": "existing-conversation",
+    "tools": [
+      "filesystem",
+      "python",
+      "shell"
+    ]
+  },
+  "run": {
+    "generatedAt": "2026-10-15T21:46:21+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 3,
+    "totalAttempts": 3,
+    "selection": "best-of-n",
+    "parameters": {},
+    "postProcessing": "none",
+    "notes": "按动画协议固定提示词在当前 WorkBuddy 会话内生成，harness context 为 existing-conversation（含此前两条已发布结果与规范文档的上下文）。用 Python 计算两骨逆运动学腿部轨迹与脚踏坐标后逐帧烘焙 SVG 路径，72 帧一循环，未使用外部绘图工具或图像模型。attempt 1 与 2 的几何存在硬伤（翅尖与车把握手脱节、腿部被车身遮挡、围巾脱离颈部），渲染核对后重写坐标契约，第三版通过；三次均为完整重新生成而非后期修图，故 selection 为 best-of-n、postProcessing 为 none，被选中的图未再改动。模型名 Space-Bunny 由用户在生成后提供，未从服务端接口独立核实，因此 model.id 为 null、provider 记为 unknown。会话环境变量中存在 ANTHROPIC_DEFAULT_*_MODEL=deepseek-v4-flash 的路由声明，但该声明与用户提供的模型名不一致，未据此推断实际模型，也未做进一步核实。推理参数未知。暂停图由脚本从原 SVG 自动移除 style 与 animate 元素派生，原始绘图未修改。"
+  },
+  "artifact": {
+    "path": "pelican-assets/space-bunny-workbuddy-2026-10-15-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 800,
+    "height": 600,
+    "sha256": "18eec87a048f51d52a4e65224926ba10c88fa49bc9b6f010974aa4d3fad647de"
+  },
+  "source": null,
+  "animation": {
+    "mechanism": "css-smil",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/space-bunny-workbuddy-2026-10-15-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 800,
+    "height": 600,
+    "sha256": "cf7d02353a080d715289f0445a932e16a99ed3940ef08ed3bea29f6c2f5ce992"
+  }
+}
