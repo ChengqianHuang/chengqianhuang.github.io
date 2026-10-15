@@ -1,0 +1,51 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "deepseek-v4-1-flash-workbuddy-2026-10-15-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "DeepSeek",
+    "name": "DeepSeek-V4.1-Flash",
+    "id": null,
+    "identitySource": "system-reported"
+  },
+  "harness": {
+    "name": "WorkBuddy",
+    "version": "5.8.2",
+    "mode": "agent",
+    "context": "existing-conversation",
+    "tools": [
+      "bash",
+      "python3"
+    ]
+  },
+  "run": {
+    "generatedAt": "2026-10-15T22:56:18+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 1,
+    "totalAttempts": 1,
+    "selection": "first",
+    "parameters": {},
+    "postProcessing": "none",
+    "notes": "Single generation, written to disk before rendering and not redrawn afterwards; the SVG bytes were not touched after that. Animation is CSS only: wheel and crank rotation plus a two-bone IK solve for the legs, baked into 20 keyframes per 2 s pedal revolution so both feet track the pedal spindles. Geometry was computed by a Python script rather than drawn by hand. Verified per phase: the spokes and valve rotate a full turn per cycle, the legs follow the pedals, and with prefers-reduced-motion forced the artwork is fully static and matches the poster. Context is declared existing-conversation: the protocol document, the manifest, the schemas, the validator and the commit message of a withdrawn DeepSeek-V4.1-Flash record were already read earlier in the same conversation, so this is not a blind fresh-context sample. No submitted artwork had been viewed when the SVG was written; the gallery page was rendered afterwards to confirm the record loads, which did expose the other entries, but the artifact was already final and unchanged. Model identity is the name the harness reports and is not independently verified, so model.id is null. Cosmetic defects recorded rather than corrected: both legs share one screen plane and overlap into a single silhouette; the folded wing reads as an oval inside the body rather than a wing; the neck's lower corner protrudes slightly past the head outline; the bill and gular pouch are large relative to the head."
+  },
+  "artifact": {
+    "path": "pelican-assets/deepseek-v4-1-flash-workbuddy-2026-10-15-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 900,
+    "height": 560,
+    "sha256": "03e179cf163051c9460179fbedc07fc49c1214c1174c801a2d5f92321e9a9b4c"
+  },
+  "source": null,
+  "animation": {
+    "mechanism": "css",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/deepseek-v4-1-flash-workbuddy-2026-10-15-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 900,
+    "height": 560,
+    "sha256": "8f82c9f1eae0ad4388d66385298212c84a6680653cfc247ef9302ec13be4352f"
+  }
+}
