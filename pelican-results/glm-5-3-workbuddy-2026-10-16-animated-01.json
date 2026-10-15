@@ -1,0 +1,51 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "glm-5-3-workbuddy-2026-10-16-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "Z.ai",
+    "name": "GLM-5.3",
+    "id": null,
+    "identitySource": "system-reported"
+  },
+  "harness": {
+    "name": "WorkBuddy",
+    "version": "5.8.2",
+    "mode": "agent",
+    "context": "existing-conversation",
+    "tools": [
+      "bash",
+      "python3"
+    ]
+  },
+  "run": {
+    "generatedAt": "2026-10-16T07:58:41+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 2,
+    "totalAttempts": 2,
+    "selection": "best-of-n",
+    "parameters": {},
+    "postProcessing": "none",
+    "notes": "Second and final generation. The first output was written to disk, render-checked in headless Chrome, and rejected: the cream-colored body and neck had near-zero contrast against the warm sky, so the figure read as a floating head with legs. The artwork was regenerated once with a cool pale-blue sky, a white body with outline strokes, a reworked folded wing and a doubled neck stroke for a silhouette edge; the accepted second output's bytes were not modified after writing. Geometry and animation were computed by a Python script: wheel spokes and crank rotate via CSS transforms; each leg is a two-bone IK solve (L1 80, L2 86) baked into 20 keyframes per 1.6 s pedal revolution so both feet track the pedal spindles exactly; a counter-rotating nested group keeps the webbed feet level; the upper body bobs twice per revolution; prefers-reduced-motion disables all animation; the poster is the same file with the style element removed. A static mid-phase debug render (crank at 72 degrees) was used to verify foot-on-pedal alignment before accepting. Context is declared existing-conversation: the protocol documents, manifest, schemas, validator and the metadata records of existing entries (including another entry's detailed defect notes) were read in this conversation before authoring; no submitted SVG source or rendered artwork was viewed. Model identity is the name the harness reports and is not independently verified, so model.id is null. Cosmetic defects recorded rather than corrected: the chain is static and does not animate; pedals are drawn as rotation-invariant circles; both legs share one screen plane; the near thigh emerges from the belly above the saddle and partially occludes it; the far leg is muted and drawn behind the frame; the folded wing reads as a smooth oval rather than a feathered wing."
+  },
+  "artifact": {
+    "path": "pelican-assets/glm-5-3-workbuddy-2026-10-16-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 800,
+    "height": 600,
+    "sha256": "98f970f6d5a73614daae738e472e45ffe57c6662db0a0ffc77b792dc9097ff6a"
+  },
+  "source": null,
+  "animation": {
+    "mechanism": "css",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/glm-5-3-workbuddy-2026-10-16-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 800,
+    "height": 600,
+    "sha256": "e4c44899ea30fdbf11a1b096ff0c23f7c6029b20a6dd146f133a60b49b04198c"
+  }
+}
