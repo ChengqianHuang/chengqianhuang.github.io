@@ -1,0 +1,52 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "qwen3-8-max-qoder-2026-10-15-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "Alibaba",
+    "name": "Qwen3.8-Max",
+    "id": null,
+    "identitySource": "user-reported"
+  },
+  "harness": {
+    "name": "Qoder",
+    "version": null,
+    "mode": "agent",
+    "context": "existing-conversation",
+    "tools": [
+      "filesystem",
+      "shell",
+      "python"
+    ]
+  },
+  "run": {
+    "generatedAt": "2026-10-15T22:50:19+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 3,
+    "totalAttempts": 3,
+    "selection": "best-of-n",
+    "parameters": {},
+    "postProcessing": "none",
+    "notes": "按动画协议固定提示词在当前 Qoder 会话内生成，harness context 为 existing-conversation（会话含此前对该仓库鹈鹕测试的讨论与 PELICAN.md 内容）。SVG 由代理以 Python 程序化绘制：腿部为髋关节到脚踏销的两骨逆运动学链，48 帧烘焙成 SMIL animate 的 d 值；轮子、曲柄、脚踏水平补偿、路面与远景视差由 CSS keyframes 驱动；未使用外部绘图工具或图像模型。共生成三次：第 1 次渲染核对发现轮辐坐标错误（只画出中心星号）、翅膀呈板状、上喙与喉囊之间有白缝、远侧脚朝向反了；第 2 次修复上述问题后，渲染中途帧又发现轮子旋转原点偏离轮心、导致轮子绕偏心点公转脱离车架；第 3 次修正旋转原点后，在曲柄 0/90/180/270 度四个烘焙帧上核对脚与脚踏贴合、膝盖朝向与轮辐同步，通过。三次均为完整重新生成，被选中的第 3 版生成后未再修改，故 selection 为 best-of-n、postProcessing 为 none。渲染核对使用无头浏览器截图，仅用于检查显示效果，未参与图形生成。模型名 Qwen3.8-Max 由用户在生成前提供，无法从系统或接口独立核实，会话环境变量中也没有任何模型路由声明（仅有 QODER_MODEL_SAFETY_TAG=enterprise-safety，与模型身份无关），故 identitySource 为 user-reported、provider 取自用户所给型号名、model.id 为 null。推理参数未知。暂停图由同一生成器以曲柄 0 度静态烘焙派生，不含任何动画，动画原图未修改。"
+  },
+  "artifact": {
+    "path": "pelican-assets/qwen3-8-max-qoder-2026-10-15-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 800,
+    "height": 600,
+    "sha256": "ac9236db9fbe44b9a6a597433555ccc12f1ccb5d5f253960cd14153fd7df8676"
+  },
+  "source": null,
+  "animation": {
+    "mechanism": "css-smil",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/qwen3-8-max-qoder-2026-10-15-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 800,
+    "height": 600,
+    "sha256": "da0bceabe8012b7696fde76283cf96f2ac0a988b6f4af2d93d75f264b6e97a95"
+  }
+}
