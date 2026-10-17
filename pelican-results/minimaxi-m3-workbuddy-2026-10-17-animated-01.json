@@ -1,0 +1,52 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "minimaxi-m3-workbuddy-2026-10-17-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "MiniMax",
+    "name": "MiniMax-M3",
+    "id": null,
+    "identitySource": "system-reported"
+  },
+  "harness": {
+    "name": "WorkBuddy",
+    "version": "5.8.3",
+    "mode": "agent",
+    "context": "existing-conversation",
+    "tools": [
+      "bash",
+      "python3",
+      "filesystem"
+    ]
+  },
+  "run": {
+    "generatedAt": "2026-10-17T11:45:00+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 1,
+    "totalAttempts": 1,
+    "selection": "first",
+    "parameters": {},
+    "postProcessing": "none",
+    "notes": "Scaffolded by the same engineering pipeline that produced the other animated submissions: a Python script in /tmp computed 24 phase samples per 1.6 s pedal revolution and baked them into CSS @keyframes for both legs, the body bob, the wing flap, the scarf flutter and the fish-tail wiggle. Two-bone IK (thigh 82, shin 92, crank radius 36, forward knee) is solved so both feet track the pedal spindles exactly; nested pedal groups counter-rotate at the crank rate to keep the pedals level. Wheels, chainring and crank arms spin via simple CSS rotation; clouds drift and road dashes plus chain runs animate via translateX and stroke-dashoffset; a prefers-reduced-motion media query disables every animation class. Color palette differs from step-5-preview (lavender body, pink pouch, blue scarf, cool grey-blue legs) so this card is visually distinguishable. Headless Chrome render-check verified the reduced-motion poster is byte-identical to the rendered first frame and that the 1.6 s frame matches the 0 s frame. Model identity MiniMax-M3 is the name the system reports and is not independently verified, so model.id is null; provider MiniMax is the model's origin, also not independently verified. Known cosmetic defects recorded rather than corrected: chain runs are animated dashed strokes rather than linked chains; both legs share one screen plane; hips are fixed so the body bob is cosmetic and not driven by leg IK; the saddle is mostly occluded by the body; the fish is static except its tail; clouds loop discontinuously at the wrap point; no audio; transitions are linear only."
+  },
+  "artifact": {
+    "path": "pelican-assets/minimaxi-m3-workbuddy-2026-10-17-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 800,
+    "height": 600,
+    "sha256": "e52eb746f32a03c665247d9f8729ee38915bf2d58dabdb52b9e8e333121b6409"
+  },
+  "source": null,
+  "animation": {
+    "mechanism": "css",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/minimaxi-m3-workbuddy-2026-10-17-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 800,
+    "height": 600,
+    "sha256": "c2b954e9858e1706beaa3a6c834e5764d502ac9d856995ebc01eb53ceffe178c"
+  }
+}
