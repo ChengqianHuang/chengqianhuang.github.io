@@ -1,0 +1,52 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "step-5-preview-workbuddy-2026-10-17-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "StepFun",
+    "name": "Step-5-Preview",
+    "id": null,
+    "identitySource": "system-reported"
+  },
+  "harness": {
+    "name": "WorkBuddy",
+    "version": "5.8.3",
+    "mode": "agent",
+    "context": "existing-conversation",
+    "tools": [
+      "bash",
+      "python3",
+      "filesystem"
+    ]
+  },
+  "run": {
+    "generatedAt": "2026-10-17T10:35:25+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 1,
+    "totalAttempts": 1,
+    "selection": "first",
+    "parameters": {},
+    "postProcessing": "none",
+    "notes": "First and only accepted generation; the generator script ran once and the accepted bytes were not modified after being written. Drawing and animation were produced by a Python script written in this session: 24 phase samples per 1.6 s pedal revolution; each leg is a two-bone IK solve (thigh 82, shin 92, crank radius 36, forward knee) baked into per-phase thigh/shin rotation keyframes so both webbed feet track the pedal spindles exactly; pedal groups counter-rotate at the crank rate to stay level; body bob, wing flap, scarf flutter and fish-tail wiggle are baked from the same phase samples so they stay in sync; wheels, chainring and crank arms spin via CSS keyframes; clouds drift and road dashes plus chain runs animate via translateX and stroke-dashoffset; a prefers-reduced-motion media query disables every animation class. Verified in headless Chrome by pinning each CSS animation's currentTime and sampling 9 phases of the revolution: measured foot centroids match the crank orbit at every sampled phase and the pose at 1.6 s returns to the pose at 0 s; the reduced-motion render is byte-identical to the poster. Context is existing-conversation: PELICAN.md, both protocol files, both schemas, the validator and its unit tests, and the manifest were read in this conversation before authoring; the style block of one existing animated submission was inspected to confirm the transform-box/transform-origin convention; no submitted artwork was viewed. Model identity Step-5-Preview is what the system reports and is not independently verified, so model.id is null; provider StepFun is the model's origin, also not independently verified. Known cosmetic defects recorded rather than corrected: the chain runs are animated dashed strokes rather than linked chains; the far and near legs share one screen plane; the hips are fixed and the body bob is cosmetic, so leg IK is solved at fixed hips; the saddle is largely occluded by the body; the fish is static except its tail; beak pouch and body shapes are simplified; each wheel has 8 spokes and completes 1.6 revolutions per pedal revolution."
+  },
+  "artifact": {
+    "path": "pelican-assets/step-5-preview-workbuddy-2026-10-17-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 800,
+    "height": 600,
+    "sha256": "234b4caaa1afe78ef9ac2fff883b14766a6758df807b4bbaa3d1ab3fba7f1cff"
+  },
+  "source": null,
+  "animation": {
+    "mechanism": "css",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/step-5-preview-workbuddy-2026-10-17-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 800,
+    "height": 600,
+    "sha256": "d647905b21f90281327f18063bf65cdcf1c6f8d9a817f203a182d1f0babecd4c"
+  }
+}
