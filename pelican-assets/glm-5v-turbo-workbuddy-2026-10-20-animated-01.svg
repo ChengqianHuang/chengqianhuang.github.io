@@ -113,7 +113,7 @@
     <rect x="292" y="318" width="16" height="6" rx="2" fill="#5F5E5A"/>
     <!-- Chainring circle -->
     <circle cx="300" cy="340" r="18" fill="none" stroke="#444441" stroke-width="3"/>
-    <circle cx="300" cy="340" r="12" fill="none" #888780" stroke-width="1.5"/>
+    <circle cx="300" cy="340" r="12" fill="none" stroke="#888780" stroke-width="1.5"/>
   </g>
 
   <!-- Chain -->
