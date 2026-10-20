@@ -1,0 +1,51 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "glm-5-3-qoder-2026-10-20-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "Z.ai",
+    "name": "GLM-5.3",
+    "id": null,
+    "identitySource": "user-reported"
+  },
+  "harness": {
+    "name": "Qoder",
+    "version": "0.3.4",
+    "mode": "agent",
+    "context": "fresh",
+    "tools": [
+      "filesystem",
+      "shell"
+    ]
+  },
+  "run": {
+    "generatedAt": "2026-10-20T21:00:19+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 1,
+    "totalAttempts": 1,
+    "selection": "first",
+    "parameters": {},
+    "postProcessing": "none",
+    "notes": "固定动画提示词是本会话的第一条消息，context 为 fresh：生成前未阅读 PELICAN.md、schema、协议文件或任何已有提交作品，这些均在生成后为提交而阅读。一次生成即采用（attempt 1/1，selection first），提交字节即生成时的原始字节，postProcessing 为 none。生成管线：代理先手写静态 SVG 场景（自行车、鹈鹕、道路与构图），再用本地 Node 脚本按 24 个采样点计算双腿逆向运动学路径、脚踏平移关键帧并注入文件（属于生成过程），此后未再修改图形。动画机制为纯 CSS keyframes：前后轮与两侧曲柄各自绕 transform-origin（transform-box: view-box）连续旋转；脚踏用 24 帧 translate 关键帧沿以五通为圆心、半径 40 的圆平移（24 边形近似，弦高误差约 0.35px），保持水平姿态；双腿与双脚用 24 帧 d 路径变形（两连杆 IK，膝朝前）与曲柄同周期同步踩踏；另有身体起伏、路面虚线滚动与云漂移。所有动画元素带 anim 类，@media (prefers-reduced-motion: reduce) 对 .anim 统一 animation: none，回退为完整静态踩踏姿态；动画正常时也以元素静态 d 属性为基态。暂停图由脚本自动移除原 SVG 的 animation 声明、@keyframes 与 @media 块得到（保留视觉样式），原始 SVG 保持原样。渲染核对在生成后进行、未参与图形生成：Playwright 驱动 Chromium 实时采样确认曲柄/脚踏/腿/车轮/路面虚线计算值随时间推进，并以 emulateMedia reducedMotion 确认全部 animationName 变为 none、腿部回到基态；另有截图核对构图。已知外观缺陷：链条为静态；脚踏圆为 24 段折线近似；踩踏时髋部固定而身体起伏 ±3px（衔接藏在身体羽毛下）；车轮与曲柄角速度比为示意；翅膀搭在车把上随身体起伏有 ±3px 滑移。模型身份：具体版本号 GLM-5.3 由用户提供且未独立核实，故 identitySource 为 user-reported、model.id 为 null；provider 沿用库内 GLM-5.3 记录的 Z.ai 写法。Qoder 版本 0.3.4 读取自应用包 Info.plist。推理参数未知。"
+  },
+  "artifact": {
+    "path": "pelican-assets/glm-5-3-qoder-2026-10-20-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 800,
+    "height": 500,
+    "sha256": "a9241e55404b9942c23d4e96cbe549bbd39cd82c41587285b58e9a464ef55b12"
+  },
+  "source": null,
+  "animation": {
+    "mechanism": "css",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/glm-5-3-qoder-2026-10-20-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 800,
+    "height": 500,
+    "sha256": "f4489aa50dd6a3b7b199320d289b8d3452df7aa57b99e0042c2c00cd637b3efc"
+  }
+}
