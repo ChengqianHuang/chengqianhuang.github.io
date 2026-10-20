@@ -1,6 +1,7 @@
 ---
 title: 基于 DSH 接入飞书：dsh-lark 的会话、审批与文件交互实现
 date: 2026-10-18
+updated: 2026-10-20
 author: Codex
 ---
 
@@ -8,11 +9,46 @@ author: Codex
 
 一开始看，这件事像是把“收到消息”和“调用 agent”接起来。但接着就会遇到一些具体问题：同一个 agent 同时有 Web UI 和飞书两个输入来源，飞书该拿哪一轮回答？用户点了一张旧卡片，能不能停止后来开始的任务？群里两个人同时讨论两个问题，后续一句“继续”该去哪个 session？文件上传超时了，到底能不能直接重试？
 
-这篇文章沿着实现把这些问题讲开。我会贴出用到的 DSH 接口和插件中的代码，解释数据从哪里进入、由谁持有、何时记入日志，以及取消和卸载时如何退出。代码片段有两种：标为“契约摘录”的内容来自安装依赖的类型声明，省略无关成员；标为“实现摘录”的内容来自插件源码，少数片段只调整换行。
+我把这层接入最需要维持的关系归纳为三项：输入与执行回合的对应关系，持久会话与远端选择目录的发布顺序，以及本地取消与外部交付的结果范围。下面先列出它们，再沿实际代码解释各层如何配合。代码片段有两种：标为“契约摘录”的内容来自安装依赖的类型声明，省略无关成员；标为“实现摘录”的内容来自插件源码，少数片段只调整换行。
 
 本文对照的是 **dsh-lark `0.2.0`，源码提交 `1165fe8`**。插件依赖的 DSH npm 包版本锁定为 **`0.1.2-alpha.5`**，Cordis 为 **`4.0.2`**。DSH 仍在快速变化，本文引用安装产物中的声明，不把当前主分支的接口当成这个插件已经支持的接口。文末提供按提交固定的源码链接。
 
+修订于 **2026-10-20**。本文附有基于该提交的本地可复现实验；它验证 DSH 的调度、日志和桥接语义，实验中的“UI”是第二个输入来源的程序化模拟。真实飞书租户的回调与文件投递仍单独标为未验证。
+
+<a id="guarantees" style="scroll-margin-top: 120px"></a>
+## 读之前：三个需要维持的关系
+
+先不看文件名，设想同一个 session 同时被飞书和另一个输入入口使用。我希望能回答清楚三个问题：这一段回答归谁，向外公布的 session 是否真能恢复，以及停止之后哪些事情已经无法撤回。
+
+<div style="overflow-x: auto">
+
+| 关系 | 实现需要维持什么 | 怎样观察它是否成立 |
+|---|---|---|
+| 请求归属 | 由具体输入被认领的事实确定 turn；回复和进度按 turn 筛选，人工交互在当前 owner 有效期间路由；取消区分未认领和已认领。 | 后续 UI 回合仍在运行，飞书已经拿到自己那轮结果；取消队列中的飞书输入后，别的 producer 输入还在。 |
+| 引用发布 | 先使 session 可从宿主持久化恢复，再保存私聊目录中的引用；目录提交后才公布新的内存选择。 | 在不同异步步骤失败，检查目录保留的 ID 是否可恢复，以及下一条消息实际进入哪份历史。 |
+| 外部交付 | 本地请求结束、CLI 关闭、服务端执行和确认响应分别观察；取消不承诺回滚已发生的远端写入。 | 在发出上传前取消、上传后失去响应、CLI 不响应终止时，分别核对工具结果、文件与进程。 |
+
+</div>
+
+请求在几种系统中的身份并不相同：
+
+```text
+飞书 chat + root message
+    ↓ 对话路由
+DSH session + UserMessage.id
+    ↓ inbox claimed
+turn N
+    ↓ 同一 session 的 turn/end
+本请求的结果、owner 撤销与卡片终态
+```
+
+这里大部分协议由 DSH 提供，桥接负责把这些已有事实连接起来。下面会分别标明哪些是宿主保证，哪些是插件通过字段检查和时序维持的关系。各聊天仍共享配置工作区，可信同进程插件也仍共享宿主能力。
+
+如果只沿一条主线阅读，可以先看[回合归属](#turn)、[取消](#cancellation)、[会话目录的失败切点](#session-failure-cuts)、[外部写入的不确定结果](#delivery-outcomes)，再运行[本地对照实验](#ownership-experiment)。其余章节保留完整实现细节，便于对照源码。
+
 ## 目录
+
+**第一部分：接入范围与消息身份**
 
 - [1. 先看实际交互](#interaction)
 - [2. DSH 和桥接插件各自负责什么](#responsibilities)
@@ -21,17 +57,23 @@ author: Codex
 - [5. 消息校验：先检查发送者，再查询原消息](#admission)
 - [6. 用什么标识一段对话](#conversation)
 - [7. 创建 agent：在发布前完成配置](#creation)
+**第二部分：请求归属、会话发布与人工交互**
+
 - [8. 找到这条消息自己的回合](#turn)
 - [9. 排队、停止和重置的语义](#cancellation)
 - [10. 私聊中的多 session 切换](#sessions)
 - [11. 审批：接入 DSH 的 answerer waterfall](#approval)
 - [12. 询问：把卡片提交还原为原始问题的答案](#questions)
 - [13. 任务进度：从日志投影到一张卡片](#progress)
+**第三部分：文件、外部副作用与资源退出**
+
 - [14. 接收图片和普通文件](#incoming-files)
 - [15. 发送文件：一个受约束的工具](#outgoing-files)
 - [16. 文件路径、普通文件检查与上传快照](#file-safety)
 - [17. 消息发出去之后，怎样判断成功](#egress)
 - [18. 子进程退出与插件卸载](#lifecycle)
+**第四部分：实现取舍、实验与适用范围**
+
 - [19. 代码如何保持容易阅读](#structure)
 - [20. 配置与部署时需要知道的事](#configuration)
 - [21. 用真实 DSH 运行时验证桥接](#testing)
@@ -40,7 +82,7 @@ author: Codex
 - [24. 从这个插件看 DSH 的扩展方式](#extension)
 - [源码与接口对照](#sources)
 
-<a id="interaction"></a>
+<a id="interaction" style="scroll-margin-top: 120px"></a>
 ## 1. 先看实际交互
 
 插件面向的是已经可以正常使用的 DSH 宿主。模型、工具、agent preset、工作区和权限先在宿主中配置好，飞书提供另一个使用入口。
@@ -76,6 +118,8 @@ A、B 的根消息不同，分别映射到两个 DSH session。用户进入对�
 
 几条命令处理的是控制操作：
 
+<div style="overflow-x: auto">
+
 | 输入 | 实际作用 |
 |---|---|
 | `/help` | 显示命令，不创建一个模型任务。 |
@@ -84,9 +128,11 @@ A、B 的根消息不同，分别映射到两个 DSH session。用户进入对�
 | `/new` | 取消并清空桥接任务，释放当前选择，让后续消息开始新会话。 |
 | `/sessions` | 在私聊里选择已有会话，或者让下一条消息创建新会话。 |
 
+</div>
+
 审批卡片、询问表单、任务停止按钮和文件交付都沿用产生它们的那条请求。这条关联会贯穿后面的实现。
 
-<a id="responsibilities"></a>
+<a id="responsibilities" style="scroll-margin-top: 120px"></a>
 ## 2. DSH 和桥接插件各自负责什么
 
 我把执行能力留在 DSH 中。dsh-lark 负责把聊天输入转换为 DSH 消息，再把相关日志和交互转换为飞书消息。它没有自己的模型调用循环，也没有复制一份工具执行器。
@@ -115,6 +161,8 @@ LarkEgress → lark-cli → 原消息或原话题
 
 这几个层次在代码中分别有自己的工作：
 
+<div style="overflow-x: auto">
+
 | 模块 | 持有的数据或资源 | 主要职责 |
 |---|---|---|
 | `index.ts` | 消费者、路由器、重启定时器 | 插件初始化、依赖检查、启动和卸载。 |
@@ -126,6 +174,8 @@ LarkEgress → lark-cli → 原消息或原话题
 | `progress.ts` | 一张任务卡片及其更新任务 | 合并增量、串行更新、呈现终态。 |
 | `files.ts` | 下载目录和上传快照 | 接收附件、注册受审批的文件交付工具。 |
 | `egress.ts` / `process.ts` | CLI 请求及其管道 | argv 调用、响应检查、限额和进程退出。 |
+
+</div>
 
 DSH 已经提供了这些能力，插件通过 `Context` 中的服务使用它们。入口声明的依赖包括：
 
@@ -149,7 +199,7 @@ static inject = [
 
 从插件作者的角度，我主要依赖的是三个约定：创建 agent 时可以完成其作用域内的配置；输入、回合和日志有可关联的身份；审批、询问和工具执行有可组合的事件入口。下面按它们在一次请求中出现的顺序展开。
 
-<a id="bundle"></a>
+<a id="bundle" style="scroll-margin-top: 120px"></a>
 ## 3. 用 bundle 加入现有 profile
 
 项目是一个独立包，其 `package.json` 声明了 DSH bundle：
@@ -200,7 +250,7 @@ protected async [Service.init](): Promise<void> {
 
 构建产物是 ESM。这个包没有一个单独启动模型循环的命令行入口；它安装进已有 profile，使用宿主已经装配好的服务。开发时也因此可以把“桥接能不能正常工作”和“模型/provider 能不能正常工作”分开排查。
 
-<a id="ingress"></a>
+<a id="ingress" style="scroll-margin-top: 120px"></a>
 ## 4. 接收事件：进程启动和订阅就绪是两回事
 
 传输层使用 `lark-cli event consume`。消息和卡片是两个独立 consumer，分别订阅：
@@ -218,6 +268,14 @@ card.action.trigger
 ```
 
 一个 consumer 对应一个 event key。它们各自有 readiness、异常退出通知和重启定时器。消息 consumer 正常不代表卡片 consumer 正常，卡片 consumer 启动成功也不代表租户后台已经正确开启了回调订阅。
+
+### 为什么在这里沿用 CLI
+
+这个本机入口已经使用 CLI 管理应用配置、身份和事件连接。桥接沿用这些能力，把进程启动、ready、输入输出和关闭当作显式协议来管理，凭据不会因此再复制到插件 YAML 中；也无需为这个入口新增公网 webhook。
+
+代价是额外的进程与 JSON 编解码、必须区分快捷命令和原始 API 响应，以及必须处理 ready 与终止协议。一次性查询和回复各自启动请求进程，文章没有给出这项开销的性能测量。这个选择适合当前可信用户驱动的本机工作流，不代表高频多租户服务也应使用同样部署方式。
+
+如果以后要减少进程启动成本，可以让传输实现直接维护连接和 API 客户端，但仍需重新实现身份、连接监督、错误分类与取消；替换的是 `LarkIngest` / `LarkEgress` 所承载的传输责任，消息到 turn 的归属关系仍然要保留。
 
 ### 4.1 两条输出流承担不同的协议
 
@@ -252,7 +310,7 @@ stdout.on('line', (line: string) => {
 
 默认最多缓冲 128 行。收到正确标记后再按原顺序派发。超过上限会让启动失败，保留下来重放的内容不会悄悄缺一半。
 
-这里约束的是“完整行数量”，不是整个输入流的字节预算。不能据此宣称桥接对所有尺寸的异常 NDJSON 输入都有统一的内存上限。这个区别在写限制说明时也应该保留。
+这个上限只计算完整行数量；尚未结束的单行和单行字节数没有独立预算，因此它不构成整个 NDJSON 输入流的统一内存上限。
 
 ### 4.3 stdin 不能提前关闭
 
@@ -268,7 +326,7 @@ CLI 把 stdin EOF 当成正常关闭请求，用它来取消订阅。因此 cons
 
 事件协议的使用方式可对照 [Lark CLI 的事件技能说明](https://github.com/larksuite/cli/tree/main/skills/lark-event)；插件对应实现见 [ingress.ts](https://github.com/ChengqianHuang/dsh-lark/blob/1165fe83dfce4496ea76333029eb0469d9fffb8c/src/ingress.ts)。
 
-<a id="admission"></a>
+<a id="admission" style="scroll-margin-top: 120px"></a>
 ## 5. 消息校验：先检查发送者，再查询原消息
 
 一条事件进入桥接后，还没有获得执行本机任务的资格。`ChatRouter.accept()` 先做低成本检查：插件是否正在退出，发送者是否在白名单，聊天是否被允许，群聊是否禁用，消息类型是否支持，文本是否为空。
@@ -318,7 +376,22 @@ if (
 
 元数据查询失败时，也不会对群里的任意未提及消息刷失败通知。只有私聊，或者明确以机器人提及开头的消息，才会在最终话题 admission 前收到诊断回复。这让白名单群中无关的对话可以继续正常进行。
 
-<a id="conversation"></a>
+### 5.3 同群 admission 串行，话题执行并行
+
+查询原消息之前，桥接还不知道可信的 topic root。因此 admission 使用真实 chat ID 排序；识别 root 后，执行队列才使用 `[chatId, rootMessageId]`。下面是时序示意，不是延迟测量：
+
+```text
+到达：          A 附件事件       B 文本事件       A 后续文本
+chat admission：查询 A ──────→ 查询 B ───────→ 查询 A 后续
+topic A 执行：               下载/执行 A ─────────→ A 后续
+topic B 执行：                              执行 B ───────
+```
+
+admission 调用 `handle()` 后不等待模型回合完成，所以 A 执行期间 B 可以开始；同一个 A 队列仍按顺序完成附件准备和后续文本。代价是 A 的原消息查询慢时，即使 B 最终属于另一话题，B 也要先等待这个 chat 的 admission 链。这里保证的是路由解析顺序和话题执行并行，两者需要分别观察。
+
+这个区分也限制 `/stop` 的响应方式。私聊文本控制命令可以绕过正在等待的元数据查询，`/stop` 和 `/new` 会撤销该私聊整批 admission。群话题中的命令则必须先查询 root，并排在同 chat 已有查询之后；只有确定目标，才能清空该话题的桥接队列并取消其当前请求。它不会中止整个群的 admission，否则话题 B 的输入也会被一起丢弃。排在停止命令之后完成 admission 的消息，仍可能成为后续任务。群控制消息也受 admission 容量限制，达到上限时会先返回忙碌提示。
+
+<a id="conversation" style="scroll-margin-top: 120px"></a>
 ## 6. 用什么标识一段对话
 
 私聊和群话题使用同一个内部 `ConversationId`，生成函数只有几行：
@@ -342,11 +415,15 @@ private conversation(event: LarkMessageEvent): ConversationId {
 
 话题根消息是飞书消息系统已有的关联。用户在哪个话题回复，就携带哪个 root；不同根消息互不覆盖选择。它也为审批回复、文件交付和停止命令提供同一个目标。
 
+<div style="overflow-x: auto">
+
 | 场景 | 会话标识 | 继续对话方式 |
 |---|---|---|
 | 私聊 | chat + 当前私聊选择 | 直接发送后续消息。 |
 | 群话题默认模式 | chat + root message | 在该话题中回复。 |
 | 群共享模式 | chat | 每条文本都以准确的机器人提及开头。 |
+
+</div>
 
 默认是 `groupSessions: thread`。新的群话题需要准确的开头提及。已经存在的活跃桥接话题，允许白名单发送者不再重复提及，包括在话题中发送图片和普通文件。
 
@@ -358,7 +435,7 @@ private conversation(event: LarkMessageEvent): ConversationId {
 
 群绑定保存在内存中。空闲释放、`/new` 或重启后，未提及的回复不会自动恢复旧群历史，需要重新提及建立会话。私聊持久选择的行为不同，后面单独说明。
 
-<a id="creation"></a>
+<a id="creation" style="scroll-margin-top: 120px"></a>
 ## 7. 创建 agent：在发布前完成配置
 
 对话第一次需要执行任务时，路由器从宿主拿默认模型、解析 preset、取得工作区，再通过 `ctx.agents.create()` 创建 agent。
@@ -414,7 +491,7 @@ preset 的解析与挂载也分开：先从宿主的 registry 解析出具体 pr
 
 创建时的 `signal` 按 DSH 声明是**仅作用于创建阶段**的信号，返回 handle 前会解绑。后续一条具体任务的取消需要走消息和回合的取消路径，不能以为保留这个 signal 就能永久控制 agent。
 
-<a id="turn"></a>
+<a id="turn" style="scroll-margin-top: 120px"></a>
 ## 8. 找到这条消息自己的回合
 
 这一部分是桥接中比较值得单独讲的地方。同一个 agent 可以接收不同 producer 的输入，session 中也会保留多轮 assistant 输出。飞书要回复的是自己提交的那条消息对应的结果。
@@ -520,7 +597,36 @@ export type TurnOutcome =
 
 完整提交与等待逻辑放在 [summary.ts](https://github.com/ChengqianHuang/dsh-lark/blob/1165fe83dfce4496ea76333029eb0469d9fffb8c/src/summary.ts)。这里保留了统一的清理函数：结束时撤销归属、移除 abort listener、移除所有会话和 inbox listener，避免下一轮仍被上一条消息的监听器观察。
 
-<a id="cancellation"></a>
+### 8.5 从提交到结束：归属在什么时刻生效
+
+认领之前，桥接知道原始飞书 event 和新建的 UserMessage，但还不知道它将在哪个 turn 执行。`agent.status === 'running'` 只说明宿主正在处理某项工作。把这个状态当成“正在处理我的消息”，会提前获得不属于自己的取消和展示资格。
+
+![输入认领、回合结束和归属撤销的状态顺序](post-assets/dsh-lark/request-lifecycle.svg)
+
+图中是桥接观察到的正常执行路径。阶段内的取消由下面的规则处理，审批与工具步骤发生在 claimed 与 turn/end 之间。
+
+<div style="overflow-x: auto">
+
+| 阶段 | 可用的身份 | 取消时执行什么 | 何时结束本请求 |
+|---|---|---|---|
+| 尚在桥接 queue | 原始 event、conversation | 对话级 `/stop` 清除等待 work；它还没有进入 DSH inbox。 | 不提交该 work。 |
+| 已提交、未认领 | agent + UserMessage.id | `inbox.remove(message.id)`，保留其他输入。 | 移除自己的等待输入后，以 canceled 结算。 |
+| 已认领 | agent + message.id → turn N | `agent.cancel(..., { keepInbox: true })`。 | 继续等待同一 session 的 N 号 turn/end。 |
+| 匹配 turn/end | session + turn N 的日志 | 已结束请求不再发起取消。 | 读取 N 的结果，同步撤销 owner、移除 listener，然后 resolve。 |
+
+</div>
+
+这里有三个顺序条件：
+
+1. **先注册再提交。** 监听 `claimed`、`discarded` 和 `turn/end` 之后才 `followup()`；提交触发同步通知也不会漏掉。
+2. **取消中间没有异步空隙。** 检查 settled 与当前归属，到调用 `inbox.remove()` 或 `agent.cancel()` 之间没有 `await`。正常宿主调度下，不会在检查完属于 N 后，先让另一个回合经过异步调度接管，再执行旧取消。
+3. **先撤销再交还结果。** `finish()` 先调用 cleanup；cleanup 先 `observeTurn(undefined)`、移除 abort listener 和事件监听，随后才 resolve。后续 producer 即使立即进入下一轮，旧等待也已经结算，旧 owner 已撤销。
+
+被其他入口移除的未执行输入走 discarded；提交抛错与日志读取错误走 reject，它们也撤销监听与 owner。取消时的 `cancelRequested` 还会参与结果判断，避免匹配 turn/end 后把已取消任务的部分输出呈现为成功。
+
+这些关系中，认领事件的 agent/message/turn 字段、普通 follow-up 的回合语义和 session 事件由 DSH 提供；先装监听、逐项匹配、按阶段选择取消方式，以及结束时撤销 owner，由桥接负责维持。[对照实验](#ownership-experiment)会用相同输入和阻塞条件分别观察错误方案与当前方案。
+
+<a id="cancellation" style="scroll-margin-top: 120px"></a>
 ## 9. 排队、停止和重置的语义
 
 路由器为每个 conversation 保存 `ChatState`。同一对话中的普通消息顺序执行，不同对话则可以并行。当前状态包括等待队列、正在处理的 work、当前 AbortController、drain task、会话句柄和回合归属。
@@ -574,7 +680,7 @@ agent.cancel({ kind: 'user' }, { keepInbox: true })
 
 这两个入口共用取消执行的底层路径，但在是否清空排队任务上有不同语义。保留这个区别，用户才可以同时拥有“只停这一项”和“这个话题先都别做了”两种操作。
 
-<a id="sessions"></a>
+<a id="sessions" style="scroll-margin-top: 120px"></a>
 ## 10. 私聊中的多 session 切换
 
 私聊 session 切换需要两份不同的数据：DSH 保存会话内容和执行历史，桥接保存“这个私聊允许看到哪些由它创建的会话，以及当前选中了谁”。
@@ -666,7 +772,32 @@ this.data = next
 
 移出最近列表只会删掉一个选择项，不会删除 DSH 历史。私聊 live agent 空闲释放时保留 durable selection；下一条消息可以恢复它。群话题没有复用这份私聊目录，因此不能把私聊恢复能力顺手推广成群话题也会自动恢复。
 
-<a id="approval"></a>
+<a id="session-failure-cuts" style="scroll-margin-top: 120px"></a>
+### 10.5 在两个存储之间切断执行，会留下什么
+
+启用私聊会话目录后，创建顺序是 `ensureMaterialized(session) → catalog.add() → state.entry = entry`。catalog 内部还有自己的顺序：克隆当前数据、修改副本、写同目录临时文件、rename、清理临时路径，最后替换 `this.data`。
+
+<div style="overflow-x: auto">
+
+| 故障切点 | 已经可能存在的状态 | 桥接随后怎样处理 |
+|---|---|---|
+| 物化尚未成功 | live handle；持久存储状态取决于 provider 的完成情况 | 不执行 catalog.add，回退工作区关联并 dispose handle。 |
+| 物化成功，catalog 尚未发布 | 可恢复 session，目录中还没有新选择 | 后续失败会释放 handle；已保存历史不会随 dispose 删除。 |
+| 临时文件已写，rename 尚未成功 | 旧正式目录、旧内存数据，以及待清理临时文件 | 不发布新内存数据，清理临时文件并向上报告错误。 |
+| rename 已成功，内存尚未替换 | 磁盘目录已更新，当前内存仍是旧数据 | 这段期间进程退出后，重启从磁盘加载新目录；不能声称磁盘与内存同时提交。 |
+| catalog.add 完成，live entry 尚未发布 | 新持久选择已存在 | 若随后发现取消，释放 handle；后续输入仍可能按已保存选择恢复 session。 |
+| live entry 已发布 | 本次创建的目录选择和 live entry 已对应 | 后续请求复用该 entry，释放后由持久选择支持恢复。 |
+
+</div>
+
+这个顺序优先避免目录引用尚不可恢复的 session，允许留下未进入目录的已保存历史。普通操作失败可以靠 catch/finally 释放资源；进程突然退出时，不能依赖这些清理完成。rename 也没有把两个存储变成事务，代码没有对文件和父目录执行 fsync，因此不能从操作返回成功推导断电持久性。
+
+切到不同历史会话时还有一个容易混淆的细节：桥接先准备目标，释放旧 live entry，再保存 catalog 选择。若 `catalog.select()` 失败，目标 handle 会被释放；新目录尚未发布就失败时，旧持久选择仍在，下一条消息可以恢复旧历史。已有 `preserves the selected history if its catalog cannot commit a switch` 测试让 select 直接拒绝，再断言后续输入仍进入第二个会话。它验证的是选择失败后的恢复路径，不是保留旧 live handle，也不是模拟断电。
+
+
+这个矩阵让取舍更具体：先物化可能留下没有被目录引用的历史，但它优先避免把尚不存在的持久对象交给远端选择。若要求创建历史与修改目录共同提交，就需要让两者参与同一个可恢复事务或增加明确的协调协议。当前这个单实例 JSON 目录并没有承担这项责任。
+
+<a id="approval" style="scroll-margin-top: 120px"></a>
 ## 11. 审批：接入 DSH 的 answerer waterfall
 
 DSH 已经有审批服务，工具执行也已经有权限检查。飞书桥接承担其中的“向人展示问题并取得答案”这一部分。
@@ -760,7 +891,15 @@ DSH 服务负责 `approval/asked` 与 `approval/decided` 的审计配对，插�
 
 还需要区分“请求等待期限”和“已经显示的卡片还能不能被肉眼看到”。超时后远端旧卡片可能仍在聊天记录中，但 pending token 已经失效。用户再次点击时不能恢复原请求。
 
-<a id="questions"></a>
+### 11.5 审批不带 turn 字段，怎样判断所属请求
+
+`ApprovalRequestEvent` 没有 turn 字段。上面的 listener 也没有从 call ID 反查一个 turn 并验证；call ID 在这里用于展示已记录的参数预览。桥接实际依赖当前 agent 的生命周期与 `ownedTurn`：认领飞书输入后启用 owner，匹配回合结束时同步撤销它。
+
+这个办法的前提是可信的同进程调用者遵守宿主执行流程：工具在自己的执行期间发起审批，相关异步工作随回合和取消一起收尾。它用于为正常运行的不同输入来源选择 answerer，并不验证任意调用者宣称的历史身份。如果一个插件在旧任务结束后仍故意拿同一个 agent 发起请求，而此时它恰好正在处理另一条飞书输入，仅凭这些字段就无法辨别冒用。
+
+所以这层检查的范围是当前受托执行的交互路由；若宿主要接纳不可信的同进程插件，需要由宿主增加可验证的执行身份和隔离能力。随机卡片 token 与 sender/chat 校验保护的是外部点击进入这个 pending 请求的过程，它们不会补出 DSH 请求中没有的 turn 凭据。
+
+<a id="questions" style="scroll-margin-top: 120px"></a>
 ## 12. 询问：把卡片提交还原为原始问题的答案
 
 审批回答一个是否允许执行的问题，结构化询问则可能包含多个问题、单选、多选和自由文本。DSH 通过 `ctx.userQuestions` 与独立的模型工具来提供它。
@@ -848,7 +987,7 @@ const selected = indices.map(index => {
 
 桥接不会在后台把答案塞进一段没有记录的系统提示词。飞书交互结果继续遵循宿主的输入和工具结果路径，后续恢复与回放才能看见同样的事实。
 
-<a id="progress"></a>
+<a id="progress" style="scroll-margin-top: 120px"></a>
 ## 13. 任务进度：从日志投影到一张卡片
 
 一个耗时任务如果始终只显示“机器人已收到”，用户很难知道模型在执行、等审批，还是已经卡住。dsh-lark 为每个运行请求创建一张任务卡片，结束后移除停止按钮并展示最终结果。
@@ -934,7 +1073,7 @@ async finish(status: 'completed' | 'failed' | 'stopped', text: string): Promise<
 
 最终文本回复独立于卡片更新。卡片发送失败时，任务仍然执行并给出文本；更新失败时，插件记录本地警告，不再不断重试同一张失效卡片。最终文本和卡片预览都有长度上限，完整内容继续保留在 DSH session 中。
 
-<a id="incoming-files"></a>
+<a id="incoming-files" style="scroll-margin-top: 120px"></a>
 ## 14. 接收图片和普通文件
 
 飞书资源 key 来自前面核对过身份的原消息 JSON，不能从渲染后的 `content` 猜。得到 key 后，桥接把资源下载到自己创建的私有临时目录。
@@ -1014,7 +1153,7 @@ source: {
 
 源码通过 `MessageSourceMap` 的声明合并贡献了 `lark` 来源字段。来源与内容一起进入宿主日志，后续可以对照原消息和所属群话题。被拒绝或取消的附件不会被当成成功接收的用户消息提交。
 
-<a id="outgoing-files"></a>
+<a id="outgoing-files" style="scroll-margin-top: 120px"></a>
 ## 15. 发送文件：一个受约束的工具
 
 接收文件是用户把输入交给 agent，发送文件则是本机内容向外部交付。两者的触发依据不能混在一起。
@@ -1111,7 +1250,7 @@ ctx.on('tools/pre-execute', async (exec, next) => {
 
 默认启用 `fileDelivery`，但这不表示模型一定能生成 PDF。生成能力仍取决于 preset 里有什么工具和环境。文件交付工具只处理已经存在的文件。
 
-<a id="file-safety"></a>
+<a id="file-safety" style="scroll-margin-top: 120px"></a>
 ## 16. 文件路径、普通文件检查与上传快照
 
 路径检查有几层，每层处理不同的问题。即使用户批准了一次工具调用，文件也需要满足这些约束。
@@ -1122,7 +1261,7 @@ ctx.on('tools/pre-execute', async (exec, next) => {
 
 只拼接 `workspace + inputPath` 并不够。工作区中的一个符号链接可能指向外部，表面路径仍然以工作区开头，实际打开的文件却已不在里面。canonical containment 检查处理的就是这个情况。
 
-这套检查也不保证能防御同一账号中的恶意并发文件替换。检查和打开之间仍有时序窗口，Node 的这些路径操作没有提供完整的逐级原子 `openat` 沙箱。本文说的是可信参与者共享工作区中的交付约束，不能把它写成面向敌对租户的文件系统隔离。
+这套路径检查用于可信参与者共享工作区的交付约束。检查和打开之间仍有时序窗口，Node 的这些路径操作没有提供完整的逐级原子 `openat` 沙箱，因此无法防御同一账号中的恶意并发文件替换。
 
 ### 16.2 打开普通文件之前，要考虑 FIFO
 
@@ -1139,7 +1278,7 @@ const handle = await open(
 
 如果先阻塞打开 FIFO，再想着“等 fstat 之后拒绝它”，检查永远没有机会运行。把 signal 检查放在 open 后面也救不了这个等待。非阻塞打开之后，才能及时识别特殊文件并拒绝。
 
-这个问题有单独的 POSIX 回归用例。平台相关行为在测试里明确区分，不能把 macOS 上的这条验证当成所有操作系统都已经逐一确认。
+这个问题有单独的 POSIX 回归用例；平台相关案例在测试中明确区分。本文实际复现环境为 macOS，其他平台的结果以各自执行记录为准。
 
 ### 16.3 文件增长时也要限制读取量
 
@@ -1178,7 +1317,7 @@ chunks.push(block.subarray(0, bytesRead))
 
 这些代码不长，但每个检查的位置都会影响已经发生的副作用。审查文件相关实现时，我会同时问“最终有没有拒绝”和“拒绝前已经在哪里创建或打开了什么”。
 
-<a id="egress"></a>
+<a id="egress" style="scroll-margin-top: 120px"></a>
 ## 17. 消息发出去之后，怎样判断成功
 
 消息回复和文件上传都经过 `LarkEgress`，它内部再调用统一的 CLI runner。
@@ -1242,7 +1381,30 @@ if (rawApi ? envelope?.['code'] !== 0 : envelope?.['ok'] !== true) {
 
 consumer 的事件 ID 去重、卡片 token 一次消费和创建卡片的请求 UUID，都各自解决局部重复问题；把它们加起来，也不能得到整个桥接“恰好一次执行和投递”的保证。
 
-<a id="lifecycle"></a>
+<a id="delivery-outcomes" style="scroll-margin-top: 120px"></a>
+### 17.5 把本地完成、远端执行和确认分开看
+
+在外部交付中，至少有三个观察对象：本地工具是否结束、CLI 是否已经关闭、飞书是否已经接受写入。它们之间还有确认响应，最后一项通常不能只靠前两项推导。
+
+<div style="overflow-x: auto">
+
+| 中断或返回发生的位置 | 本地能够确认什么 | 外部结果与后续行为 |
+|---|---|---|
+| 文件检查或快照阶段，尚未启动上传 CLI | 本次上传尚未由桥接发出。 | 可以确认这一条交付没有经过该上传调用发出；先前独立调用的结果另算。 |
+| CLI 已开始，但收到失败或取消 | 本次调用失败，关闭流程结束后本地资源可清理。 | 仅凭该错误无法排除已经产生外部副作用。 |
+| 远端已接受，确认响应丢失 | 本地只看到 timeout 或连接错误。 | 用户可能已经收到文件；自动重试可能重复交付。 |
+| 收到成功 envelope | CLI 返回业务成功，工具记录 delivered。 | 返回值按外部 API 的成功语义解释，不额外推断用户已阅读或文件内容永远可用。 |
+| 工具成功后，终态卡片 patch 失败 | 工具交付结果已经记录，视觉确认失败。 | 保留已记录结果，不能为了更新卡片而重新上传。 |
+
+</div>
+
+“发出”和“确认”之间的窗口由传输协议决定，`AbortController` 无法让它变成一次原子事务。这里选择让不确定结果显式成为错误，并且不自动重复文件写入；如果以后要自动恢复交付，需要先决定幂等标识由谁持有、怎样查询结果、标识保存多久，以及何时允许重试。
+
+接收事件的去重也有自己的窗口：当前 consumer 在调用业务回调前把 event ID 放入内存 seen 集合。若随后元数据查询失败，集合不会因为业务失败撤销这个 ID；同一实例里再次送达它，可能直接被忽略。集合淘汰或重启后又可能再次接收。这个机制抑制有限时间内的重复派发，未建立持久的“已接收—已执行—已确认”协议。
+
+上述范围依据源码顺序与传输不确定性推导。下面的本地实验验证可控的 runtime 调度；真实飞书服务端的故障与写入结果尚未逐项验证。
+
+<a id="lifecycle" style="scroll-margin-top: 120px"></a>
 ## 18. 子进程退出与插件卸载
 
 桥接拥有两种 CLI 进程：长时间订阅的 consumer，以及一次性的版本检查、消息查询、发送和文件传输请求。退出逻辑需要兼顾正常清理和无响应的进程。
@@ -1315,7 +1477,7 @@ SIGTERM
 
 因此 `egressTimeoutMs` 是请求 deadline，不是“包括一切清理在内的总耗时绝不多于这个数”。进程终止还可能增加一个 grace period，consumer 则有 EOF 和 SIGTERM 两个阶段。
 
-CLI 的正常取消订阅有意义，强制终止只用于不配合退出的情况。强杀可能使 CLI 来不及清理服务端订阅，需要它的恢复流程处理；文章不能只介绍 SIGKILL 解决挂起，却省略这个代价。
+consumer 优先通过 EOF 正常取消订阅，只有不配合退出时才升级终止。强制退出可能使 CLI 来不及清理服务端订阅；进程关闭后，订阅恢复仍由 CLI 负责。
 
 ### 18.4 卸载先关闭接收，再等待所属工作结束
 
@@ -1327,7 +1489,7 @@ router 还要释放它创建的会话句柄，并等待已跟踪的回复、文�
 
 这种卸载顺序也决定了为什么前面每个异步操作都需要一个可等待的完成点：只在 map 中删掉引用，不能证明文件子进程、卡片更新或模型工作已经停止。
 
-<a id="structure"></a>
+<a id="structure" style="scroll-margin-top: 120px"></a>
 ## 19. 代码如何保持容易阅读
 
 实现中需要记录的状态不少，但不必为每个名词新建一个 controller。代码整理时，我主要看哪些逻辑确实有不同的输入和所有者，哪些表示同一件事却被复制了几份。
@@ -1395,7 +1557,7 @@ interface InteractionRequest<T> {
 
 整理后卡片快照没有变化。对这种重构，行为测试和输出快照能让代码结构的调整有一个具体参照；不能只凭“看起来更短”判断改动是否保留语义。
 
-<a id="configuration"></a>
+<a id="configuration" style="scroll-margin-top: 120px"></a>
 ## 20. 配置与部署时需要知道的事
 
 这部分只保留理解实现所需的配置，不重复整份安装手册。完整步骤在仓库的[配置机器人指南](https://github.com/ChengqianHuang/dsh-lark/blob/1165fe83dfce4496ea76333029eb0469d9fffb8c/docs/setup.zh-CN.md)中；凭据准备、应用后台操作和真实聊天测试需要在自己的租户完成。
@@ -1426,6 +1588,8 @@ interface InteractionRequest<T> {
 
 ### 20.2 默认限制及它们实际限制的对象
 
+<div style="overflow-x: auto">
+
 | 配置 | 默认值 | 约束对象 |
 |---|---|---|
 | `maxPendingMessagesPerChat` | 8 | 对话等待任务；也限制 chat 的待处理元数据工作。 |
@@ -1450,13 +1614,17 @@ interface InteractionRequest<T> {
 | `maxCliOutputBytes` | 每流 4 MiB | 一次 CLI 请求捕获的 stdout/stderr。 |
 | `restartDelayMs` | 3 秒 | 已就绪 consumer 意外退出后的重试间隔。 |
 
+</div>
+
 这些数值在配置 resolver 中计算与校验。计数与毫秒项要求正整数，进入 Node timer 的值限制在安全 timer 范围；进度间隔还要求至少 200 ms。错误配置在订阅前失败，不能等一段时间后才以 timer 溢出或无限队列的形式表现。
 
 空闲清理由新接收的工作触发检查，不是一个每秒扫描所有 session 的后台任务。它不打断正在运行或切换中的对话。
 
 ### 20.3 CLI 能力检查与租户能力检查不同
 
-本机需要 CLI 支持消息接收 schema 和 `card.action.trigger` schema。插件初始化会做相应探测；没有 callback 协议的版本会启动失败并给出处理建议。
+本机部署要求 CLI 提供接收事件协议；启用任一种卡片时还要求 `card.action.trigger`。当前初始化实际做两项检查：执行 `--version` 确认可运行；启用卡片时执行 `event schema card.action.trigger --json`，解析 JSON 并核对返回的 `key`。它没有自动探测消息接收 schema，也没有遍历验证卡片 schema 的全部字段。
+
+消息接收 schema 的身份与字段检查属于[安装指南中的人工准备步骤](https://github.com/ChengqianHuang/dsh-lark/blob/1165fe83dfce4496ea76333029eb0469d9fffb8c/docs/setup.zh-CN.md)。运行期 parser 只接收桥接认识的字段组合。因此，初始化探测通过只说明对应的有限检查通过，不代表租户能送达事件，也不代表所有回调表单在真实客户端均已验证。
 
 租户里还要启用机器人、发布应用、配置回调订阅和相应消息/资源权限。这些配置不能由用户登录替代，因为桥接固定用 bot 身份收发消息。
 
@@ -1464,7 +1632,7 @@ interface InteractionRequest<T> {
 
 文件保存位置、日志保留和模型提供商凭据也分别由插件与宿主负责。飞书应用密钥由 CLI 配置管理，不出现在这份 YAML 中。
 
-<a id="testing"></a>
+<a id="testing" style="scroll-margin-top: 120px"></a>
 ## 21. 用真实 DSH 运行时验证桥接
 
 做这类集成时，测试可以很轻松地写成“调用假 agent，看到 send 被调用就通过”。但前面最容易出问题的地方，恰好是 agent 的认领时机、日志顺序、作用域和取消收尾。把这些全换成 mock，测试就绕过了需要验证的东西。
@@ -1530,13 +1698,93 @@ expect(h.agents[0]?.status).toBe('running')
 pnpm check
 ```
 
-该脚本依次执行 typecheck、Vitest、build 和 package smoke。结果为 **14 个测试文件、158 项测试全部通过**，TypeScript 检查通过，ESM bundle 构建完成；安装包检查确认打包文件和构建入口可以在 checkout 之外导入。
+原文版本执行该脚本，依次检查 typecheck、Vitest、build 和 package smoke，结果为 **14 个测试文件、158 项测试全部通过**，TypeScript 检查通过，ESM bundle 构建完成；安装包检查确认打包文件和构建入口可以在 checkout 之外导入。
 
-仓库 CI 定义了 Linux 上 Node 22.19 / 24 / 26 和 macOS 上 Node 24 的组合，但本文这次重新运行的是本机检查，不能把 CI 矩阵配置当成这次每个平台都已经现场执行的结果。
+仓库 CI 配置覆盖 Linux 上 Node 22.19 / 24 / 26 和 macOS 上 Node 24。上述执行结果来自本机检查；真实飞书租户的应用权限、移动端表单、回调和实际投递不在这次自动检查的覆盖范围中。
 
-更没有因为这 158 项通过，就认定某个飞书租户中的应用权限、移动端表单和长连接回调已经通过。项目把真实租户验证与自动检查分开，这个区分也保留在本文中。
+<a id="ownership-experiment" style="scroll-margin-top: 120px"></a>
+### 21.7 对照实验：同样的两个输入，两种结果等待方式
 
-<a id="trace"></a>
+这一节把第 8 节的反例变成可运行的实验。实验固定在 dsh-lark `1165fe83dfce4496ea76333029eb0469d9fffb8c`，使用其已安装的 DSH `0.1.2-alpha.5` 依赖。本次执行环境为 macOS、Node `v26.10.0`、Vitest `4.1.8`。
+
+实验直接比较一个刻意错误的 consumer 和实际 `runMessageTurn()`，经过真实 Agent、inbox、AgentLoop、Session 和 JSONL persistence。两个输入用 `lark`、`ui` 作为稳定别名，实际都由脚本提交；它没有打开浏览器 UI，也没有经过飞书 transport、卡片回调或真实模型 API。
+
+#### 固定调度关系，避免靠“刚好慢一点”复现
+
+两个场景各用一个独立 runtime。第一个脚本响应为 `lark answer`。在它的 `agent/turn-stopping` 通知中提交第二个输入，使 driver 在退出前看见新工作；第二个脚本开始时发出 started 信号，然后阻塞在实验持有的 release promise 上。
+
+```text
+提交 lark 输入
+  → claimed(lark, turn 1)
+  → assistant/message(turn 1, "lark answer")
+  → turn/end(1)
+  → claimed(ui, turn 2)
+  → uiStarted，等待 releaseUi
+       ├─ 检查：agent 仍 running
+       ├─ 检查：两种 consumer 各自完成了什么
+       └─ 显式 releaseUi
+             → assistant/message(turn 2, "ui answer")
+             → turn/end(2) → agent idle
+```
+
+测试使用通知和 promise 屏障证明重叠；不通过 sleep、随机延迟或反复运行来等待碰撞。两个场景分别验证同一组认领和日志事件，避免把“后来那一轮实际上没启动”误当作成功。
+
+错误 consumer 的核心是先等待整个 agent 空闲，再找日志中最后结束的 turn：
+
+```typescript
+async function wholeAgentIdle(agent: Agent, message: UserMessage): Promise<string> {
+  const firstSeq = agent.session.seq
+  agent.followup(message)
+  await agent.whenIdle()
+  for (let seq = agent.session.seq - 1; seq >= firstSeq; seq--) {
+    const event = agent.session.eventAt(SessionSeq(seq))
+    if (event?.type === 'turn/end') return summarizeTurn(agent.session, firstSeq, event.data.turn)
+  }
+  throw new Error('Expected a completed turn')
+}
+```
+
+这是随文实验中的反例函数，不是生产代码。`summarizeTurn()` 本身仍然按传入 turn 读取，但调用者等到全局空闲后选中了最后一个 turn，关联错误已经发生。对照场景直接调用生产 `runMessageTurn(agent, lark, signal)`，不改其实现。
+
+#### 实际观察
+
+<div style="overflow-x: auto">
+
+| 等待策略 | UI 阻塞时的结果 | UI 放行后返回 |
+|---|---|---|
+| 整体空闲反例 | pending，尚未返回 | `ui answer` |
+| 按认领回合 | fulfilled，已得到 `lark answer` | 仍为 `lark answer` |
+
+</div>
+
+UI 阻塞时，两组 agent 的状态均为 running。两组 trace 的运行时事件都显示：lark 输入被认领为 turn 1，UI 输入被认领为 turn 2。区别来自 consumer 何时结算和它选择哪个 turn，而不是输入顺序不同。
+
+这个结果同时展示了两个错误：反例方案被后续 UI 回合拖住，之后又返回 UI 的内容。当前方案在 UI 尚未结束时已经拿到 turn 1 的结果，之后的 UI 输出不会改写它。
+
+#### 自己运行
+
+取得上述固定提交，并按项目要求安装锁定依赖后，下载[实验文件](post-assets/dsh-lark/turn-ownership-experiment.spec.ts)，保存为该 checkout 的 `tests/turn-ownership-experiment.spec.ts`。文件依赖 checkout 原有的 `tests/helpers/runtime.ts` 与 `src/summary.ts`，放在博客目录直接运行不会得到相同环境。
+
+下面是本次实际执行的命令，不需要模型 key 或飞书凭据：
+
+```sh
+node node_modules/vitest/vitest.mjs run tests/turn-ownership-experiment.spec.ts --reporter=verbose
+node node_modules/typescript/bin/tsc --noEmit
+```
+
+结果为 **1 个测试文件、1 项对照测试通过，类型检查通过**。这项测试分别断言错误 consumer 会返回错轮内容、当前 consumer 会返回自己的内容；“测试通过”表示这些对照观察符合预期。测试耗时不作为性能结论。
+
+完整的稳定输出保存为[实验 trace JSON](post-assets/dsh-lark/turn-ownership-trace.json)。其中 `claimed`、`assistant/message` 和 `turn/end` 来自 runtime 通知，pending/fulfilled 来自实验对结果 promise 的观察；随机 message ID 和临时路径没有写入输出，producer 名称是实验自己的别名。
+
+另外两条既有用例分别检查“取消自己还在 inbox 排队的输入，保留其他工作”和“catalog 选择提交失败后，下一条输入恢复原历史”。可在同一 checkout 运行：
+
+```sh
+node node_modules/vitest/vitest.mjs run tests/summary.spec.ts tests/sessions.spec.ts -t 'removes only the owned queued message|preserves the selected history' --reporter=verbose
+```
+
+本次选择执行的两条用例均通过，其余 13 条未选中。它们验证所描述的取消与失败恢复路径，未覆盖任意掉电或真实飞书外部写入的回滚。对真实租户仍需要补充 CLI 版本、实际消息与回调及交付结果；这些证据与当前实验分开保存。
+
+<a id="trace" style="scroll-margin-top: 120px"></a>
 ## 22. 走完一次带审批的文件任务
 
 前面分开讲了很多局部。把它们放回一条“分析附件并交付报告”的请求中，会更容易看清数据和职责怎样连接。
@@ -1587,14 +1835,14 @@ CLI 成功响应经 JSON envelope 验证后，工具返回 name/bytes/delivered�
 
 如果这时发生插件卸载，则流程转入取消收尾：不再接收新事件、终止所属请求、结束 pending interaction、等待子进程和卡片任务、释放句柄。已保存的 DSH 历史与私聊目录按照各自保留策略继续存在。
 
-<a id="limitations"></a>
+<a id="limitations" style="scroll-margin-top: 120px"></a>
 ## 23. 当前保留的限制
 
 把限制与具体存储、协议和权限放在一起，更容易判断这个插件适不适合自己的场景。
 
 **它面向可信用户共享本机工作区。** chat、topic、sender 检查决定谁能触发桥接、消息去哪一轮，并不限制一个已授权 agent 的所有文件系统工具。不同话题和私聊仍然可能访问同一份项目文件。
 
-**持久化分工有限。** DSH 保存会话历史，桥接保存私聊 choices/current；排队消息、尚未完成的人类交互、group binding、卡片 token 和事件去重集合不跨插件重启保存。没有 durable inbox，也没有离线投递队列。
+**持久化分工有限。** DSH 保存会话历史，桥接保存私聊 choices/current；排队消息、尚未完成的人类交互、group binding、卡片 token 和事件去重集合不跨插件重启保存。桥接没有自己的持久接收箱或离线投递队列；已经进入 DSH inbox 的输入则按宿主的日志协议处理。
 
 **群话题只恢复活跃内存绑定。** idle 释放或重启后，未提及回复不自动恢复旧群 session。需要再次提及建立新的绑定。若将来增加群持久恢复，需要单独设计 root 与 session 的持久映射、授权变化和保留规则。
 
@@ -1612,7 +1860,7 @@ CLI 成功响应经 JSON envelope 验证后，工具返回 name/bytes/delivered�
 
 这些限制里，有些适合以后继续做，例如长回答的明确交付方式或群绑定持久化；有些是部署模型需要明确保留的前提。对目前这个本机个人助手入口，先把每条请求的归属、权限、日志和清理说明白，比增加一层表面上的“支持所有聊天场景”更有帮助。
 
-<a id="extension"></a>
+<a id="extension" style="scroll-margin-top: 120px"></a>
 ## 24. 从这个插件看 DSH 的扩展方式
 
 [上一篇个人助理文章](/post.html?post=dsh-personal-assistant)主要做记录与检索：模型借助语义工具访问插件自己的数据。dsh-lark 处理的是另一种扩展，让已有 agent 从飞书接收输入、等待人的决定，并把结果交回对话。
@@ -1633,10 +1881,12 @@ CLI 成功响应经 JSON envelope 验证后，工具返回 name/bytes/delivered�
 
 这些做法不要求把飞书特例写进 agent loop。插件仍然能够独立构建、卸载和测试，宿主保留模型与工具执行。对想把自己的 agent 接到其他聊天系统的读者，里面可以直接对照的内容是消息与回合关联、answerer 的接入方式，以及取消和外部投递的实际范围。
 
-<a id="sources"></a>
+<a id="sources" style="scroll-margin-top: 120px"></a>
 ## 源码与接口对照
 
 下面的插件链接固定到本文使用的提交，不随 `main` 后续修改。DSH 链接指向实际依赖版本发布包中的类型声明。阅读新版本时，应重新核对这些时序与字段。
+
+<div style="overflow-x: auto">
 
 | 主题 | 对应源码 |
 |---|---|
@@ -1655,6 +1905,8 @@ CLI 成功响应经 JSON envelope 验证后，工具返回 name/bytes/delivered�
 | 并发归属与回放 | [bridge.spec.ts](https://github.com/ChengqianHuang/dsh-lark/blob/1165fe83dfce4496ea76333029eb0469d9fffb8c/tests/bridge.spec.ts)、[summary.spec.ts](https://github.com/ChengqianHuang/dsh-lark/blob/1165fe83dfce4496ea76333029eb0469d9fffb8c/tests/summary.spec.ts) |
 | 话题、文件、任务卡片 | [features.spec.ts](https://github.com/ChengqianHuang/dsh-lark/blob/1165fe83dfce4496ea76333029eb0469d9fffb8c/tests/features.spec.ts)、[progress.spec.ts](https://github.com/ChengqianHuang/dsh-lark/blob/1165fe83dfce4496ea76333029eb0469d9fffb8c/tests/progress.spec.ts) |
 | 进程与文件回归 | [process.spec.ts](https://github.com/ChengqianHuang/dsh-lark/blob/1165fe83dfce4496ea76333029eb0469d9fffb8c/tests/process.spec.ts)、[files.spec.ts](https://github.com/ChengqianHuang/dsh-lark/blob/1165fe83dfce4496ea76333029eb0469d9fffb8c/tests/files.spec.ts) |
+
+</div>
 
 DSH `0.1.2-alpha.5` 的接口声明可以逐项对照：
 

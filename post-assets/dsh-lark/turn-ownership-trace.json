@@ -1,0 +1,94 @@
+{
+  "dshLarkCommit": "1165fe8",
+  "dshPackages": "0.1.2-alpha.5",
+  "scenarios": [
+    {
+      "method": "whole-agent-idle",
+      "whileUiBlocked": {
+        "agentStatus": "running",
+        "consumer": "pending",
+        "text": null
+      },
+      "afterUiReleased": {
+        "agentStatus": "idle",
+        "returned": "ui answer"
+      },
+      "observedRuntimeEvents": [
+        {
+          "event": "agent/inbox/claimed",
+          "producer": "lark",
+          "turn": 1
+        },
+        {
+          "event": "assistant/message",
+          "turn": 1,
+          "text": "lark answer"
+        },
+        {
+          "event": "turn/end",
+          "turn": 1,
+          "reason": "completed"
+        },
+        {
+          "event": "agent/inbox/claimed",
+          "producer": "ui",
+          "turn": 2
+        },
+        {
+          "event": "assistant/message",
+          "turn": 2,
+          "text": "ui answer"
+        },
+        {
+          "event": "turn/end",
+          "turn": 2,
+          "reason": "completed"
+        }
+      ]
+    },
+    {
+      "method": "claimed-turn",
+      "whileUiBlocked": {
+        "agentStatus": "running",
+        "consumer": "fulfilled",
+        "text": "lark answer"
+      },
+      "afterUiReleased": {
+        "agentStatus": "idle",
+        "returned": "lark answer"
+      },
+      "observedRuntimeEvents": [
+        {
+          "event": "agent/inbox/claimed",
+          "producer": "lark",
+          "turn": 1
+        },
+        {
+          "event": "assistant/message",
+          "turn": 1,
+          "text": "lark answer"
+        },
+        {
+          "event": "turn/end",
+          "turn": 1,
+          "reason": "completed"
+        },
+        {
+          "event": "agent/inbox/claimed",
+          "producer": "ui",
+          "turn": 2
+        },
+        {
+          "event": "assistant/message",
+          "turn": 2,
+          "text": "ui answer"
+        },
+        {
+          "event": "turn/end",
+          "turn": 2,
+          "reason": "completed"
+        }
+      ]
+    }
+  ]
+}

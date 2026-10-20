@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="810" viewBox="0 0 480 810" role="img" aria-labelledby="title desc">
+  <title id="title">飞书输入与 DSH 回合的归属顺序</title>
+  <desc id="desc">先安装监听并提交输入；匹配 inbox claimed 后设置 turn；等匹配 turn end 后先撤销 owner 和监听再返回结果。取消在认领前移除输入，认领后请求停止并等回合结束。</desc>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" fill="#596b85"/></marker></defs>
+  <rect width="480" height="810" rx="16" fill="#f7f9fc"/>
+  <g font-family="system-ui,-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif" fill="#17283f" text-anchor="middle">
+    <text x="240" y="38" font-size="21" font-weight="700">输入、回合和归属的先后关系</text>
+    <g fill="#fff" stroke="#bdcce0" stroke-width="1.5">
+      <rect x="28" y="66" width="424" height="112" rx="12"/>
+      <rect x="28" y="248" width="424" height="112" rx="12"/>
+      <rect x="28" y="430" width="424" height="112" rx="12"/>
+      <rect x="28" y="612" width="424" height="112" rx="12"/>
+    </g>
+    <g font-size="19" font-weight="650">
+      <text x="240" y="100">监听已安装，输入已提交</text>
+      <text x="240" y="282">本输入被认领为 turn N</text>
+      <text x="240" y="464">收到同一 session 的 N 号结束事件</text>
+      <text x="240" y="646">同步清理后返回本请求结果</text>
+    </g>
+    <g font-size="17" fill="#455d7c">
+      <text x="240" y="133">已知 agent 与 UserMessage.id</text>
+      <text x="240" y="159">owner 尚未生效；取消只移除本输入</text>
+      <text x="240" y="315">ownedTurn = N，owner 生效</text>
+      <text x="240" y="341">取消：keepInbox，并等待 N 结束</text>
+      <text x="240" y="497">只读取 N 的 assistant/message</text>
+      <text x="240" y="523">区分完成、取消与其他结束原因</text>
+      <text x="240" y="679">owner = undefined，移除所有监听</text>
+      <text x="240" y="705">随后 resolve；后续回合可继续运行</text>
+      <text x="240" y="214">claimed 的 agent/id 与 message/id 匹配</text>
+      <text x="240" y="396">模型、工具与人工交互发生在本回合内</text>
+      <text x="240" y="578">finish() 在交还结果前执行 cleanup()</text>
+      <text x="240" y="766">图示正常执行路径；取消与失败见正文状态表。</text>
+      <text x="240" y="790">其他来源的排队输入由 DSH 继续管理。</text>
+    </g>
+    <g stroke="#596b85" stroke-width="2" marker-end="url(#arrow)"><path d="M240 180v17"/><path d="M240 222v22"/><path d="M240 362v17"/><path d="M240 404v22"/><path d="M240 544v17"/><path d="M240 586v22"/></g>
+  </g>
+</svg>
