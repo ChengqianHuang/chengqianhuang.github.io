@@ -1,0 +1,50 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "kimi-k2-6-workbuddy-2026-10-20-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "Moonshot AI",
+    "name": "Kimi-K2.6",
+    "id": null,
+    "identitySource": "system-reported"
+  },
+  "harness": {
+    "name": "WorkBuddy",
+    "version": "5.8.3",
+    "mode": "agent",
+    "context": "existing-conversation",
+    "tools": [
+      "show_widget"
+    ]
+  },
+  "run": {
+    "generatedAt": "2026-10-20T20:36:00+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 1,
+    "totalAttempts": 1,
+    "selection": "first",
+    "parameters": {},
+    "postProcessing": "none",
+    "notes": "SVG authored directly via show_widget inline rendering tool. Four CSS @keyframes animations: spin rotates both wheel groups about their hub centers via transform-origin:0 0 inside translated groups; pedal rotates crank arms + pedals about the bottom bracket; leg-l and leg-r oscillate each leg to track pedals with opposing phases; bob translates the pelican body vertically. All animations disabled via prefers-reduced-motion media query. Bicycle frame is geometric line-art (coral stroke). Pelican: light-gray body ellipse with gray stroke, gray wing, curved neck via thick stroke overlay, amber beak with pink pouch, orange feet. Legs are stroked paths (coral) ending in elliptical feet on pedals. Known defects recorded rather than corrected: chain is absent entirely; legs use simple CSS rotation rather than IK solving so pedal tracking is approximate and both legs share one pivot point; the saddle is mostly occluded by the body; the bird reads somewhat goose-like, with a shorter neck and smaller pouch than a real pelican."
+  },
+  "artifact": {
+    "path": "pelican-assets/kimi-k2-6-workbuddy-2026-10-20-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 680,
+    "height": 480,
+    "sha256": "6cf7051f2693df84e821e9f1f93b4ad5434721d9c01a90735a5a6be44818da97"
+  },
+  "source": null,
+  "animation": {
+    "mechanism": "css",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/kimi-k2-6-workbuddy-2026-10-20-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 680,
+    "height": 480,
+    "sha256": "307afa429ec450b75f3d0d5eb69e671a41bcba7c6b832cb2ae3915768ae74843"
+  }
+}
