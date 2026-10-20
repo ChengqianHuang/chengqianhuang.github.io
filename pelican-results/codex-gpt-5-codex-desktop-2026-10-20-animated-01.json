@@ -1,0 +1,48 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "codex-gpt-5-codex-desktop-2026-10-20-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "OpenAI",
+    "name": "GPT-5",
+    "id": null,
+    "identitySource": "system-reported"
+  },
+  "harness": {
+    "name": "Codex desktop",
+    "version": null,
+    "mode": "agent",
+    "context": "existing-conversation",
+    "tools": ["apply_patch", "exec_command"]
+  },
+  "run": {
+    "generatedAt": "2026-10-20T20:00:00+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 1,
+    "totalAttempts": 1,
+    "selection": "first",
+    "parameters": {},
+    "postProcessing": "none",
+    "notes": "Generated in an existing Codex conversation. The illustration uses CSS keyframes for wheel rotation, alternating pedal strokes, and a subtle head bob. A static poster was derived for reduced-motion gallery playback; the original animated SVG is preserved unchanged."
+  },
+  "artifact": {
+    "path": "pelican-assets/codex-gpt-5-codex-desktop-2026-10-20-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 900,
+    "height": 560,
+    "sha256": "9705c308265b6eeccf0c8a096d74171fb9ccf0d0deb544b7d318fdda875dda9c"
+  },
+  "source": null,
+  "animation": {
+    "mechanism": "css",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/codex-gpt-5-codex-desktop-2026-10-20-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 900,
+    "height": 560,
+    "sha256": "860af4c7b5c5ea19161ee6a105e28bf4fb3b1f1dd5b64d1d223208baed996f9b"
+  }
+}

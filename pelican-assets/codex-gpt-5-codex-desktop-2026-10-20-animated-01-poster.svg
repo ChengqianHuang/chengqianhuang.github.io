@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" role="img" aria-labelledby="title desc">
+  <title id="title">A pelican riding a bicycle</title>
+  <desc id="desc">An animated illustration of a pelican pedaling a bicycle. The wheels turn and the legs alternate. Animation stops when reduced motion is preferred.</desc>
+  <style>
+    :root { color-scheme: light dark; }
+    .scene { fill: #dff4f7; }
+    .sun { fill: #ffd166; }
+    .cloud { fill: #fff9ed; opacity: .88; }
+    .ground { stroke: #2d6a4f; stroke-width: 7; stroke-linecap: round; opacity: .6; }
+    .road { fill: #88b0ad; opacity: .28; }
+    .bike-stroke { fill: none; stroke: #143642; stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; }
+    .bike-accent { fill: none; stroke: #e76f51; stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; }
+    .tire { fill: none; stroke: #143642; stroke-width: 12; }
+    .spoke { stroke: #143642; stroke-width: 3; opacity: .58; }
+    .pelican-body { fill: #f6f1e9; stroke: #143642; stroke-width: 7; stroke-linejoin: round; }
+    .pelican-wing { fill: #d9e2e4; stroke: #143642; stroke-width: 7; stroke-linejoin: round; }
+    .pelican-leg { fill: none; stroke: #e76f51; stroke-width: 8; stroke-linecap: round; stroke-linejoin: round; }
+    .pelican-foot { fill: none; stroke: #e76f51; stroke-width: 7; stroke-linecap: round; }
+    .eye { fill: #143642; }
+    .beak { fill: #f4a261; stroke: #143642; stroke-width: 6; stroke-linejoin: round; }
+    .wheel-spin { transform-box: fill-box; transform-origin: center; }
+    .pedal-cycle { transform-box: fill-box; transform-origin: 50% 100%; }
+    .head-bob { transform-box: fill-box; transform-origin: 50% 100%; } } 50% { transform: rotate(-24deg); } } 50% { transform: rotate(2deg) translateY(3px); } }
+    }
+  </style>
+
+  <rect class="scene" width="900" height="560" rx="32"/>
+  <circle class="sun" cx="120" cy="105" r="46"/>
+  <path class="cloud" d="M225 132c0-23 19-42 42-42 12 0 23 5 31 14 8-21 28-36 52-36 30 0 54 24 54 54h8c19 0 35 15 35 35H225c-17 0-30-11-30-25s13-26 30-26z"/>
+  <path class="cloud" d="M620 105c0-17 14-31 31-31 9 0 17 4 23 10 6-16 21-27 39-27 23 0 41 18 41 41h6c14 0 26 11 26 26H620c-13 0-23-8-23-19s10-20 23-20z"/>
+  <path class="road" d="M0 405h900v155H0z"/>
+  <path class="ground" d="M42 474h816"/>
+  <path class="ground" d="M135 493h80m560 0h80"/>
+
+  <g aria-label="bicycle">
+    <g class="wheel-spin" aria-label="rear wheel">
+      <circle class="tire" cx="280" cy="399" r="88"/>
+      <path class="spoke" d="M280 311v176M192 399h176M218 337l124 124M342 337L218 461"/>
+      <circle fill="#e76f51" cx="280" cy="399" r="9"/>
+    </g>
+    <g class="wheel-spin" aria-label="front wheel">
+      <circle class="tire" cx="650" cy="399" r="88"/>
+      <path class="spoke" d="M650 311v176M562 399h176M588 337l124 124M712 337L588 461"/>
+      <circle fill="#e76f51" cx="650" cy="399" r="9"/>
+    </g>
+    <path class="bike-stroke" d="M280 399l135-119 100 119H280l80-3 55 3"/>
+    <path class="bike-stroke" d="M415 280l18-58m-18 58h-57"/>
+    <path class="bike-accent" d="M433 222h42m-20 0 33 19"/>
+    <path class="bike-stroke" d="M515 399l40-146m0 0h35m-35 0 24-24"/>
+    <circle fill="#e76f51" cx="415" cy="399" r="17"/>
+    <g class="wheel-spin" aria-label="pedal crank">
+      <path class="bike-accent" d="M415 399l-2-38m2 38 32 22"/>
+      <circle fill="#143642" cx="415" cy="399" r="7"/>
+    </g>
+  </g>
+
+  <g aria-label="pelican rider">
+    <path class="pelican-body" d="M424 278c-24-41-16-94 25-124 37-27 82-17 105 17 17 25 14 57-4 78-22 27-69 43-126 29z"/>
+    <path class="pelican-wing" d="M448 203c26-23 61-23 82-6-5 31-28 55-59 59-12-11-20-29-23-53z"/>
+    <g class="head-bob">
+      <path class="pelican-body" d="M426 162c-20-30-13-71 15-92 25-19 63-15 83 9 12 14 16 33 11 51-7 28-39 46-73 44z"/>
+      <path class="beak" d="M508 118l91 25c10 3 11 16 1 20l-76 21c-18 5-34-12-27-29z"/>
+      <circle class="eye" cx="490" cy="104" r="7"/>
+      <path class="pelican-body" d="M476 82c-2-20 9-37 26-43 19-6 37 5 43 22-20-6-43 1-69 21z"/>
+    </g>
+    <g class="pelican-leg pedal-cycle">
+      <path d="M470 263l-20 94 42 40"/>
+      <path class="pelican-foot" d="M492 397l-20 10m20-10 18 9"/>
+    </g>
+    <g class="pelican-leg pedal-cycle" style="animation-delay:-.775s">
+      <path d="M510 260l-4 89 42 50"/>
+      <path class="pelican-foot" d="M548 399l-20 10m20-10 18 9"/>
+    </g>
+    <path class="pelican-foot" d="M480 407h-25m85 1h-23"/>
+  </g>
+
+  <text x="450" y="525" text-anchor="middle" font-family="system-ui, sans-serif" font-size="18" fill="#143642" opacity=".72">pedal, pedal, flap!</text>
+</svg>
