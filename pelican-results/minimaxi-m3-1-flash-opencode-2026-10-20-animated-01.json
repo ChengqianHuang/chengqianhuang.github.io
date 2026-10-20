@@ -1,0 +1,52 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "minimaxi-m3-1-flash-opencode-2026-10-20-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "MiniMax",
+    "name": "MiniMax M3.1 Flash",
+    "id": "minimax-m3.1-flash-free",
+    "identitySource": "system-reported"
+  },
+  "harness": {
+    "name": "OpenCode",
+    "version": "2.0.16",
+    "mode": "agent",
+    "context": "existing-conversation",
+    "tools": [
+      "write",
+      "shell",
+      "python3"
+    ]
+  },
+  "run": {
+    "generatedAt": "2026-10-20T19:58:57+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 1,
+    "totalAttempts": 1,
+    "selection": "first",
+    "parameters": {},
+    "postProcessing": "none",
+    "notes": "Night scene: a pelican riding a bicycle under a moonlit sky with drifting clouds, twinkling stars, layered hills and a dashed road. The picture was produced by a Python generator script (written outside the repository) that authored the scene geometry and baked the pedalling motion into CSS keyframes. A two-bone IK solver (thigh 76, shin 86, crank radius 32, hip at 352,312, bottom bracket at 400,432, knee bending forward) was sampled at 33 stops across one 1.6 s crank revolution, so both ankles track the pedal spindles exactly and the cycle closes on the first frame without a jump. The animation is pure CSS @keyframes with no SMIL and no script: wheels and cranks rotate, the crank arms carry level pedals, legs are driven by the baked IK, the head bobs, the wing flaps, the tail flicks, the scarf flutters, clouds drift, road dashes scroll and the chain runs as a dashed stroke. Every animated element is a top level group whose transform is translate(place) rotate(angle) with transform-origin 0 0, so no nested transform-origin ambiguity can arise. A prefers-reduced-motion query sets animation:none on every animated class; a headless Chrome render with forced reduced motion is pixel-identical to the poster, which is the same file with the style block removed. Three technical corrections were applied to the generator before the final file was produced (px units are invalid in SVG transform attributes, the reduced-motion selector list named keyframes instead of classes, and the keyframe loop had to close on the first frame); none of them changed the artwork, and the shipped SVG was not edited after generation. Model identity MiniMax M3.1 Flash, id minimax-m3.1-flash-free, is what the runtime reports and is not independently verified, so it is recorded as system-reported and provider MiniMax is likewise unverified. Known cosmetic simplifications recorded rather than corrected: the wheels turn at twice the crank rate instead of a real gear ratio, the chain is a dashed stroke rather than linked chain, both legs share one screen plane, the hips are fixed so only the head bobs and the body does not rise and fall with the stroke, the saddle is hidden behind the body, the far foot is usually covered by the near leg, the chainring has no teeth, and the moon, hills and road dashes are static scenery."
+  },
+  "artifact": {
+    "path": "pelican-assets/minimaxi-m3-1-flash-opencode-2026-10-20-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 800,
+    "height": 600,
+    "sha256": "530288583b55f5f17c14d0b838b2642e33bd30937ecc612da591f002008ab41f"
+  },
+  "source": null,
+  "animation": {
+    "mechanism": "css",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/minimaxi-m3-1-flash-opencode-2026-10-20-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 800,
+    "height": 600,
+    "sha256": "d7f76fc84f3961544603aaef394a7efaaa3c3b690e2cc3c5331b0c746b317992"
+  }
+}
