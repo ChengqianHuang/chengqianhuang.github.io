@@ -1,0 +1,48 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "glm-5-2-workbuddy-2026-10-20-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "Z.ai",
+    "name": "GLM-5.2",
+    "id": null,
+    "identitySource": "system-reported"
+  },
+  "harness": {
+    "name": "WorkBuddy",
+    "version": "5.8.3",
+    "mode": "agent",
+    "context": "fresh",
+    "tools": []
+  },
+  "run": {
+    "generatedAt": "2026-10-20T20:25:48+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 1,
+    "totalAttempts": 1,
+    "selection": "first",
+    "parameters": {},
+    "postProcessing": "none",
+    "notes": "First and only generation, written as direct model output (no Python geometry script, no IK solver). Animation is hand-coordinated SMIL with a CSS reduced-motion guard. Both wheels rotate via animateTransform rotate around each hub (2s loop); the crank and pedal pair rotate via animateTransform rotate around the bottom bracket (1s loop). Each leg is a single <path> whose d attribute animates through 5 keyframes so the foot endpoint follows the pedal spindle on a 25px-radius circle around the bottom bracket; leg 1 sequence is right-down-left-up-right, leg 2 is offset 180 degrees (left-up-right-down-left) so the two legs pump in counter-phase. Three ground speed-lines translate left via animateTransform translate to imply forward motion. Reduced motion is honored by a <style> block in <defs> that does @media (prefers-reduced-motion: reduce) { animate, animateTransform, animateMotion { display: none !important; } }, suppressing every SMIL element. The poster is the same file with the <style> element and all animate/animateTransform elements removed, freezing the scene at the t=0 pose (wheels unrotated, crank at 0 degrees, feet at right and left pedals). Context is declared fresh: the SVG was generated as the direct first response to the protocol prompt in a new turn; the protocol documents, manifest, schema, validator and the metadata of prior entries were read only AFTER generation, before submission. No submitted SVG source or rendered artwork from prior entries was viewed before generating. Model identity (GLM-5.2) is what the WorkBuddy system prompt declares for this conversation; it is not independently verified by an API round-trip, so model.id is null. Harness version 5.8.3 is read from the on-disk plugin cache path (workbuddy-builtin/.../5.8.3-wb.*); mode is agent. Mechanism is recorded as css-smil because the file contains both a CSS @media block (the reduced-motion guard) and SMIL animation elements (the actual motion). Cosmetic defects recorded rather than corrected: (1) legs are single straight paths with no knee joint, so each lower leg visibly stretches and shrinks as the pedal circles (length ranges roughly 40 to 90 px); (2) no chain is drawn between crank and rear hub; (3) both legs share one screen plane, separated only by stroke color, with no near/far depth cue beyond color; (4) the pelican has no visible wing-flap or hands on the handlebar; (5) the front and rear wheel spoke groups share the same 2s period with no phase offset, so they rotate in lockstep rather than reading as independent rolling; (6) the speed-lines translate linearly and snap back at loop end rather than scrolling seamlessly; (7) the beak is a static triangle with no open/close animation."
+  },
+  "artifact": {
+    "path": "pelican-assets/glm-5-2-workbuddy-2026-10-20-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 680,
+    "height": 420,
+    "sha256": "6072ff7d0cadd13d67b6dc07c02a1616a6a13d54758cd61e6442de5a56f25e58"
+  },
+  "source": null,
+  "animation": {
+    "mechanism": "css-smil",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/glm-5-2-workbuddy-2026-10-20-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 680,
+    "height": 420,
+    "sha256": "f4301d3737b4b8b608db32398e930833738c87bc61ea7abea1650f2c6de908b5"
+  }
+}
