@@ -1,0 +1,88 @@
+<svg viewBox="0 0 680 530" width="100%" role="img" xmlns="http://www.w3.org/2000/svg">
+<title>A pelican riding a bicycle</title>
+<desc>An animated illustration of a pelican pedaling a bicycle with turning wheels. Motion is disabled when prefers-reduced-motion is set.</desc>
+<style>
+.spin{transform-box:fill-box;transform-origin:50% 50%;animation:spin 1.5s linear infinite}
+.pedal{transform-box:fill-box;transform-origin:0 0;animation:pedal 1.5s linear infinite}
+.pedal.b{animation-delay:-0.75s}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pedal{
+0%{transform:rotate(0deg) scale(.821)}
+12.5%{transform:rotate(-8.25deg) scale(.882)}
+25%{transform:rotate(-10.16deg) scale(1.016)}
+37.5%{transform:rotate(-6.41deg) scale(1.134)}
+50%{transform:rotate(0deg) scale(1.179)}
+62.5%{transform:rotate(6.41deg) scale(1.134)}
+75%{transform:rotate(10.16deg) scale(1.016)}
+87.5%{transform:rotate(8.25deg) scale(.882)}
+100%{transform:rotate(0deg) scale(.821)}
+}
+@media (prefers-reduced-motion:reduce){.spin,.pedal{animation:none}}
+</style>
+
+<circle cx="612" cy="84" r="26" fill="#FAC775"/>
+<ellipse cx="100" cy="100" rx="34" ry="16" fill="#D3D1C7"/>
+<ellipse cx="128" cy="90" rx="24" ry="13" fill="#D3D1C7"/>
+<ellipse cx="145" cy="102" rx="20" ry="11" fill="#D3D1C7"/>
+
+<line x1="40" y1="500" x2="640" y2="500" stroke="#5F5E5A" stroke-width="2"/>
+<ellipse cx="350" cy="503" rx="210" ry="8" fill="#D3D1C7" opacity="0.6"/>
+<g stroke="#B4B2A9" stroke-width="3" stroke-linecap="round">
+<line x1="60" y1="340" x2="100" y2="340"/>
+<line x1="50" y1="380" x2="95" y2="380"/>
+<line x1="65" y1="440" x2="105" y2="440"/>
+</g>
+
+<g>
+<circle cx="200" cy="420" r="78" fill="none" stroke="#2C2C2A" stroke-width="7"/>
+<circle cx="200" cy="420" r="70" fill="none" stroke="#5F5E5A" stroke-width="2"/>
+<g class="spin"><path d="M130,420 L270,420 M200,350 L200,490 M150.5,370.5 L249.5,469.5 M249.5,370.5 L150.5,469.5" stroke="#888780" stroke-width="2"/></g>
+<circle cx="200" cy="420" r="6" fill="#2C2C2A"/>
+</g>
+<g>
+<circle cx="500" cy="420" r="78" fill="none" stroke="#2C2C2A" stroke-width="7"/>
+<circle cx="500" cy="420" r="70" fill="none" stroke="#5F5E5A" stroke-width="2"/>
+<g class="spin"><path d="M430,420 L570,420 M500,350 L500,490 M450.5,370.5 L549.5,469.5 M549.5,370.5 L450.5,469.5" stroke="#888780" stroke-width="2"/></g>
+<circle cx="500" cy="420" r="6" fill="#2C2C2A"/>
+</g>
+
+<g fill="none" stroke="#185FA5" stroke-width="6" stroke-linecap="round">
+<path d="M200,420 L350,420"/>
+<path d="M200,420 L345,278"/>
+<path d="M350,420 L345,278"/>
+<path d="M350,420 L476,318"/>
+<path d="M345,278 L466,282"/>
+<path d="M476,318 L500,420"/>
+</g>
+<path d="M466,282 L476,318" fill="none" stroke="#185FA5" stroke-width="8" stroke-linecap="round"/>
+<path d="M466,282 L458,258" fill="none" stroke="#2C2C2A" stroke-width="5" stroke-linecap="round"/>
+<path d="M458,258 Q482,248 496,262" fill="none" stroke="#2C2C2A" stroke-width="5" stroke-linecap="round"/>
+<ellipse cx="345" cy="272" rx="24" ry="7" fill="#2C2C2A"/>
+
+<g class="spin">
+<path d="M350,396 L350,444" stroke="#2C2C2A" stroke-width="5" stroke-linecap="round"/>
+<circle cx="350" cy="396" r="5" fill="#2C2C2A"/>
+<circle cx="350" cy="444" r="5" fill="#2C2C2A"/>
+<circle cx="350" cy="420" r="12" fill="none" stroke="#2C2C2A" stroke-width="2"/>
+<circle cx="350" cy="420" r="5" fill="#2C2C2A"/>
+</g>
+
+<g class="pedal" transform="translate(350 286) scale(0.821) translate(-350 -286)">
+<path d="M350,286 Q359,353 350,420" fill="none" stroke="#EF9F27" stroke-width="6" stroke-linecap="round"/>
+<path d="M354,417 L366,414 M354,420 L368,420 M354,423 L366,426" fill="none" stroke="#EF9F27" stroke-width="3" stroke-linecap="round"/>
+</g>
+<g class="pedal b" transform="translate(350 286) scale(1.179) translate(-350 -286)">
+<path d="M350,286 Q359,353 350,420" fill="none" stroke="#EF9F27" stroke-width="6" stroke-linecap="round"/>
+<path d="M354,417 L366,414 M354,420 L368,420 M354,423 L366,426" fill="none" stroke="#EF9F27" stroke-width="3" stroke-linecap="round"/>
+</g>
+
+<path d="M292,256 L266,238 L272,270 Z" fill="#FFFFFF" stroke="#2C2C2A" stroke-width="2"/>
+<line x1="328" y1="210" x2="398" y2="158" stroke="#2C2C2A" stroke-width="28" stroke-linecap="round"/>
+<line x1="328" y1="210" x2="398" y2="158" stroke="#FFFFFF" stroke-width="24" stroke-linecap="round"/>
+<ellipse cx="345" cy="248" rx="60" ry="52" fill="#FFFFFF" stroke="#2C2C2A" stroke-width="2"/>
+<circle cx="408" cy="150" r="21" fill="#FFFFFF" stroke="#2C2C2A" stroke-width="2"/>
+<path d="M302,234 Q342,222 376,246 Q348,274 308,264 Z" fill="#D3D1C7" stroke="#2C2C2A" stroke-width="2"/>
+<circle cx="401" cy="144" r="3.5" fill="#2C2C2A"/>
+<path d="M426,146 Q480,138 524,158 L520,164 Q472,150 424,158 Z" fill="#EF9F27" stroke="#2C2C2A" stroke-width="2"/>
+<path d="M424,160 Q458,198 502,186 Q522,180 521,164 Q484,172 454,166 Q434,162 424,160 Z" fill="#FAC775" stroke="#2C2C2A" stroke-width="2"/>
+</svg>

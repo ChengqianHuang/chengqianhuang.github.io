@@ -1,0 +1,51 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "deepseek-v4-pro-workbuddy-2026-10-20-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "DeepSeek",
+    "name": "DeepSeek-V4-Pro",
+    "id": null,
+    "identitySource": "user-reported"
+  },
+  "harness": {
+    "name": "WorkBuddy",
+    "version": "5.8.3",
+    "mode": "agent",
+    "context": "fresh",
+    "tools": [
+      "widget_guidelines",
+      "show_widget"
+    ]
+  },
+  "run": {
+    "generatedAt": "2026-10-20T21:49:00+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 1,
+    "totalAttempts": 1,
+    "selection": "first",
+    "parameters": {},
+    "postProcessing": "none",
+    "notes": "固定动画提示词是本会话的第一条用户消息，context 为 fresh：生成前未阅读 PELICAN.md、schema、协议文件或任何已有提交作品，这些均在生成后为提交而阅读。一次生成即采用（attempt 1/1，selection first），提交字节即生成时的原始字节，postProcessing 为 none。生成管线无脚本：生成期间未运行任何 python/bash，几何全部手算。髋点固定于 (350,286)，曲柄绕五通 (350,420) 半径 24；双腿各自是一个从髋到脚的二次贝塞尔腿段，用 8 个线性关键帧对整条腿做 rotate+scale（绕髋，transform-box: fill-box、transform-origin 0 0），把脚端锁定在曲柄圆周上（8 段近似，弦高误差约 1.8px），两腿相位差 180°（animation-delay -0.75s）反向踩踏；前后轮辐条组与曲柄组各自绕中心 360° 连续旋转。动画机制为纯 CSS keyframes，@media (prefers-reduced-motion: reduce) 对 .spin/.pedal 统一 animation: none；双腿以元素上的静态 transform 属性为基态（一脚上、一脚下），减少动态时回退到完整静态踩踏姿态。暂停图由脚本自动移除原 SVG 的整个 <style> 块得到（无 @keyframes 与 animation），原始 SVG 保持原样。宿主在会话开始时注入了持久化记忆文件（SOUL.md/IDENTITY.md/用户记忆），故并非完全空白状态；但生成前无任何对话轮次，也未读取鹈鹕基准的任何文件或已有作品。模型身份：名称 DeepSeek-V4-Pro 由用户提供（用户写作 Deepseek-V4_Pro，已规范化为 DeepSeek-V4-Pro），未经独立核实，故 identitySource 为 user-reported、model.id 为 null、provider 沿用库内 DeepSeek 写法。harness 版本 5.8.3 来自内置技能版本串。实际使用工具为 widget_guidelines（读取视觉设计规范）与 show_widget（内联渲染），未使用图片生成或几何脚本工具。已知外观缺陷如实记录：无链条；两腿共用同一髋点 (350,286) 且膝均朝前弯；腿段随缩放（0.821–1.179）脚部有轻微透视缩放；车轮与曲柄 1:1 同步（非真实传动比）；脚趾恒指向前方；鹈鹕喙与喉囊相对头部偏大。推理参数未知。"
+  },
+  "artifact": {
+    "path": "pelican-assets/deepseek-v4-pro-workbuddy-2026-10-20-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 680,
+    "height": 530,
+    "sha256": "aea1990d4680ff08350a0c37c4433dfd653b6d49e928514a5d89ef0a4d29c6bf"
+  },
+  "source": null,
+  "animation": {
+    "mechanism": "css",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/deepseek-v4-pro-workbuddy-2026-10-20-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 680,
+    "height": 530,
+    "sha256": "eafeaa2f916fb18b0857447b95b562027c9f69b667df16389c42be5bf7fe24f9"
+  }
+}
