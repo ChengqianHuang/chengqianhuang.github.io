@@ -1,0 +1,51 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "xiaomi-mimo-v2-6-pro-workbuddy-2026-10-20-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "Xiaomi",
+    "name": "MiMo-V2.6-Pro",
+    "id": null,
+    "identitySource": "system-reported"
+  },
+  "harness": {
+    "name": "WorkBuddy",
+    "version": "5.8.3",
+    "mode": "agent",
+    "context": "existing-conversation",
+    "tools": [
+      "bash",
+      "python3"
+    ]
+  },
+  "run": {
+    "generatedAt": "2026-10-20T19:53:00+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 1,
+    "totalAttempts": 1,
+    "selection": "first",
+    "parameters": {},
+    "postProcessing": "none",
+    "notes": "Honest conditions: generated inside a conversation that already contained repository exploration and earlier geometry experiments (headless-Chrome transform-origin probes and IK angle tables), so harness.context is existing-conversation, not the suggested fresh-conversation comparison condition. The artwork was produced by one Python generation script executed via bash: two-bone IK (thigh 62, shin 66, crank radius 30, forward knee) solves 20 phase samples per 1.6 s pedal revolution for both legs (far leg 180 deg out of phase) and bakes relative thigh/shin/foot rotation deltas into CSS @keyframes; nested groups use transform-box:view-box with transform-origin 0 0 so each segment rotates about its own proximal joint (semantics verified by headless-Chrome probe renders before authoring). Wheels and chainring spin via CSS rotation, pedals counter-rotate to stay level, road dashes and chain dashes run via stroke-dashoffset, clouds drift via translateX, head bobs and tail wiggles on ease-in-out. A prefers-reduced-motion media query disables every animation. The poster was derived automatically from the generated SVG by stripping its style block only, leaving a static rest-pose first frame; the animated artifact itself is unmodified after generation (postProcessing none, source null). Render-checked with headless Chrome: poster frame and a mid-animation frame both show correct pedal tracking and wheel spin. Model identity MiMo-V2.6-Pro is what the harness system reports and is not independently verified, so model.id is null; provider Xiaomi likewise not independently verified. Known defects recorded rather than corrected: chain is an animated dashed stroke, not linked chain geometry; both legs share one screen plane; hips are fixed so the seat post does not react to leg IK; saddle is mostly occluded by the body; cloud loop wraps discontinuously offscreen; feather detail is stylized flat shapes; no audio."
+  },
+  "artifact": {
+    "path": "pelican-assets/xiaomi-mimo-v2-6-pro-workbuddy-2026-10-20-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 800,
+    "height": 600,
+    "sha256": "8c424002816adc85cec9cca84ddadf67844f7e98c5e0a1e7f532c7695f4d2a5b"
+  },
+  "source": null,
+  "animation": {
+    "mechanism": "css",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/xiaomi-mimo-v2-6-pro-workbuddy-2026-10-20-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 800,
+    "height": 600,
+    "sha256": "69e4e930213884f7652ca828392b5a5f43885f64b48f2d26e12c42e008483ab5"
+  }
+}
