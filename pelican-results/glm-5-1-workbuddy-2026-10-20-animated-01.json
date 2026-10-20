@@ -1,0 +1,50 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "glm-5-1-workbuddy-2026-10-20-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "Z.ai",
+    "name": "GLM-5.1",
+    "id": null,
+    "identitySource": "system-reported"
+  },
+  "harness": {
+    "name": "WorkBuddy",
+    "version": "5.8.3",
+    "mode": "agent",
+    "context": "fresh",
+    "tools": [
+      "widget_guidelines"
+    ]
+  },
+  "run": {
+    "generatedAt": "2026-10-20T20:37:00+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 1,
+    "totalAttempts": 1,
+    "selection": "first",
+    "parameters": {},
+    "postProcessing": "none",
+    "notes": "First and only generation, written as direct model output in one pass (no geometry script, no image-generation tool, no post-edit). Generated in a fresh conversation whose first user message was exactly the protocol prompt; the SVG was the direct first response. Repo protocol documents, manifest, schema, validator and prior-entry metadata were read only AFTER generation, before submission; no prior submission's SVG source or rendered artwork was viewed before or during generation. The SVG was authored for WorkBuddy's inline SVG renderer (viewBox 0 0 680 380 per host rules). Before writing it, the host's widget_guidelines module was loaded once - text-only design guidance (color palette, flat-fill/stroke conventions, viewBox sizing, title/desc accessibility); color choices follow that palette, and it generated no geometry, so it is listed in harness.tools. Animation is pure CSS keyframes, no SMIL: each wheel's spoke group rotates 360deg around the hub (0.9s linear, transform-box fill-box, transform-origin center); the crank rotates 360deg around the bottom bracket (1s) with two pedal groups counter-rotating -360deg so pedals stay level; each leg is a bent-path group oscillating about +-20deg around the hip (transform-origin at the group origin 0,0), the two legs in counter-phase via a -0.5s delay; the body bobs twice per crank revolution; chain runs scroll via animated stroke-dashoffset in opposite directions; the dashed road line scrolls left one dash period per loop; three speed lines sweep left with staggered delays. Reduced motion is honored by a single @media (prefers-reduced-motion: reduce) block that sets animation:none !important on every animated class, keeps the speed lines at opacity 0, and reveals a small Chinese notice text; since no SMIL elements exist, this CSS suppression fully pauses the file. The poster is the same file with the <style> block replaced by two static rules (.sl line{opacity:0}, .off{display:none}); all animation declarations, keyframes and the @media block were removed and no geometry changed, freezing the scene at the drawn pose (wheels unrotated, crank horizontal, legs at rest). Timestamp is minute-accurate. Model identity GLM-5.1 comes from the WorkBuddy system prompt for this conversation (also stated by the user); it is not independently verified by an API round-trip, so model.id is null. Harness version 5.8.3 was read from the on-disk plugin cache path. Known cosmetic limitation: leg pedaling is impressionistic - feet trace arcs around the hips near the crank rather than being mathematically locked to the pedal spindles; the reduced-motion notice text is Chinese only."
+  },
+  "artifact": {
+    "path": "pelican-assets/glm-5-1-workbuddy-2026-10-20-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 680,
+    "height": 380,
+    "sha256": "d982909579414d25e3aea5c9760cddd751adcbbbad31adf48c17e5e14715a74a"
+  },
+  "source": null,
+  "animation": {
+    "mechanism": "css",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/glm-5-1-workbuddy-2026-10-20-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 680,
+    "height": 380,
+    "sha256": "f45f0e1f683b7ad6d11a7d39fb7a85adec344f978ffecb241c887f27a688a923"
+  }
+}
