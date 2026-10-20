@@ -1,0 +1,50 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "hy4-preview-workbuddy-2026-10-20-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "unknown",
+    "name": "Hy4 preview",
+    "id": null,
+    "identitySource": "user-reported"
+  },
+  "harness": {
+    "name": "WorkBuddy",
+    "version": "5.8.3",
+    "mode": "agent",
+    "context": "fresh",
+    "tools": [
+      "widget_guidelines"
+    ]
+  },
+  "run": {
+    "generatedAt": "2026-10-20T20:38:00+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 1,
+    "totalAttempts": 1,
+    "selection": "first",
+    "parameters": {},
+    "postProcessing": "none",
+    "notes": "Generated as direct model output in one pass: no geometry script (no python/bash run before or during generation), no image-generation tool, no raster source, no post-edit of the drawing. The first user message of this session was exactly the animated protocol prompt, so harness.context is fresh; after the SVG was produced, repository files (PELICAN.md, AGENTS.md, existing result JSON, manifest, schema, validator) were read for submission only, and no previously published pelican SVG source or rendered artwork was opened before or during generation. Dishonest to hide: the host injects persistent agent/personal memory files at session start, so the model was not in a fully blank state even though no conversation turns preceded the prompt. Model name 'Hy4 preview' came from the user after generation and was not independently verified against any server-reported identifier, so model.id is null and provider is unknown. Geometry was solved by hand, not scripted: hip fixed at (300,225), thigh 60, shin 62, foot locked to a crank circle of radius 30 around bottom bracket (325,305); knee positions are the forward solution of the two-circle intersection (thigh circle around the hip, shin circle around the pedal) evaluated at 8 crank phases and converted to absolute thigh angles plus absolute shin angles. Each leg segment is its own top-level <g> using transform-box:view-box with transform-origin 0 0 and CSS keyframes carrying translate+rotate, so no parent translate is involved and the joint math cannot be displaced by ancestor transforms. The far leg reuses the same 8 values shifted by 4 phases (180 degrees), so both legs are permanently counter-phased and both feet stay exactly on their pedals. Feet animate translate only, never rotate, so the sole stays level on the pedal instead of swinging with the shin. Wheels are two groups nested inside translate parents with transform-box:fill-box and transform-origin:center, spinning 0.62s to a 1.4s crank period (a fake gear ratio that merely looks plausible). Road dashes and four speed lines scroll via animated stroke-dashoffset (one 44-unit dash period per 0.5s loop); head nods and scarf sways on the 1.4s cadence. Static fallback is real rather than a black frame: because every animated element also carries a presentation transform attribute matching the 0% keyframe, deleting all animation still leaves a correct pedaling pose - this is exactly how the poster was derived (the same file with only the <style> block removed, no other byte touched). prefers-reduced-motion is handled positively, not by adding !important overrides: all animation-name declarations live inside @media (prefers-reduced-motion: no-preference), so under reduce there is no animation at all to suppress and the file is genuinely static. There is no SMIL element anywhere, so nothing can animate outside CSS control. Rendered in WorkBuddy's inline SVG renderer immediately after generation and again from disk before submission; the only known cosmetic compromises are that the knee x-coordinate stalls between the 270 and 315 degree phases (roughly 1px of drift over 45 degrees of crank) and that both legs share one hip point, so the far leg has no lateral offset for perspective. Authored to viewBox 0 0 680 396 per the host renderer's dimensions; contains no script, no external reference and no embedded image."
+  },
+  "artifact": {
+    "path": "pelican-assets/hy4-preview-workbuddy-2026-10-20-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 680,
+    "height": 396,
+    "sha256": "b836a5293f78c2ac672b607a81905e8f0c61347eb22090a94bb98f0c827da0f9"
+  },
+  "source": null,
+  "animation": {
+    "mechanism": "css",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/hy4-preview-workbuddy-2026-10-20-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 680,
+    "height": 396,
+    "sha256": "1a12b9919d4a6899d9995bb6b9c92601cdcdedc5c1cebec2354181a67b4edd72"
+  }
+}
