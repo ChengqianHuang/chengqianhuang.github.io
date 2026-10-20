@@ -1,0 +1,52 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "kimi-k3-qoder-2026-10-20-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "Moonshot AI",
+    "name": "Kimi-K3",
+    "id": null,
+    "identitySource": "user-reported"
+  },
+  "harness": {
+    "name": "Qoder",
+    "version": "0.3.4",
+    "mode": "agent",
+    "context": "fresh",
+    "tools": [
+      "filesystem",
+      "shell",
+      "browser"
+    ]
+  },
+  "run": {
+    "generatedAt": "2026-10-20T20:36:00+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 1,
+    "totalAttempts": 1,
+    "selection": "first",
+    "parameters": {},
+    "postProcessing": "none",
+    "notes": "固定动画提示词是本会话的第一条消息，context 为 fresh：生成前未阅读 PELICAN.md、schema、协议文件或任何已有提交作品，这些均在生成后为提交而阅读。一次生成即采用（attempt 1/1，selection first），接受输出的字节未修改，postProcessing 为 none。SVG 为手写图形：前后轮（含红色气门点）与曲柄组通过 CSS keyframes 绕各自 transform-origin（transform-box: view-box）旋转；双脚以 8 步 keyframe 平移描绘以五通为圆心、半径 34 的脚踏圆，与曲柄同周期同向，远侧脚 animation-delay -1.2s 反相；双腿绕髋关节 ±16° 摇摆近似跟随脚踏；身体起伏、翅膀、围巾、地面虚线、云与日光另有独立 CSS 动画。全部动画仅声明在 @media (prefers-reduced-motion: no-preference) 内；减少动态效果时由元素上的静态 transform 属性保持双脚停在脚踏上，画面仍为完整构图。暂停图由脚本自动移除原 SVG 唯一的 style 元素得到，原始 SVG 保持原样。渲染核对：in-app 浏览器截图确认动画帧与静态帧姿态不同（动画确实运行），无头 Chrome 截图确认构图，并以 --force-prefers-reduced-motion 截图对比确认减少动态效果时全部动画不生效；核对仅检查显示效果，未参与图形生成。已知外观缺陷：链条为静态；腿部摇摆与脚踏圆存在轻微滑移，脚踝短桩与腿端在中途帧可能略分离；车轮与曲柄角速度比（2:1）为示意。模型身份：系统声明为 Moonshot AI 开发的 Kimi，具体版本号 Kimi-K3 由用户提供且未独立核实，故 identitySource 为 user-reported、model.id 为 null。Qoder 版本 0.3.4 读取自应用包 Info.plist。推理参数未知。"
+  },
+  "artifact": {
+    "path": "pelican-assets/kimi-k3-qoder-2026-10-20-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 900,
+    "height": 600,
+    "sha256": "29c88fb3086a6530214d2e2541f302a93157abec8a7204a972163c090cb1e111"
+  },
+  "source": null,
+  "animation": {
+    "mechanism": "css",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/kimi-k3-qoder-2026-10-20-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 900,
+    "height": 600,
+    "sha256": "f22ae8d18da99f8600ad92decb6728eec9d379c90901af3ac34052a073023831"
+  }
+}
