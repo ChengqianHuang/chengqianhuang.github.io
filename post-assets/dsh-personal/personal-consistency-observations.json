@@ -1,0 +1,65 @@
+{
+  "node": "v26.10.0",
+  "retrieval": {
+    "query": "博客证书",
+    "terms": [
+      "博客",
+      "证书"
+    ],
+    "literalSubstringExists": false,
+    "ranked": [
+      {
+        "type": "task",
+        "title": "检查博客的 HTTPS 证书",
+        "score": 0.0000036713735558408212
+      },
+      {
+        "type": "idea",
+        "title": "整理运维笔记",
+        "score": 0.0000018274760383386584
+      }
+    ],
+    "globalLimitOne": [
+      "检查博客的 HTTPS 证书"
+    ]
+  },
+  "guardedEdit": {
+    "selectedTitle": "检查博客证书",
+    "externalTitle": "检查生产证书",
+    "staleUpdateRejected": true,
+    "staleDeleteRejected": true,
+    "statusAfterRejections": "TODO",
+    "freshRevisionUpdate": {
+      "title": "检查生产证书",
+      "status": "DONE"
+    },
+    "coldReopen": {
+      "rowEqual": true,
+      "revisionEqual": true,
+      "title": "检查生产证书",
+      "status": "DONE",
+      "rebuiltSearch": [
+        "检查生产证书"
+      ]
+    }
+  },
+  "indexConsistency": {
+    "externalCommitDuringRebuild": "域名续费",
+    "pinnedSnapshot": [
+      "新证书"
+    ],
+    "nextCertificateSearch": [],
+    "nextDomainSearch": [
+      "域名续费"
+    ],
+    "afterLocalRollback": [
+      "域名续费"
+    ],
+    "failedRebuildRejected": true,
+    "afterFailedRebuildRetry": [
+      "证书续期"
+    ],
+    "durableSearchTables": [],
+    "durableSchemaVersion": 4
+  }
+}
