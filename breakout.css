@@ -1,0 +1,186 @@
+/* The first stop on the homepage: a small, self-contained arcade. */
+.home .arcade {
+  max-width: 1160px;
+  padding-top: 28px;
+  padding-bottom: 28px;
+  scroll-margin-top: 90px;
+}
+.arcade-card {
+  display: grid;
+  grid-template-columns: minmax(230px, .38fr) minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid #deded6;
+  border-radius: 22px;
+  background: #f3f1e9;
+  box-shadow: 0 20px 65px rgba(25, 35, 55, .09);
+}
+.arcade-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 26px;
+  padding: 30px 28px;
+  color: #252b30;
+}
+.arcade-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #555b58;
+  font-size: 12px;
+  font-weight: 600;
+}
+.arcade-eyebrow > span { color: #be4f25; font-size: 23px; line-height: 1; }
+.arcade-label {
+  margin: 0 0 8px;
+  color: #92502f;
+  font: 600 11px/1.5 "SF Mono", Menlo, Consolas, monospace;
+  letter-spacing: .2em;
+}
+#arcade-title {
+  margin: 0 0 16px;
+  font-size: clamp(38px, 4.2vw, 58px);
+  font-weight: 800;
+  letter-spacing: -.07em;
+  line-height: 1.15;
+}
+.arcade-summary { margin: 0; font-size: 14px; color: #62665f; line-height: 1.9; }
+.arcade-guide { font-size: 12px; color: #555b58; }
+.arcade-guide p { margin: 0 0 12px; }
+.arcade-key {
+  display: inline-block;
+  padding: 1px 5px;
+  min-width: 24px;
+  text-align: center;
+  border: 1px solid #c9cbc3;
+  border-radius: 4px;
+  box-shadow: 0 2px 0 #d8d9d0;
+  font: 11px/1.6 "SF Mono", Menlo, Consolas, monospace;
+  margin-right: 3px;
+}
+.arcade-guide .arcade-tip { margin-top: 20px; margin-bottom: 0; line-height: 1.9; }
+.arcade-skip { color: #3a423d; font-size: 12px; text-decoration: none; font-weight: 600; }
+.arcade-skip span { margin-left: 8px; }
+.arcade-skip:hover { color: #a6421c; }
+.arcade-machine { background: #101b2c; color: #e7edf5; min-width: 0; }
+.arcade-scoreboard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 68px;
+  padding: 11px 27px;
+  border-bottom: 1px solid #ffffff0f;
+  background: #111c2b;
+}
+.arcade-score-group { display: flex; gap: clamp(18px, 3vw, 38px); }
+.arcade-stat-label { display: block; color: #98a6b8; font-size: 10px; letter-spacing: .05em; line-height: 1.5; }
+.arcade-scoreboard strong { font: 500 23px/1.4 "SF Mono", Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+#breakout-score { color: #ffad7c; }
+.arcade-stat-total { color: #98a6b8; font-size: 12px; }
+.arcade-stage { position: relative; isolation: isolate; }
+#breakout-canvas { display: block; width: 100%; height: auto; aspect-ratio: 18 / 11; touch-action: none; }
+#breakout-canvas:focus { outline: none; }
+#breakout-canvas:focus-visible { outline: 2px solid #76d7c4; outline-offset: -4px; }
+.arcade-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, #101b2c05, #101b2c52 25%, #101b2ce8 60%, #101b2c70);
+}
+.arcade-overlay[hidden] { display: none; }
+.arcade-overlay-card { text-align: center; padding: 22px; margin-top: 44px; max-width: 100%; }
+.arcade-play-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ffad7c45;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  padding-left: 3px;
+  color: #ffad7c;
+  background: #ffad7c0a;
+  font-size: 13px;
+}
+.arcade-overlay h3 { margin: 13px 0 6px; font-size: 25px; line-height: 1.3; letter-spacing: -.03em; }
+.arcade-overlay p { margin: 0 0 23px; font-size: 12px; color: #a7b5c8; }
+#breakout-start {
+  min-width: 148px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 8px;
+  padding: 11px 22px;
+  background: #ffa16c;
+  color: #292017;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  cursor: pointer;
+  box-shadow: 0 5px 25px #ffa16c1a;
+}
+#breakout-start:hover { background: #ffb58c; }
+#breakout-start span { margin-left: 14px; }
+.arcade-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 8px 20px; border-top: 1px solid #ffffff0f; }
+.arcade-toolbar p { margin: 0; color: #a7b5c8; font-size: 10px; }
+.arcade-buttons { display: flex; gap: 7px; flex-shrink: 0; }
+.arcade-buttons button {
+  border: 1px solid #39475a;
+  border-radius: 6px;
+  background: #1c293a;
+  color: #dce4ee;
+  font: inherit;
+  font-size: 11px;
+  min-width: 45px;
+  min-height: 36px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+.arcade-buttons button:hover:enabled { border-color: #76d7c4; color: #b4f3e6; }
+.arcade-buttons button:disabled { opacity: .4; cursor: default; }
+.arcade button:focus-visible, .arcade a:focus-visible { outline: 2px solid #e9793e; outline-offset: 4px; }
+.arcade-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+:root[data-theme="dark"] .arcade-card { border-color: #2d3844; background: #202a32; }
+:root[data-theme="dark"] .arcade-intro { color: #f0f0e8; }
+:root[data-theme="dark"] .arcade-eyebrow, :root[data-theme="dark"] .arcade-summary, :root[data-theme="dark"] .arcade-guide { color: #b7c0bf; }
+:root[data-theme="dark"] .arcade-label, :root[data-theme="dark"] .arcade-eyebrow > span { color: #ffad7c; }
+:root[data-theme="dark"] .arcade-key { border-color: #566168; box-shadow: 0 2px 0 #38434a; }
+:root[data-theme="dark"] .arcade-skip { color: #d3dfda; }
+@media (max-width: 800px) {
+  .home .arcade { padding-top: 24px; }
+  .arcade-card { grid-template-columns: 1fr; }
+  .arcade-intro { display: grid; grid-template-columns: 1fr auto; gap: 12px 20px; padding: 20px 25px; }
+  .arcade-eyebrow { grid-column: 1 / -1; }
+  .arcade-label { display: none; }
+  #arcade-title { font-size: 36px; margin: 0; }
+  .arcade-summary { font-size: 12px; margin-top: 8px; }
+  .arcade-summary br { display: none; }
+  .arcade-guide { display: none; }
+  .arcade-skip { align-self: end; padding-bottom: 2px; }
+}
+@media (max-width: 480px) {
+  .home .arcade { padding: 18px 12px 14px; }
+  .arcade-card { border-radius: 15px; }
+  .arcade-intro { padding: 17px 20px; gap: 10px; }
+  .arcade-eyebrow { font-size: 10px; }
+  .arcade-eyebrow > span { font-size: 17px; }
+  #arcade-title { font-size: 31px; }
+  .arcade-summary { font-size: 11px; margin-top: 6px; }
+  .arcade-skip { font-size: 10px; }
+  .arcade-scoreboard { padding: 12px 18px; min-height: 68px; }
+  .arcade-score-group { gap: 20px; }
+  .arcade-scoreboard strong { font-size: 19px; }
+  .arcade-stat-label { font-size: 9px; }
+  .arcade-play-mark { display: none; }
+  .arcade-overlay-card { padding: 15px; margin-top: 30px; }
+  .arcade-overlay h3 { font-size: 21px; margin-top: 0; }
+  .arcade-overlay p { font-size: 11px; margin-bottom: 14px; }
+  #breakout-start { min-width: 140px; font-size: 13px; }
+  .arcade-toolbar { padding: 8px 12px; gap: 8px; }
+  .arcade-toolbar p { max-width: 175px; font-size: 9px; }
+  .arcade-buttons button { min-height: 40px; }
+}
