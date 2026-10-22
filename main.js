@@ -48,6 +48,8 @@ async function renderPosts() {
   } catch (err) {
     list.innerHTML = '<li class="loading">文章列表加载失败，请刷新重试</li>';
     console.error(err);
+  } finally {
+    list.setAttribute('aria-busy', 'false');
   }
 }
 

@@ -51,31 +51,61 @@
     let activeIndex=-1;
     let enlargedImage=null;
     let originalPicture=null;
+    let closing=false;
+    const detailImages=new Map();
     function restoreImage() {
-      if (enlargedImage && originalPicture) originalPicture.append(enlargedImage);
+      if (enlargedImage) {
+        if (originalPicture) originalPicture.append(enlargedImage);
+        else enlargedImage.remove();
+      }
       enlargedImage=null;
       originalPicture=null;
     }
     function show(index,updateHash=true) {
       const item=entries[index]; if (!item) return;
-      if (activeIndex!==index) restoreImage();
-      activeIndex=index;
-      document.getElementById('pelican-detail-title').textContent=item.model;
-      document.getElementById('pelican-detail-harness').textContent=`Harness · ${item.harness}`;
-      document.getElementById('pelican-detail-prompt').textContent=item.prompt;
-      // Enlarge the existing image rather than load a second animation instance.
-      const card=(home || gallery).querySelector(`[data-result-index="${index}"]`);
-      const image=card.querySelector('img');
-      if (image) {
+      const wasOpen=dialog.open;
+      if (activeIndex!==index) {
+        restoreImage();
+        // Reuse the preview's animation; load other results only when requested.
+        const card=(home || gallery).querySelector(`[data-result-index="${index}"]`);
+        let image=card?.querySelector('img') || detailImages.get(index);
+        if (!image) {
+          image=document.createElement('img');
+          image.src=imagePath(item);
+          image.alt=`${item.model} 生成的鹈鹕骑自行车`;
+          image.width=item.width;
+          image.height=item.height;
+          if (item.animated) image.dataset.motionIndex=String(index);
+          detailImages.set(index,image);
+        }
         enlargedImage=image;
         originalPicture=image.parentElement;
         document.getElementById('pelican-detail-image').append(image);
       }
+      activeIndex=index;
+      document.getElementById('pelican-detail-title').textContent=item.model;
+      document.getElementById('pelican-detail-harness').textContent=`Harness · ${item.harness}`;
+      document.getElementById('pelican-detail-prompt').textContent=item.prompt;
       document.getElementById('pelican-detail-motion').hidden=!item.animated;
       document.getElementById('pelican-detail-nav').hidden=entries.length<2;
       motionState();
       if (!dialog.open) { dialog.showModal(); document.body.classList.add('pelican-modal-open'); }
-      if (updateHash) history.replaceState(null,'',`#result=${encodeURIComponent(item.id)}`);
+      if (updateHash) {
+        const url=`#result=${encodeURIComponent(item.id)}`;
+        if (wasOpen) history.replaceState(history.state,'',url);
+        else history.pushState({...history.state,pelicanDetail:true},'',url);
+      }
+    }
+    function requestClose() {
+      if (closing) return;
+      if (history.state?.pelicanDetail) {
+        closing=true;
+        history.back();
+      } else {
+        // A directly opened result has no in-page history entry to return to.
+        history.replaceState(history.state,'',location.pathname+location.search);
+        dialog.close();
+      }
     }
     function step(direction) { if (entries.length) show((activeIndex+direction+entries.length)%entries.length); }
     (home || gallery).addEventListener('click',event=>{
@@ -83,7 +113,8 @@
       if (!link || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
       event.preventDefault(); show(Number(link.dataset.resultIndex));
     });
-    document.getElementById('pelican-close').addEventListener('click',()=>dialog.close());
+    document.getElementById('pelican-close').addEventListener('click',requestClose);
+    dialog.addEventListener('cancel',event=>{ event.preventDefault(); requestClose(); });
     document.getElementById('pelican-previous').addEventListener('click',()=>step(-1));
     document.getElementById('pelican-next').addEventListener('click',()=>step(1));
     dialog.addEventListener('keydown',event=>{
@@ -92,22 +123,24 @@
     dialog.addEventListener('click',event=>{
       if (event.target!==dialog) return;
       const r=dialog.getBoundingClientRect();
-      if (event.clientX<r.left || event.clientX>r.right || event.clientY<r.top || event.clientY>r.bottom) dialog.close();
+      if (event.clientX<r.left || event.clientX>r.right || event.clientY<r.top || event.clientY>r.bottom) requestClose();
     });
     dialog.addEventListener('close',()=>{
       restoreImage();
       activeIndex=-1;
       document.body.classList.remove('pelican-modal-open');
-      history.replaceState(null,'',location.pathname+location.search);
     });
     function fromHash() {
+      closing=false;
       const id=new URLSearchParams(location.hash.slice(1)).get('result');
       const index=entries.findIndex(item=>item.id===id);
       if (index>=0) show(index,false); else if (dialog.open) dialog.close();
     }
-    fromHash(); addEventListener('hashchange',fromHash);
+    fromHash(); addEventListener('popstate',fromHash); addEventListener('hashchange',fromHash);
   } catch (error) {
     (home || gallery).innerHTML='<p class="pelican-empty">加载失败，请刷新重试。</p>';
     console.error(error);
+  } finally {
+    (home || gallery).setAttribute('aria-busy','false');
   }
 })();

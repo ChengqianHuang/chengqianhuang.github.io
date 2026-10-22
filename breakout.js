@@ -1,9 +1,10 @@
-// 首页打砖块：固定时间步长的物理模拟，只有开局后才运行动画。
+// 打砖块：固定时间步长的物理模拟，只有开局后才运行动画。
 (() => {
   const canvas = document.getElementById('breakout-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
+  const controls = canvas.closest('.arcade-machine') || canvas;
 
   const ui = {};
   for (const name of ['overlay', 'message', 'description', 'start', 'score', 'best', 'lives', 'level', 'pause', 'restart', 'status']) {
@@ -348,8 +349,10 @@
   canvas.addEventListener('pointerup', releasePointer);
   canvas.addEventListener('pointercancel', releasePointer);
   canvas.addEventListener('lostpointercapture', releasePointer);
-  canvas.addEventListener('keydown', event => {
+  controls.addEventListener('keydown', event => {
     if (!['ArrowLeft', 'ArrowRight', ' ', 'Escape'].includes(event.key)) return;
+    // 按钮保留原生空格激活，避免快捷键和随后的 click 连续切换两次。
+    if (event.key === ' ' && event.target.closest('button')) return;
     event.preventDefault();
     event.stopPropagation();
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') keys.add(event.key);
@@ -359,13 +362,21 @@
       else start();
     }
   });
-  canvas.addEventListener('keyup', event => {
+  controls.addEventListener('keyup', event => {
     if (!['ArrowLeft', 'ArrowRight', ' ', 'Escape'].includes(event.key)) return;
+    if (event.key === ' ' && event.target.closest('button')) return;
     event.preventDefault();
     event.stopPropagation();
     keys.delete(event.key);
   });
-  canvas.addEventListener('blur', () => keys.clear());
+  controls.addEventListener('focusout', event => {
+    keys.clear();
+    if (event.relatedTarget && controls.contains(event.relatedTarget)) return;
+    // 开局会隐藏当前按钮并聚焦球场，等这次焦点转移完成后再判断是否离开。
+    queueMicrotask(() => {
+      if (!controls.contains(document.activeElement)) pause(true);
+    });
+  });
   ui.start.addEventListener('click', start);
   ui.restart.addEventListener('click', newGame);
   ui.pause.addEventListener('click', () => mode === 'paused' ? play() : pause());
