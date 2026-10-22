@@ -36,3 +36,7 @@
 ## 鹈鹕测试
 
 提交图片与模型 / harness 信息前，请阅读 [PELICAN.md](PELICAN.md)。格式定义见 `schemas/`，校验器在 `scripts/validate_pelican.py`。
+
+## 小游戏
+
+游戏列表见 [games.html](games.html)。新增游戏与首页排版约定见 [GAMES.md](GAMES.md)，首页和完整列表共用 `games.json`。

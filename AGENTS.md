@@ -1,5 +1,9 @@
 # Blog maintenance
 
+## Games
+
+Read `GAMES.md` before adding or reorganizing games. Register games in `games.json`; the homepage and full collection share this catalog. Keep gameplay in independent pages under `games/`, and list only playable games.
+
 ## Pelican test submissions
 
 Read `PELICAN.md`, `pelican-test.json`, and `schemas/pelican-result.schema.json` before adding or changing a pelican result. All agents and models use the same versioned record format (v1.0 static / v1.1 animated). Read `pelican-test-animated.json` for animated submissions.

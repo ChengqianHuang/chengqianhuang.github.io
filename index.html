@@ -14,7 +14,7 @@
     })();
   </script>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="breakout.css?v=1">
+  <link rel="stylesheet" href="games.css?v=1">
   <link rel="stylesheet" href="pelican.css?v=1.1.2">
 </head>
 <body class="home">
@@ -25,7 +25,7 @@
     <div class="container">
       <a class="site-title" href="/">Chengqian Huang</a>
       <nav>
-        <a href="#arcade">小游戏</a>
+        <a href="/games.html">小游戏</a>
         <a href="#post-list">文章</a>
         <a href="/pelican.html">鹈鹕测试</a>
         <a href="/about.html">关于</a>
@@ -36,65 +36,13 @@
   </header>
 
   <main>
-    <section id="arcade" class="arcade container" tabindex="-1" aria-labelledby="arcade-title">
-      <div class="arcade-card">
-        <div class="arcade-intro">
-          <p class="arcade-eyebrow"><span aria-hidden="true">✳</span> 休息一下</p>
-          <div>
-            <p class="arcade-label" aria-hidden="true">BREAKOUT</p>
-            <h2 id="arcade-title">打砖块</h2>
-            <p class="arcade-summary">接住小球，清空砖块。<br>三条命，三关。</p>
-          </div>
-          <div class="arcade-guide">
-            <p><span class="arcade-key">←</span> <span class="arcade-key">→</span> 或移动鼠标</p>
-            <p><span class="arcade-key">Space</span> 暂停 / 继续</p>
-            <p class="arcade-tip">用挡板的边缘接球，可以改变方向。手机上按住球场左右拖动。</p>
-          </div>
-          <a class="arcade-skip" href="#post-list">先看文章 <span aria-hidden="true">↗</span></a>
-        </div>
-        <div class="arcade-machine">
-          <div class="arcade-scoreboard" aria-label="游戏计分板">
-            <div class="arcade-score-group">
-              <div><span class="arcade-stat-label">得分</span><strong id="breakout-score">0</strong></div>
-              <div><span class="arcade-stat-label" title="仅保存在当前浏览器">本机最高</span><strong id="breakout-best">0</strong></div>
-            </div>
-            <div class="arcade-score-group">
-              <div><span class="arcade-stat-label">剩余机会</span><strong id="breakout-lives">3</strong></div>
-              <div><span class="arcade-stat-label">关卡</span><strong><span id="breakout-level">1</span><span class="arcade-stat-total"> / 3</span></strong></div>
-            </div>
-          </div>
-          <div class="arcade-stage">
-            <canvas id="breakout-canvas" width="720" height="440" tabindex="0" aria-label="打砖块游戏球场" aria-describedby="arcade-help">请使用支持 Canvas 的浏览器来玩打砖块。</canvas>
-            <div id="breakout-overlay" class="arcade-overlay">
-              <div class="arcade-overlay-card">
-                <span class="arcade-play-mark" aria-hidden="true">▶</span>
-                <h3 id="breakout-message">准备好了吗？</h3>
-                <p id="breakout-description">接住小球，把砖块全部打掉。</p>
-                <button id="breakout-start" type="button">开始游戏 <span aria-hidden="true">→</span></button>
-              </div>
-            </div>
-          </div>
-          <div class="arcade-toolbar">
-            <p id="arcade-help">鼠标 / ← → 移动 · 手机拖动 · 空格暂停</p>
-            <div class="arcade-buttons">
-              <button id="breakout-pause" type="button" disabled>暂停</button>
-              <button id="breakout-restart" type="button" disabled>重来</button>
-            </div>
-          </div>
-          <p id="breakout-status" class="arcade-sr-only" role="status" aria-live="polite"></p>
-        </div>
-      </div>
-      <noscript><p>小游戏需要 JavaScript。你也可以直接<a href="#post-list">阅读文章</a>。</p></noscript>
-    </section>
-
     <section class="hero container" aria-labelledby="hero-name">
       <div class="hero-text">
         <p class="eyebrow"><span class="status-light"></span> 个人博客 · 深圳</p>
         <h1 id="hero-name" data-text="Chengqian Huang">Chengqian Huang</h1>
-        <p class="terminal"><span id="typed"></span><span class="cursor" aria-hidden="true"></span></p>
         <div class="hero-actions">
           <a class="primary-action" href="#post-list">阅读文章 <span aria-hidden="true">↗</span></a>
-          <a class="text-action" href="#playground">查看互动 <span aria-hidden="true">↓</span></a>
+          <a class="text-action" href="#arcade">玩小游戏 <span aria-hidden="true">↓</span></a>
         </div>
       </div>
       <div class="donut-window" aria-label="正在旋转的 ASCII 甜甜圈">
@@ -104,28 +52,13 @@
       </div>
     </section>
 
-    <section id="playground" class="playground container" aria-labelledby="playground-title">
+    <section id="arcade" class="games-section container" aria-labelledby="games-title">
       <div class="section-heading">
-        <div><p class="section-kicker">01</p><h2 id="playground-title">互动演示</h2></div>
-        <p>移动指针吸引粒子；点击画布或按钮触发脉冲。</p>
+        <div><p class="section-kicker">01</p><h2 id="games-title">小游戏</h2></div>
+        <a class="games-all" href="/games.html">全部游戏 <span aria-hidden="true">→</span></a>
       </div>
-      <div class="lab-grid">
-        <div class="lab-panel orbit-panel">
-          <div class="lab-panel-head"><span><span class="status-light"></span> 粒子场</span><span id="orbit-status">LIVE</span></div>
-          <canvas id="orbit-canvas" aria-label="互动粒子引力场，移动指针吸引粒子，点击制造脉冲"></canvas>
-          <div class="lab-panel-foot"><span>移动指针吸引 · 点击产生脉冲</span><button id="pulse-button" type="button">触发脉冲</button></div>
-        </div>
-        <div class="lab-panel console-panel">
-          <div class="lab-panel-head"><span>~/chengqian <span class="console-branch">⌁ main</span></span><span>TERMINAL</span></div>
-          <div id="console-output" class="console-output" role="log" aria-live="polite" aria-relevant="additions text"><p class="console-welcome">输入 <code>help</code> 查看命令，也可以点击下方按钮。</p></div>
-          <form id="console-form" class="console-form" autocomplete="off">
-            <label for="console-input">❯</label>
-            <input id="console-input" name="command" type="text" spellcheck="false" autocapitalize="off" maxlength="40" aria-label="输入命令" placeholder="输入 help 查看命令">
-            <button type="submit" aria-label="执行命令">↵</button>
-          </form>
-          <div class="command-chips" aria-label="快捷命令"><button type="button" data-command="help">help</button><button type="button" data-command="about">about</button><button type="button" data-command="surprise">surprise</button></div>
-        </div>
-      </div>
+      <div class="games-grid" data-game-catalog data-limit="3" aria-busy="true"><p class="games-loading">加载中…</p></div>
+      <noscript><p><a href="/games/breakout.html">玩打砖块 →</a></p></noscript>
     </section>
 
     <section id="pelican-preview" class="container pelican-home" aria-labelledby="pelican-home-title">
@@ -162,13 +95,12 @@
   <button id="back-to-top" type="button" title="返回顶部" aria-label="返回顶部">↑</button>
 
   <script src="theme.js"></script>
-  <script src="breakout.js?v=1"></script>
   <script src="shader.js"></script>
   <script src="particles.js"></script>
   <script src="donut.js"></script>
   <script src="main.js"></script>
   <script src="pelican.js?v=1.1.2"></script>
-  <script src="playground.js"></script>
+  <script src="games.js?v=1"></script>
   <script src="easter-egg.js"></script>
   <script src="scroll.js"></script>
 </body>

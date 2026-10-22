@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小游戏 - Chengqian Huang</title>
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/games.css?v=1">
+  
+</head>
+<body class="home games-page">
+  <header class="site-header">
+    <div class="container">
+      <a class="site-title" href="/">Chengqian Huang</a>
+      <nav>
+        <a href="/games.html" aria-current="page">小游戏</a>
+        <a href="/#post-list">文章</a>
+        <a href="/pelican.html">鹈鹕测试</a>
+        <a href="/about.html">关于</a>
+        <a href="https://github.com/ChengqianHuang" target="_blank" rel="noopener">GitHub</a>
+        <button id="theme-toggle" type="button"></button>
+      </nav>
+    </div>
+  </header>
+  <main class="container games-main">
+    <a class="games-back" href="/">← 返回首页</a>
+    <div class="games-page-heading"><p class="section-kicker">ARCADE</p><h1>小游戏</h1><p>挑一个，玩一会儿。</p></div>
+    <div class="games-grid" data-game-catalog aria-busy="true"><p class="games-loading">加载中…</p></div>
+    <noscript><p><a href="/games/breakout.html">玩打砖块 →</a></p></noscript>
+  </main>
+  <footer class="site-footer"><div class="container"><p>© 2026 Chengqian Huang · <a href="https://github.com/ChengqianHuang/chengqianhuang.github.io" target="_blank" rel="noopener">本站源码</a></p></div></footer>
+  <script src="/theme.js"></script>
+  <script src="/games.js?v=1"></script>
+</body>
+</html>

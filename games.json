@@ -1,0 +1,10 @@
+[
+  {
+    "id": "breakout",
+    "title": "打砖块",
+    "description": "接住小球，清空砖块。三条命，三关，试试能拿多少分。",
+    "controls": "鼠标 / 方向键 / 触屏",
+    "url": "/games/breakout.html",
+    "cover": "/game-assets/breakout.svg"
+  }
+]
