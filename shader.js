@@ -3,7 +3,8 @@
 (() => {
   const canvas = document.getElementById('shader-canvas');
   if (!canvas) return;
-  const gl = canvas.getContext('webgl', { alpha: true, antialias: false, premultipliedAlpha: true });
+  // The shader emits straight RGB; premultiplied compositing washes it out on white.
+  const gl = canvas.getContext('webgl', { alpha: true, antialias: false, premultipliedAlpha: false });
   if (!gl) {
     document.documentElement.classList.add('no-webgl');
     return;
@@ -52,9 +53,9 @@ void main(){
   float glow = band * (.22 + .16 * sin(uv.x * 5. + uv.y * 3. + u_time * .4));
 
   if (u_dark > .5) {
-    gl_FragColor = vec4(col * glow, glow * .6);
+    gl_FragColor = vec4(col, .10 + glow * 1.4);
   } else {
-    gl_FragColor = vec4(mix(vec3(1.), col, .3 + .4 * glow), glow * .3);
+    gl_FragColor = vec4(col, .055 + glow * .65);
   }
 }`;
 
