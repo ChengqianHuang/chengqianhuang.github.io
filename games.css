@@ -1,22 +1,20 @@
-/* Shared catalog: one game is featured; additional games form a card grid. */
-.home .hero {
-  min-height: 0;
-  padding-top: 24px;
-  padding-bottom: 24px;
-  gap: 64px;
-}
-.home .hero-text h1 { font-size: clamp(42px, 5.2vw, 64px); }
-.home .eyebrow { margin-bottom: 18px; }
-.home .hero-actions { margin-top: 22px; }
-.home #donut { height: 170px; min-height: 170px; font-size: 8.5px; padding: 8px 10px; }
-.home .games-section, .home .games-main, .home .game-breadcrumb { max-width: 1160px; }
-.games-section { padding-top: 24px; padding-bottom: 68px; scroll-margin-top: 90px; }
-.games-section .section-heading { align-items: end; }
+/* A compact introduction and a consistent two-column game shelf. */
+.home .home-intro, .home .games-section, .home .games-main, .home .game-breadcrumb { max-width: 1160px; }
+.home-intro { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-top: 28px; padding-bottom: 28px; border-bottom: 1px solid var(--border); }
+.home-intro p { display: flex; align-items: center; gap: 12px; margin: 0; color: var(--fg-muted); font-size: 12px; }
+.home-intro .status-light { width: 6px; height: 6px; box-shadow: none; }
+.home-intro a { color: var(--fg-muted); font-size: 12px; text-decoration: none; }
+.home-intro a:hover { color: var(--accent); }
+.home-intro a span { margin-left: 8px; }
+.games-section { padding-top: 30px; padding-bottom: 60px; scroll-margin-top: 90px; }
+.games-section .section-heading { align-items: end; margin-bottom: 26px; }
+.games-section .section-kicker { color: #a84f28; font-size: 10px; }
+.games-section h1 { margin: 0; font-size: clamp(34px, 4vw, 46px); letter-spacing: -.06em; line-height: 1.2; }
 .games-all, .games-back, .game-breadcrumb a { color: var(--fg-muted); text-decoration: none; font-size: 13px; }
 .games-all:hover, .games-back:hover, .game-breadcrumb a:hover { color: var(--accent); }
 .games-all span { margin-left: 8px; }
-.games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 22px; }
-.games-grid[aria-busy="true"] { min-height: 240px; }
+.games-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start; }
+.games-grid[aria-busy="true"] { min-height: 400px; }
 .game-card {
   display: flex;
   flex-direction: column;
@@ -25,47 +23,42 @@
   background: var(--bg);
   text-decoration: none;
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 14px;
   overflow: hidden;
-  transition: border-color .2s ease, box-shadow .2s ease;
+  transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
 }
-.game-card:hover { border-color: #d08c61; box-shadow: 0 12px 34px #232d4c0c; }
-.game-card:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
-.game-cover { background: #101b2c; overflow: hidden; }
-.game-cover img { display: block; width: 100%; height: auto; aspect-ratio: 18 / 11; object-fit: cover; }
-.game-card-body { display: flex; flex-direction: column; align-items: flex-start; padding: 24px; flex: 1; }
-.game-card h3 { margin: 0 0 10px; font-size: 24px; line-height: 1.3; letter-spacing: -.04em; }
-.game-description { margin: 0 0 18px; color: var(--fg-muted); font-size: 13px; max-width: 25em; }
-.game-controls { margin: auto 0 22px; color: var(--fg-muted); font-size: 11px; }
-.game-play { display: inline-block; padding: 9px 17px; border-radius: 7px; background: #ffa16c; color: #292017; font-size: 12px; font-weight: 700; }
-.game-card:only-child { display: grid; grid-template-columns: 1.1fr 1fr; }
-.game-card:only-child .game-cover img { height: 240px; object-fit: contain; }
-.game-card:only-child .game-card-body { padding: 30px 40px; justify-content: center; }
-.game-card:only-child .game-controls { margin-top: 0; }
-.game-card:only-child h3 { font-size: 30px; }
+.game-card:hover { border-color: #d08c61; box-shadow: 0 12px 28px #232d4c12; transform: translateY(-3px); }
+.game-card:focus-visible { outline: 3px solid #d57845; outline-offset: 4px; }
+.game-cover { background: #101b2c; overflow: hidden; border-bottom: 1px solid var(--border); }
+.game-cover img { display: block; width: 100%; height: auto; aspect-ratio: 2 / 1; object-fit: contain; }
+.game-card-body { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px 16px; padding: 22px; }
+.game-card h3 { grid-column: 1; grid-row: 1; margin: 0; font-size: 24px; line-height: 1.3; letter-spacing: -.04em; }
+.game-description { grid-column: 1 / -1; grid-row: 2; margin: 0; color: var(--fg-muted); font-size: 13px; line-height: 1.8; }
+.game-controls { grid-column: 1 / -1; grid-row: 3; margin: 4px 0 0; color: var(--fg-muted); font-size: 10px; letter-spacing: .02em; }
+.game-play { grid-column: 2; grid-row: 1; display: inline-block; padding: 9px 15px; border-radius: 7px; background: #ffa16c; color: #292017; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.game-card:hover .game-play { background: #ffb083; }
 .games-main { padding-top: 32px; padding-bottom: 76px; min-height: calc(100svh - 170px); }
-.games-page-heading { margin: 32px 0; }
-.games-page-heading h1 { margin: 0; font-size: clamp(36px, 5vw, 52px); line-height: 1.3; letter-spacing: -.06em; }
+.games-page-heading { margin: 30px 0; }
+.games-page-heading h1 { margin: 0; font-size: clamp(36px, 5vw, 48px); line-height: 1.3; letter-spacing: -.06em; }
 .games-page-heading > p:last-child { margin: 10px 0 0; color: var(--fg-muted); font-size: 14px; }
 .game-breadcrumb { display: flex; align-items: center; gap: 18px; padding-top: 25px; }
 .game-breadcrumb > span { color: var(--fg-muted); font-size: 12px; border-left: 1px solid var(--border); padding-left: 18px; }
 .game-page .arcade { padding-top: 20px; padding-bottom: 40px; }
 .game-page .site-footer { margin-top: 20px; }
-@media (max-width: 900px) {
-  .home .hero { gap: 28px; padding-top: 36px; padding-bottom: 28px; }
-  .home .hero .donut-window { display: none; }
-  .home .hero-text h1 { max-width: 650px; }
-}
+:root[data-theme="dark"] .games-section .section-kicker { color: #ffad7c; }
 @media (max-width: 600px) {
-  .games-section .section-heading { display: flex; gap: 16px; }
-  .games-section { padding-bottom: 48px; }
-  .game-card:only-child { display: flex; }
-  .game-card:only-child .game-cover img { height: auto; }
-  .game-card:only-child .game-card-body, .game-card-body { padding: 22px; }
-  .game-card:only-child h3 { font-size: 25px; }
-  .game-description { margin-bottom: 12px; }
-  .game-controls { margin-bottom: 18px; }
+  .home-intro { padding-top: 20px; padding-bottom: 20px; }
+  .games-section .section-heading { display: flex; gap: 16px; margin-bottom: 22px; }
+  .games-section { padding-top: 26px; padding-bottom: 44px; }
+  .games-grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .game-card-body { padding: 18px; gap: 10px 12px; }
+  .game-card h3 { font-size: 22px; }
+  .game-description { font-size: 12px; }
+  .game-play { padding: 9px 13px; }
   .games-page-heading { margin-top: 26px; }
   .game-breadcrumb { padding-top: 18px; }
   .game-page .arcade { padding-top: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .game-card:hover { transform: none; }
 }

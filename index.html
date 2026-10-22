@@ -14,7 +14,7 @@
     })();
   </script>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="games.css?v=1">
+  <link rel="stylesheet" href="games.css?v=2">
   <link rel="stylesheet" href="pelican.css?v=1.1.2">
 </head>
 <body class="home">
@@ -36,28 +36,17 @@
   </header>
 
   <main>
-    <section class="hero container" aria-labelledby="hero-name">
-      <div class="hero-text">
-        <p class="eyebrow"><span class="status-light"></span> 个人博客 · 深圳</p>
-        <h1 id="hero-name" data-text="Chengqian Huang">Chengqian Huang</h1>
-        <div class="hero-actions">
-          <a class="primary-action" href="#post-list">阅读文章 <span aria-hidden="true">↗</span></a>
-          <a class="text-action" href="#arcade">玩小游戏 <span aria-hidden="true">↓</span></a>
-        </div>
-      </div>
-      <div class="donut-window" aria-label="正在旋转的 ASCII 甜甜圈">
-        <div class="window-bar"><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span><span>donut.exe</span><span>LIVE ●</span></div>
-        <pre id="donut" aria-hidden="true">加载中…</pre>
-        <div class="window-footer"><span>42 × 18 字符</span><span>JavaScript 实时绘制</span></div>
-      </div>
-    </section>
+    <div class="home-intro container">
+      <p><span class="status-light" aria-hidden="true"></span> 个人博客 · 深圳</p>
+      <a href="#post-list">阅读文章 <span aria-hidden="true">↗</span></a>
+    </div>
 
     <section id="arcade" class="games-section container" aria-labelledby="games-title">
       <div class="section-heading">
-        <div><p class="section-kicker">01</p><h2 id="games-title">小游戏</h2></div>
+        <div><p class="section-kicker">01 / ARCADE</p><h1 id="games-title">小游戏</h1></div>
         <a class="games-all" href="/games.html">全部游戏 <span aria-hidden="true">→</span></a>
       </div>
-      <div class="games-grid" data-game-catalog data-limit="3" aria-busy="true"><p class="games-loading">加载中…</p></div>
+      <div class="games-grid" data-game-catalog data-limit="4" aria-busy="true"><p class="games-loading">加载中…</p></div>
       <noscript><p><a href="/games/breakout.html">玩打砖块 →</a></p></noscript>
     </section>
 
@@ -97,7 +86,6 @@
   <script src="theme.js"></script>
   <script src="shader.js"></script>
   <script src="particles.js"></script>
-  <script src="donut.js"></script>
   <script src="main.js"></script>
   <script src="pelican.js?v=1.1.2"></script>
   <script src="games.js?v=1"></script>
