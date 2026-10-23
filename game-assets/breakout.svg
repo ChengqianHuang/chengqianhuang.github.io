@@ -8,7 +8,13 @@
   <path d="M27 414V36q0-10 10-10h646q10 0 10 10v378" fill="none" stroke="#9fbad5" stroke-opacity=".17"/>
   <use href="#row" x="76" y="68" fill="#ff9760"/><use href="#row" x="76" y="100" fill="#f5c964"/>
   <use href="#row" x="76" y="132" fill="#76d7c4"/><use href="#row" x="76" y="164" fill="#7bb8f5"/>
+  <use href="#row" x="76" y="196" fill="#d7d1ad"/>
+  <g fill="none" stroke="#fff4db" stroke-width="2"><rect x="150" y="102" width="60" height="18" rx="3"/><rect x="366" y="134" width="60" height="18" rx="3"/></g>
+  <g fill="#394a54"><circle cx="175" cy="113" r="2"/><circle cx="185" cy="113" r="2"/><circle cx="391" cy="145" r="2"/><circle cx="401" cy="145" r="2"/></g>
+  <rect x="292" y="100" width="64" height="22" rx="4" fill="#cb7255"/><text x="324" y="117" fill="#fff3d9" font-size="18" font-family="system-ui" text-anchor="middle">✦</text>
   <path d="m391 296 32-48" stroke="#ffe0a6" stroke-opacity=".15" stroke-width="9" stroke-linecap="round"/>
   <circle cx="427" cy="242" r="8" fill="#fff5da"/>
+  <circle cx="518" cy="285" r="8" fill="#fff5da"/><circle cx="355" cy="318" r="8" fill="#fff5da"/>
+  <g transform="translate(196 286)"><rect x="-23" y="-13" width="46" height="26" rx="13" fill="#132a35" stroke="#f5c76a" stroke-width="2"/><text y="7" fill="#f5c76a" text-anchor="middle" font-family="system-ui" font-size="21" font-weight="700">3</text></g>
   <rect x="286" y="381" width="116" height="12" rx="6" fill="#76d7c4"/><rect x="292" y="383" width="104" height="2" rx="1" fill="#fff" opacity=".65"/>
 </svg>
