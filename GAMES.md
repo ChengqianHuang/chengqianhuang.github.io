@@ -15,3 +15,5 @@
 达到 6 个左右再按实际需要增加分类，目前不加搜索、筛选或分页。
 
 修改游戏规则后运行对应检查：`node scripts/test_2048.mjs` 或 `node scripts/test_breakout.mjs`。打砖块检查包括八关物理模拟、碰撞、多球、道具和暂停。
+
+像素突围：`node scripts/test_assault.mjs`，检查跳跃、子弹碰撞、检查点、武器、手雷及整关通关。运行逻辑在 `assault-engine.mjs`，画面与输入在 `assault.js`。

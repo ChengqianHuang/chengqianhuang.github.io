@@ -1,5 +1,13 @@
 [
   {
+    "id": "pixel-assault",
+    "title": "像素突围",
+    "description": "跑跳连射，打开武器补给箱，穿过战线击破关底装甲车。",
+    "controls": "键盘 / 触屏 · 手雷与武器补给",
+    "url": "/games/pixel-assault.html",
+    "cover": "/game-assets/pixel-assault.svg"
+  },
+  {
     "id": "2048",
     "title": "2048",
     "description": "滑动数字，相同的碰在一起就合并。试着合出 2048。",

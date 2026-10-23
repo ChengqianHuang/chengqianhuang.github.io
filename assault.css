@@ -1,0 +1,100 @@
+.assault-main { max-width: 1160px; padding-top: 20px; padding-bottom: 34px; }
+.assault-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; max-width: calc(clamp(300px, calc(100svh - 320px), 540px) * 16 / 9); margin: 0 auto 16px; }
+.assault-heading > div { display: flex; align-items: baseline; gap: 18px; }
+.assault-heading h1 { margin: 0; font-size: 28px; line-height: 1.25; letter-spacing: -.05em; white-space: nowrap; }
+.assault-heading p { margin: 5px 0 0; color: var(--fg-muted); font-size: 12px; }
+.assault-mission { color: #9a633b; font: 600 11px/1.5 Menlo, monospace; letter-spacing: .12em; }
+.assault-machine { max-width: calc(clamp(300px, calc(100svh - 320px), 540px) * 16 / 9); margin: 0 auto; scroll-margin-top: 76px; background: #10282d; color: #e6eddd; border: 1px solid #30473e; border-radius: 14px; overflow: hidden; box-shadow: 0 16px 50px #162c3517; }
+.assault-hud { display: flex; align-items: center; gap: clamp(12px, 2vw, 28px); padding: 7px 16px; min-height: 64px; background: #142e32; border-bottom: 1px solid #ffffff0c; }
+.assault-stat-label, .assault-stat-note { display: block; color: #a1b4a8; font-size: 10px; line-height: 1.5; }
+.assault-hud strong { display: block; font: 600 20px/1.4 Menlo, monospace; color: #f1dca9; font-variant-numeric: tabular-nums; }
+.assault-hud .assault-health { font: 18px/1.5 system-ui, sans-serif; letter-spacing: 2px; color: #efb17d; white-space: nowrap; }
+#assault-weapon { font: 600 15px/1.8 system-ui, sans-serif; white-space: nowrap; }
+.assault-tools { display: flex; flex-wrap: wrap; justify-content: end; gap: 6px; margin-left: auto; }
+.assault-tools button { min-height: 34px; padding: 6px 10px; background: #223d3c; color: #e0e7d5; border: 1px solid #4b6252; border-radius: 5px; font: inherit; font-size: 11px; line-height: 1.5; cursor: pointer; }
+.assault-tools button:hover:enabled { border-color: #e1b47d; }
+.assault-tools button:disabled { opacity: .4; cursor: default; }
+.assault-machine button:focus-visible, #assault-canvas:focus-visible { outline: 2px solid #f1c987; outline-offset: -4px; }
+.assault-stage { position: relative; display: grid; justify-items: center; background: #0d252b; isolation: isolate; }
+#assault-canvas { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; image-rendering: pixelated; outline: none; touch-action: none; }
+.assault-overlay { position: absolute; inset: 0; display: grid; place-items: center; background: linear-gradient(180deg, #102a2a10, #0d242bc9 36%, #0d242bed 70%); padding: 20px; }
+.assault-overlay[hidden] { display: none; }
+.assault-overlay-card { text-align: center; max-width: 430px; }
+.assault-overlay-kicker { color: #f2cb8d; font: 600 11px/1.5 Menlo, monospace; letter-spacing: .15em; }
+.assault-overlay h2 { margin: 10px 0 12px; color: #f4edd5; font-size: clamp(26px, 3vw, 42px); line-height: 1.2; letter-spacing: -.05em; }
+.assault-overlay p { margin: 0 0 18px; color: #b9c9b9; font-size: 12px; line-height: 1.8; }
+#assault-start { min-height: 44px; min-width: 148px; padding: 11px 24px; background: #e9b778; border: 0; border-radius: 6px; color: #293d33; font: 700 14px/1.5 system-ui, sans-serif; cursor: pointer; }
+#assault-start:hover { background: #f4c994; }
+.assault-overlay .assault-start-help { margin: 15px 0 0; font-size: 10px; color: #b7c6b7; line-height: 1.7; }
+.assault-progress { height: 3px; background: #243d3b; }
+.assault-progress > span { display: block; width: 0; height: 100%; background: #e6b27a; transition: width .2s linear; }
+.assault-readout { display: flex; align-items: center; justify-content: space-between; padding: 8px 18px; background: #163035; font-size: 11px; color: #c4d2bd; line-height: 1.5; }
+#assault-time { font-family: Menlo, monospace; color: #e8d5a7; font-variant-numeric: tabular-nums; }
+.assault-keyboard { margin: 0; padding: 12px 18px; font-size: 11px; line-height: 1.7; color: #abbfb0; border-top: 1px solid #ffffff0c; text-align: center; }
+.assault-touch { display: none; }
+.assault-tip { margin: 16px 0 0; color: var(--fg-muted); font-size: 12px; line-height: 1.9; }
+.assault-mobile-tip { display: none; }
+.assault-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.assault-machine:fullscreen { display: flex; flex-direction: column; justify-content: center; max-width: none; margin: 0; border: 0; border-radius: 0; width: 100%; height: 100%; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+.assault-machine:fullscreen .assault-hud { min-height: 62px; padding: 5px 20px; }
+.assault-machine:fullscreen #assault-canvas { max-width: calc((100dvh - 150px) * 16 / 9); }
+.assault-machine:fullscreen .assault-stage { min-height: 0; }
+:root[data-theme="dark"] .assault-mission { color: #e7b680; }
+@media (max-width: 800px), (pointer: coarse) {
+  .assault-heading, .assault-machine { max-width: 100%; }
+  #assault-canvas { max-width: 100%; }
+  .assault-touch { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; background: #122c30; border-top: 1px solid #ffffff0c; touch-action: none; user-select: none; -webkit-user-select: none; }
+  .assault-direction, .assault-combat { display: flex; align-items: center; gap: 8px; }
+  .assault-touch button { width: 54px; height: 52px; border: 1px solid #728776; border-bottom: 3px solid #7c8c73; border-radius: 9px; background: #304c45; color: #e7ebcd; font: 700 23px/1 system-ui, sans-serif; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+  .assault-touch .touch-fire { width: 66px; height: 58px; border-radius: 50%; background: #dba46c; color: #243c31; border-color: #f0c78e; font-size: 15px; }
+  .assault-touch .touch-jump { background: #53705a; font-size: 18px; }
+  .assault-touch .touch-grenade { width: 42px; height: 42px; font-size: 15px; border-radius: 50%; background: #25413c; }
+  .assault-touch button.held { background: #93ae79; color: #18362f; border-color: #d3d6a1; transform: translateY(2px); }
+  .assault-touch button:disabled { opacity: .5; }
+  .assault-keyboard { display: none; }
+  .assault-mobile-tip { display: block; margin-top: 4px; }
+  .assault-machine:fullscreen #assault-canvas { max-width: calc((100dvh - 205px) * 16 / 9); }
+}
+@media (max-width: 600px) {
+  .assault-main { padding: 18px 12px 22px; }
+  .assault-machine { scroll-margin-top: 108px; }
+  .assault-heading { margin-bottom: 12px; }
+  .assault-heading > div { display: block; }
+  .assault-heading h1 { font-size: 26px; }
+  .assault-heading p { font-size: 11px; }
+  .assault-mission { font-size: 9px; }
+  .assault-hud { display: grid; grid-template-columns: 1fr .8fr 1fr; gap: 9px 16px; padding: 10px 14px; }
+  .assault-tools { grid-column: 1 / -1; margin: 0; justify-content: end; border-top: 1px solid #ffffff0d; padding-top: 8px; }
+  .assault-tools button { min-height: 32px; padding: 5px 12px; font-size: 10px; }
+  .assault-hud strong { font-size: 17px; }
+  .assault-hud .assault-health { font-size: 15px; letter-spacing: 1px; }
+  #assault-weapon { font-size: 13px; }
+  .assault-stat-label, .assault-stat-note { font-size: 9px; }
+  .assault-overlay { padding: 12px; }
+  .assault-overlay-card { max-width: 290px; }
+  .assault-overlay-kicker { display: none; }
+  .assault-overlay h2 { font-size: 25px; margin: 0 0 8px; }
+  .assault-overlay p { font-size: 10px; margin-bottom: 12px; line-height: 1.6; }
+  .assault-overlay .assault-start-help { display: none; }
+  #assault-start { min-height: 40px; padding: 8px 20px; font-size: 12px; }
+  .assault-readout { font-size: 10px; padding: 7px 12px; }
+  .assault-tip { font-size: 11px; padding: 0 6px; }
+}
+@media (max-width: 360px) {
+  .assault-touch { gap: 8px; padding: 10px; }
+  .assault-touch button { width: 44px; height: 48px; }
+  .assault-direction, .assault-combat { gap: 6px; }
+  .assault-touch .touch-fire { width: 58px; height: 54px; }
+  .assault-touch .touch-grenade { width: 36px; height: 38px; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .assault-machine:fullscreen .assault-hud { min-height: 38px; padding: 3px 12px; gap: 20px; }
+  .assault-machine:fullscreen .assault-stat-label, .assault-machine:fullscreen .assault-stat-note { display: none; }
+  .assault-machine:fullscreen .assault-hud strong { font-size: 14px; }
+  .assault-machine:fullscreen .assault-readout { padding: 4px 14px; font-size: 9px; }
+  .assault-machine:fullscreen #assault-canvas { max-width: calc((100dvh - 130px) * 16 / 9); }
+  .assault-machine:fullscreen .assault-touch { padding: 5px 18px; }
+  .assault-machine:fullscreen .assault-touch button { height: 45px; }
+  .assault-machine:fullscreen .touch-fire { width: 56px; height: 48px; }
+}
+@media (prefers-reduced-motion: reduce) { .assault-progress > span { transition: none; } .assault-touch button.held { transform: none; } }

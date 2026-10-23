@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>像素突围 - Chengqian Huang</title>
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <link rel="stylesheet" href="/style.css?v=3">
+  <link rel="stylesheet" href="/games.css?v=2">
+  <link rel="stylesheet" href="/assault.css?v=4">
+</head>
+<body class="home game-page assault-page">
+  <header class="site-header">
+    <div class="container">
+      <a class="site-title" href="/">Chengqian Huang</a>
+      <nav>
+        <a href="/games.html" aria-current="location">小游戏</a>
+        <a href="/#post-list">文章</a>
+        <a href="/pelican.html">鹈鹕测试</a>
+        <a href="/about.html">关于</a>
+        <a href="https://github.com/ChengqianHuang" target="_blank" rel="noopener">GitHub</a>
+        <button id="theme-toggle" type="button"></button>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <div class="game-breadcrumb container"><a href="/games.html">← 全部游戏</a><span>像素突围</span></div>
+    <section class="assault-main container" aria-labelledby="assault-title">
+      <div class="assault-heading"><div><h1 id="assault-title">像素突围</h1><p>跑跳、连射，击破关底装甲车。</p></div><span class="assault-mission">MISSION 01</span></div>
+      <div id="assault-machine" class="assault-machine">
+        <div class="assault-hud" aria-label="游戏状态">
+          <div><span class="assault-stat-label">生命</span><strong id="assault-health" class="assault-health" aria-label="生命 5 / 5">♥♥♥♥♥</strong><span id="assault-lives" class="assault-stat-note">3 次机会</span></div>
+          <div><span class="assault-stat-label">得分</span><strong id="assault-score">00000</strong><span class="assault-stat-note">最高 <span id="assault-best">00000</span></span></div>
+          <div><span class="assault-stat-label">武器</span><strong id="assault-weapon">步枪</strong><span id="assault-grenades" class="assault-stat-note">手雷 ×3</span></div>
+          <div class="assault-tools">
+            <button id="assault-sound" type="button" aria-label="开启音效" aria-pressed="false">音效关</button>
+            <button id="assault-fullscreen" type="button">全屏</button>
+            <button id="assault-pause" type="button" disabled>暂停</button>
+            <button id="assault-restart" type="button" disabled>重来</button>
+          </div>
+        </div>
+        <div class="assault-stage">
+          <canvas id="assault-canvas" width="960" height="540" tabindex="0" aria-label="像素突围游戏画面" aria-describedby="assault-help">启用支持 Canvas 的浏览器即可开始游戏。</canvas>
+          <div id="assault-overlay" class="assault-overlay">
+            <div class="assault-overlay-card">
+              <p class="assault-overlay-kicker">横版射击闯关</p>
+              <h2 id="assault-message">像素突围</h2>
+              <p id="assault-description">推进战线，拿下关底装甲车。移动时也能开火，路上记得打开补给箱。</p>
+              <button id="assault-start" type="button">开始突围</button>
+              <p class="assault-start-help">电脑 J 开火 · K 跳跃 · L 手雷<br>手机按住开火，同时移动和跳跃</p>
+            </div>
+          </div>
+        </div>
+        <div class="assault-progress" role="progressbar" aria-label="关卡进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="assault-progress"></span></div>
+        <div class="assault-readout"><span id="assault-zone">废墟入口</span><span id="assault-time">00:00</span></div>
+        <div class="assault-touch" aria-label="触屏操作">
+          <div class="assault-direction"><button type="button" data-action="left" aria-label="向左移动">←</button><button type="button" data-action="right" aria-label="向右移动">→</button></div>
+          <div class="assault-combat"><button type="button" data-action="grenade" aria-label="投掷手雷" class="touch-grenade">雷</button><button type="button" data-action="jump" aria-label="跳跃" class="touch-jump">跳</button><button type="button" data-action="fire" aria-label="开火" class="touch-fire">开火</button></div>
+        </div>
+        <p id="assault-help" class="assault-keyboard">A / D 或 ← → 移动 · J 按住连射 · K / Space 跳跃 · L 手雷 · W / ↑ 向上瞄准 · Esc 暂停</p>
+        <p id="assault-status" class="assault-sr-only" role="status" aria-live="polite"></p>
+      </div>
+      <p class="assault-tip">打开补给箱，拾取散射枪、机枪和生命。断桥要跳过去，旗帜是检查点。快速通关、少受伤，挑战 S 评级。<span class="assault-mobile-tip">按住开火，同时移动或跳跃。手机横屏或全屏更容易看清战场。</span></p>
+      <noscript><p>游戏需要 JavaScript。</p></noscript>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="container"><p>© 2026 Chengqian Huang · <a href="https://github.com/ChengqianHuang/chengqianhuang.github.io" target="_blank" rel="noopener">本站源码</a></p></div></footer>
+  <script src="/theme.js"></script>
+  <script type="module" src="/assault.js?v=5"></script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="360" viewBox="0 0 720 360">
+  <defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#173c47"/><stop offset="1" stop-color="#96956c"/></linearGradient></defs>
+  <path fill="url(#sky)" d="M0 0h720v360H0z"/>
+  <circle cx="598" cy="86" r="36" fill="#dfc58c"/>
+  <path d="m0 260 90-128 90 81 106-114 127 138 75-85 134 116 98-78v170H0z" fill="#35534e"/>
+  <g fill="#2c4946"><path d="M40 203h99v107H40zM163 237h120v73H163zM180 184h15v53h-15zM455 186h83v124h-83zM555 214h120v96H555zM585 150h18v64h-18z"/><path d="M0 267h720v43H0z" fill="#29433d"/></g>
+  <g fill="#79815b"><path d="M55 220h10v16H55zM78 220h10v16H78zM101 220h10v16h-10zM55 250h10v16H55zM101 250h10v16h-10zM470 209h10v15h-10zM494 209h10v15h-10z"/></g>
+  <g font-family="system-ui,-apple-system,sans-serif"><text x="36" y="67" fill="#f0e8ca" font-weight="800" font-size="43" letter-spacing="-2">像素突围</text><text x="38" y="100" fill="#c4d0b4" font-size="15">跑跳 · 连射 · 关底首领</text><text x="39" y="132" fill="#e9bd80" font-size="10" letter-spacing="3">MISSION 01</text></g>
+  <path d="M0 310h720v50H0z" fill="#263e37"/><path d="M0 310h720v5H0z" fill="#a0a978"/><path d="M0 315h720v6H0z" fill="#5b704d"/>
+  <g fill="#425a41"><path d="M12 330h18v4H12zM65 342h25v4H65zM123 332h20v4h-20zM215 341h26v5h-26zM294 332h18v4h-18zM405 341h22v4h-22zM610 336h30v4h-30z"/></g>
+  <g transform="translate(210 307) scale(3)" shape-rendering="crispEdges">
+    <path d="M-5-20h9v4h-9z" fill="#445e50"/><path d="M-4-16h8v6h-8z" fill="#d8b18a"/><path d="M-6-18H6v2H-6z" fill="#e9ab69"/><path d="M2-15h2v2H2z" fill="#233d3c"/>
+    <path d="M-5-10H5v7H-5z" fill="#8fa16a"/><path d="M-7-11h3v8h-3zM-4-4h3v4h-3zM1-6h3v6H1z" fill="#43584a"/><path d="M-5-1h5v2h-5zM1-1h5v2H1z" fill="#202f2c"/>
+    <path d="M2-12h13v3H2z" fill="#263d3b"/><path d="M7-13h6v2H7z" fill="#9dae95"/><path d="M16-14h5v7h-5zM21-12h5v3h-5z" fill="#ffe2a1"/>
+  </g>
+  <g stroke="#ffebaa" stroke-width="3"><path d="M301 274h28M354 273h28M420 273h23"/></g>
+  <g transform="translate(490 220)" shape-rendering="crispEdges">
+    <path d="M-5 66h181v25H-5z" fill="#203734"/><path d="M4 70h161v18H4z" fill="#354d40"/>
+    <g fill="#818969"><circle cx="18" cy="80" r="9"/><circle cx="46" cy="80" r="9"/><circle cx="74" cy="80" r="9"/><circle cx="102" cy="80" r="9"/><circle cx="130" cy="80" r="9"/><circle cx="158" cy="80" r="9"/></g>
+    <path d="M0 31h170v36H0z" fill="#7c8d60"/><path d="M12 25h143v7H12zM30 0h110v7H30z" fill="#b3b984"/><path d="M21 7h130v20H21z" fill="#8a9667"/>
+    <path d="M-47 11h89v13h-89z" fill="#344b40"/><path d="M-55 8h14v20h-14z" fill="#819672"/><path d="M64 10h27v12H64z" fill="#efc78d"/><path d="M10 41h151v5H10z" fill="#c0b080"/><path d="M21 51h30v12H21zM66 51h82v12H66z" fill="#4d6548"/>
+    <g fill="#d1cd9a"><path d="M12 35h4v4h-4zM153 35h4v4h-4zM12 62h4v4h-4zM153 62h4v4h-4z"/></g>
+  </g>
+  <g transform="translate(305 282)"><path d="M0 0h28v28H0z" fill="#a38c58"/><path d="M3 3h22v22H3z" fill="#796e47"/><path d="M0 11h28v6H0zM11 0h6v28h-6z" fill="#c2a66e"/></g>
+</svg>
