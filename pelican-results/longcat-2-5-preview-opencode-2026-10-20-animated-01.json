@@ -1,0 +1,59 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "longcat-2-5-preview-opencode-2026-10-20-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "OpenCode",
+    "name": "LongCat 2.5 Preview",
+    "id": "longcat-2.5-preview-free",
+    "identitySource": "system-reported"
+  },
+  "harness": {
+    "name": "OpenCode",
+    "version": "2.0.16",
+    "mode": "agent",
+    "context": "fresh",
+    "tools": [
+      "write",
+      "edit",
+      "read",
+      "shell"
+    ]
+  },
+  "run": {
+    "generatedAt": "2026-10-20T21:25:36+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 1,
+    "totalAttempts": 1,
+    "selection": "first",
+    "parameters": {},
+    "postProcessing": "edited",
+    "notes": "固定动画提示词是本会话的第一条消息，context 为 fresh：生成前未阅读 PELICAN.md、schema、协议文件或任何已有提交作品，这些均在生成后为提交而阅读。一次生成即采用（attempt 1/1，selection first），但生成器在产出最终文件前经过两次修正，故 postProcessing 记为 edited，并保留首次生成文件为 source。\n\n生成管线：代理先手写 Python 生成脚本（写在仓库外）创作场景几何（自行车车架/车轮/曲柄/脚踏、鹈鹕身体/翅膀/喙与喉囊/喉囊中的鱼、太阳/云/山丘/道路），再用两连杆逆向运动学把踩踏运动烘焙进 CSS keyframes：髋部固定于 (370,300)、五通 (400,430)、曲柄半径 30、大腿/小腿各 85，膝朝前；在一个曲柄周期内采样 24 个关键帧，双脚精确落在脚踏上、循环首尾闭合。动画为纯 CSS @keyframes（无 SMIL、无脚本）：前后轮与曲柄绕各自中心连续旋转（轮速为曲柄 2 倍，示意传动比）；路面虚线以 stroke-dashoffset 反向滚动，滚动距离按每曲柄周期两个轮周长匹配；身体起伏、头部点动、翅膀轻拍、云朵漂移。所有动画与 @keyframes 都包在 @media (prefers-reduced-motion: no-preference) 内，减少动态效果时整体静止并回退到烘焙的静态踩踏姿态（云的位置也烘焙在画面内）。\n\n两次修正（均在生成器上完成，未手改 SVG 输出）：(1) 路面虚线滚动方向——首版为正偏移，地面向前滚动、车子看似倒退，改为负偏移使地面后退；(2) 云的烘焙静态位置——首版云在减少动态效果/静止帧中位于画面外，改为烘焙在画面内使静态构图完整。首次生成文件由同一确定型生成器回退这两处修正后重建并原样保存为 source（两次修正仅涉及上述方向与静态位置，场景美术未变）。\n\n模型身份：运行时模型注册表报告 provider 为 opencode/OpenCode、模型 LongCat 2.5 Preview Free（id longcat-2.5-preview-free）；用户也在指令中声明为 LongCat 2.5 Preview。二者一致但均未独立核实，底层厂商未确认，故 provider 按注册表记录、identitySource 为 system-reported。harness 为 OpenCode v2.0.16（opencode --version）。推理参数未知。\n\n已知外观简化（如实记录、未修正）：无链条；脚踏随曲柄一同旋转而非反向保持水平；车座大部分被身体遮挡；踩踏时髋部固定而身体起伏 ±4px（衔接藏在羽毛下）；轮与曲柄角速度比为示意值。"
+  },
+  "artifact": {
+    "path": "pelican-assets/longcat-2-5-preview-opencode-2026-10-20-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 800,
+    "height": 600,
+    "sha256": "ddbe0bf8c64b09ef0f95c5238a0ab41dd91a7450fb158ef67cbbb87fd2419b0b"
+  },
+  "source": {
+    "path": "pelican-assets/longcat-2-5-preview-opencode-2026-10-20-animated-01-original.svg",
+    "mediaType": "image/svg+xml",
+    "width": 800,
+    "height": 600,
+    "sha256": "8a4455f8c0267c4fb2101151bfea4999e5488bc566f1a48fc58b4ab1a8171064"
+  },
+  "animation": {
+    "mechanism": "css",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/longcat-2-5-preview-opencode-2026-10-20-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 800,
+    "height": 600,
+    "sha256": "7bca70b0a414ebbe371812d4debad0484cfaf5481efb98766c9b921db0ff6bb3"
+  }
+}

@@ -1,0 +1,178 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-labelledby="svgTitle svgDesc">
+<title id="svgTitle">A pelican riding a bicycle</title>
+  <desc id="svgDesc">A cartoon pelican pedals a teal bicycle along a road. The wheels spin, the pedals turn, and the pelican's legs pedal. Animation is disabled for users who prefer reduced motion.</desc>
+
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8ed1ee"/>
+      <stop offset="1" stop-color="#e6f7fe"/>
+    </linearGradient>
+  </defs>
+
+  <!-- sky -->
+  <rect width="800" height="600" fill="url(#sky)"/>
+
+  <!-- sun -->
+  <g stroke="#ffd94d" stroke-width="5" stroke-linecap="round">
+    <path d="M742,95 L758,95 M727,132 L738,143 M690,147 L690,163 M653,132 L642,143
+             M648,95 L632,95 M653,58 L642,47 M690,43 L690,27 M727,58 L738,47"/>
+  </g>
+  <circle cx="690" cy="95" r="42" fill="#ffd94d"/>
+  <circle cx="690" cy="95" r="42" fill="none" stroke="#f0c040" stroke-width="3"/>
+
+  <!-- clouds (baked position = composed static pose for reduced motion;
+       the drift animation overrides the transform when motion is allowed) -->
+  <g class="cloud-a" transform="translate(150,0)" fill="#ffffff" opacity="0.95">
+    <ellipse cx="0" cy="112" rx="55" ry="22"/>
+    <ellipse cx="-36" cy="119" rx="34" ry="15"/>
+    <ellipse cx="36" cy="119" rx="37" ry="16"/>
+    <circle cx="-16" cy="99" r="19"/>
+    <circle cx="14" cy="96" r="23"/>
+  </g>
+  <g class="cloud-b" transform="translate(560,0)" fill="#ffffff" opacity="0.9">
+    <ellipse cx="0" cy="72" rx="40" ry="16"/>
+    <circle cx="-10" cy="57" r="14"/>
+    <circle cx="14" cy="55" r="17"/>
+  </g>
+
+  <!-- hills -->
+  <path d="M0,500 Q200,438 430,484 T800,468 L800,500 Z" fill="#b7dfae"/>
+  <path d="M0,500 Q260,452 520,488 T800,478 L800,500 Z" fill="#93cb84"/>
+
+  <!-- road -->
+  <rect x="0" y="500" width="800" height="100" fill="#61666d"/>
+  <rect x="0" y="500" width="800" height="5" fill="#4c5056"/>
+  <line class="road-line" x1="0" y1="552" x2="800" y2="552"
+        stroke="#ffd94d" stroke-width="7" stroke-dasharray="70 30.53"/>
+
+  <!-- ground shadow -->
+  <ellipse cx="420" cy="503" rx="215" ry="11" fill="#000000" opacity="0.12"/>
+
+  <!-- far leg (behind the bike, darker) -->
+  <g transform="translate(370,300)">
+    <g class="thigh-far" transform="rotate(-40.12)">
+      <path d="M0,0 L0,85" stroke="#d9822b" stroke-width="13" stroke-linecap="round" fill="none"/>
+      <g transform="translate(0,85)">
+        <g class="shin-far" transform="rotate(80.24)">
+          <path d="M0,0 L0,85" stroke="#d9822b" stroke-width="11" stroke-linecap="round" fill="none"/>
+          <path d="M-8,76 Q6,72 18,78 Q24,82 16,86 Q4,92 -6,88 Z" fill="#c97420"/>
+        </g>
+      </g>
+    </g>
+  </g>
+
+  <!-- rear wheel -->
+  <g transform="translate(280,420)">
+    <g class="wheel-rotor">
+      <circle r="80" fill="none" stroke="#2b2b2b" stroke-width="11"/>
+      <circle r="71" fill="none" stroke="#e9e9e9" stroke-width="4"/>
+      <g stroke="#c9c9c9" stroke-width="2.5">
+        <path d="M0,-71 L0,71 M-61.4,-35.5 L61.4,35.5 M-61.4,35.5 L61.4,-35.5"/>
+      </g>
+      <circle r="7.5" fill="#777777"/>
+      <circle cx="75" cy="0" r="4.5" fill="#ff7b54"/>
+    </g>
+  </g>
+
+  <!-- front wheel -->
+  <g transform="translate(560,420)">
+    <g class="wheel-rotor">
+      <circle r="80" fill="none" stroke="#2b2b2b" stroke-width="11"/>
+      <circle r="71" fill="none" stroke="#e9e9e9" stroke-width="4"/>
+      <g stroke="#c9c9c9" stroke-width="2.5">
+        <path d="M0,-71 L0,71 M-61.4,-35.5 L61.4,35.5 M-61.4,35.5 L61.4,-35.5"/>
+      </g>
+      <circle r="7.5" fill="#777777"/>
+      <circle cx="75" cy="0" r="4.5" fill="#ff7b54"/>
+    </g>
+  </g>
+
+  <!-- frame -->
+  <g fill="none" stroke="#2a9d8f" stroke-width="9" stroke-linecap="round">
+    <path d="M400,430 L280,420"/>
+    <path d="M330,300 L280,420"/>
+    <path d="M400,430 L330,300"/>
+    <path d="M400,430 L545,360"/>
+    <path d="M330,300 L520,290"/>
+    <path d="M520,290 L545,360" stroke-width="11"/>
+    <path d="M540,352 L560,420"/>
+  </g>
+
+  <!-- handlebar -->
+  <path d="M520,290 L513,256" stroke="#2a9d8f" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M513,256 L549,249" stroke="#2a9d8f" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <rect x="545" y="244" width="18" height="10" rx="5" fill="#2b2b2b"/>
+
+  <!-- saddle -->
+  <path d="M304,290 Q330,281 354,290 L350,299 Q328,292 308,299 Z" fill="#6b4f2e"/>
+  <path d="M330,297 L327,307" stroke="#888888" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- crank + pedals -->
+  <g transform="translate(400,430)">
+    <circle r="17" fill="none" stroke="#999999" stroke-width="5"/>
+    <g class="crank">
+      <path d="M0,0 L30,0 M0,0 L-30,0" stroke="#555555" stroke-width="7" stroke-linecap="round"/>
+      <g transform="translate(30,0)">
+        <rect x="-12" y="-4.5" width="24" height="9" rx="4" fill="#333333"/>
+      </g>
+      <g transform="translate(-30,0)">
+        <rect x="-12" y="-4.5" width="24" height="9" rx="4" fill="#333333"/>
+      </g>
+      <circle r="5" fill="#333333"/>
+    </g>
+  </g>
+
+  <!-- pelican (upper body bobs gently; legs stay fixed to the pedals) -->
+  <g class="body-bob">
+    <!-- tail -->
+    <path d="M318,256 L250,286 L270,291 L246,310 L268,313 L254,329 L322,290 Z" fill="#e6e6d6"/>
+
+    <!-- body -->
+    <ellipse cx="375" cy="255" rx="78" ry="58" transform="rotate(-8 375 255)"
+             fill="#fdfdf8" stroke="#e3e3d2" stroke-width="2"/>
+    <ellipse cx="388" cy="272" rx="55" ry="36" transform="rotate(-8 388 272)"
+             fill="#f1f1e6" opacity="0.7"/>
+
+    <!-- wing -->
+    <g transform="translate(405,225)">
+      <g class="wing-flap">
+        <path d="M0,0 Q-48,-28 -88,8 Q-110,28 -124,44 Q-78,52 -36,36 Q-6,26 0,0 Z"
+              fill="#f2f2e8" stroke="#d9d9c6" stroke-width="2"/>
+        <path d="M-18,-8 Q-52,-22 -84,2 M-24,6 Q-58,-4 -92,20"
+              stroke="#d9d9c6" stroke-width="2" fill="none"/>
+      </g>
+    </g>
+
+    <!-- neck + head + beak -->
+    <g transform="translate(415,215)">
+      <g class="head-bob">
+        <path d="M-10,10 Q16,-24 32,-52" stroke="#fdfdf8" stroke-width="25"
+              fill="none" stroke-linecap="round"/>
+        <circle cx="35" cy="-55" r="34" fill="#fdfdf8" stroke="#e3e3d2" stroke-width="2"/>
+        <!-- upper mandible -->
+        <path d="M56,-68 Q120,-62 173,-40 Q176,-36 172,-33 Q116,-51 58,-57 Z" fill="#f4a259"/>
+        <!-- pouch -->
+        <path d="M58,-57 Q102,-28 142,-20 Q168,-14 173,-34 Q150,-46 104,-60 Q80,-66 58,-57 Z" fill="#f7c873"/>
+        <!-- fish tucked in the pouch -->
+        <path d="M96,-34 Q112,-48 134,-42 Q116,-34 100,-28 Z" fill="#7fb3d5"/>
+        <path d="M134,-42 L148,-50 L146,-34 Z" fill="#5d94b8"/>
+        <!-- eye -->
+        <circle cx="38" cy="-64" r="5.5" fill="#222222"/>
+        <circle cx="40" cy="-66" r="1.8" fill="#ffffff"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- near leg (in front of the body) -->
+  <g transform="translate(370,300)">
+    <g class="thigh-near" transform="rotate(-57.40)">
+      <path d="M0,0 L0,85" stroke="#f4a259" stroke-width="13" stroke-linecap="round" fill="none"/>
+      <g transform="translate(0,85)">
+        <g class="shin-near" transform="rotate(65.25)">
+          <path d="M0,0 L0,85" stroke="#f4a259" stroke-width="11" stroke-linecap="round" fill="none"/>
+          <path d="M-8,76 Q6,72 18,78 Q24,82 16,86 Q4,92 -6,88 Z" fill="#e8933f"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
