@@ -56,7 +56,8 @@ class SubmissionValidation(unittest.TestCase):
         self.record['artifact']['width'] += 1; self.save()
         self.assertIn('dimensions do not match', '\n'.join(validate(self.root)))
     def test_edited_result_requires_original(self):
-        self.record['run']['postProcessing'] = 'edited'; self.save()
+        self.record['run']['postProcessing'] = 'edited'
+        self.record['source'] = None; self.save()
         self.assertIn('preserve original', '\n'.join(validate(self.root)))
 
 if __name__ == '__main__':
