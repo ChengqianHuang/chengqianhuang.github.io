@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="360" viewBox="0 40 720 360">
+  <rect width="720" height="440" fill="#f2f0e7"/>
+  <circle cx="677" cy="39" r="164" fill="#e5e8db"/>
+  <circle cx="30" cy="447" r="150" fill="#e9ddc8"/>
+  <g font-family="system-ui,-apple-system,sans-serif" fill="#354037">
+    <text x="49" y="117" font-size="12" font-weight="600" letter-spacing="3" fill="#94704b">SLIDE &amp; MERGE</text>
+    <text x="43" y="221" font-size="100" font-weight="800" letter-spacing="-8">2048</text>
+    <text x="51" y="268" font-size="19" fill="#697061">滑动 · 合并 · 再来一局</text>
+    <path d="M53 315h59m-12-9 12 9-12 9" fill="none" stroke="#9b653a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g transform="translate(382 75)">
+    <rect width="290" height="290" rx="18" fill="#b5baa9"/>
+    <g fill="#d0d4c5">
+      <rect x="14" y="14" width="57" height="57" rx="6"/><rect x="82" y="14" width="57" height="57" rx="6"/><rect x="150" y="14" width="57" height="57" rx="6"/><rect x="218" y="14" width="57" height="57" rx="6"/>
+      <rect x="14" y="82" width="57" height="57" rx="6"/><rect x="82" y="82" width="57" height="57" rx="6"/><rect x="150" y="82" width="57" height="57" rx="6"/><rect x="218" y="82" width="57" height="57" rx="6"/>
+      <rect x="14" y="150" width="57" height="57" rx="6"/><rect x="82" y="150" width="57" height="57" rx="6"/><rect x="150" y="150" width="57" height="57" rx="6"/><rect x="218" y="150" width="57" height="57" rx="6"/>
+      <rect x="14" y="218" width="57" height="57" rx="6"/><rect x="82" y="218" width="57" height="57" rx="6"/><rect x="150" y="218" width="57" height="57" rx="6"/><rect x="218" y="218" width="57" height="57" rx="6"/>
+    </g>
+    <g font-family="system-ui,-apple-system,sans-serif" font-weight="750" text-anchor="middle" dominant-baseline="central" font-size="24">
+      <rect x="14" y="14" width="57" height="57" rx="6" fill="#eee9dd"/><text x="42.5" y="42.5" fill="#535a50">2</text>
+      <rect x="82" y="82" width="57" height="57" rx="6" fill="#e8d9bd"/><text x="110.5" y="110.5" fill="#535447">4</text>
+      <rect x="14" y="150" width="57" height="57" rx="6" fill="#efb077"/><text x="42.5" y="178.5" fill="#492d19">8</text>
+      <rect x="82" y="150" width="57" height="57" rx="6" fill="#eb9865"/><text x="110.5" y="178.5" fill="#482819">16</text>
+      <rect x="14" y="218" width="57" height="57" rx="6" fill="#c65436"/><text x="42.5" y="246.5" fill="#fff8e9">64</text>
+      <rect x="82" y="218" width="57" height="57" rx="6" fill="#eaca72"/><text x="110.5" y="246.5" fill="#574117" font-size="21">128</text>
+      <rect x="150" y="218" width="57" height="57" rx="6" fill="#deba5b"/><text x="178.5" y="246.5" fill="#513b12" font-size="21">256</text>
+      <rect x="218" y="218" width="57" height="57" rx="6" fill="#c99f38"/><text x="246.5" y="246.5" fill="#352809" font-size="21">512</text>
+    </g>
+  </g>
+</svg>

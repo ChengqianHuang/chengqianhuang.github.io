@@ -1,5 +1,13 @@
 [
   {
+    "id": "2048",
+    "title": "2048",
+    "description": "滑动数字，相同的碰在一起就合并。试着合出 2048。",
+    "controls": "方向键 / 滑动 · 可撤回一步",
+    "url": "/games/2048.html",
+    "cover": "/game-assets/2048.svg"
+  },
+  {
     "id": "breakout",
     "title": "打砖块",
     "description": "接住小球，清空砖块。三条命，三关，试试能拿多少分。",

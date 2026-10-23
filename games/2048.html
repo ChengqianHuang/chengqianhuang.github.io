@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2048 - Chengqian Huang</title>
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <link rel="stylesheet" href="/style.css?v=3">
+  <link rel="stylesheet" href="/games.css?v=2">
+  <link rel="stylesheet" href="/game-2048.css?v=2">
+</head>
+<body class="home game-page puzzle-page">
+  <header class="site-header">
+    <div class="container">
+      <a class="site-title" href="/">Chengqian Huang</a>
+      <nav>
+        <a href="/games.html" aria-current="location">小游戏</a>
+        <a href="/#post-list">文章</a>
+        <a href="/pelican.html">鹈鹕测试</a>
+        <a href="/about.html">关于</a>
+        <a href="https://github.com/ChengqianHuang" target="_blank" rel="noopener">GitHub</a>
+        <button id="theme-toggle" type="button"></button>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <div class="game-breadcrumb container"><a href="/games.html">← 全部游戏</a><span>2048</span></div>
+    <div class="puzzle-layout container">
+      <section class="puzzle-intro" aria-labelledby="puzzle-title">
+        <p class="puzzle-eyebrow">数字合并</p>
+        <h1 id="puzzle-title">2048</h1>
+        <p class="puzzle-summary">相同数字碰在一起，就会合并。<br>试着合出 2048。</p>
+        <div class="puzzle-guide">
+          <p><strong>电脑用方向键，手机在棋盘上滑动。</strong></p>
+          <p>每次有效移动后，会出现一个新的 2 或 4。棋盘填满、也无法合并时，这一局结束。</p>
+          <p>走错了，可以撤回一步。</p>
+        </div>
+      </section>
+      <section class="puzzle-machine" aria-label="2048 游戏">
+        <div class="puzzle-hud">
+          <p id="puzzle-help" class="puzzle-hint">方向键 / 滑动棋盘</p>
+          <div class="puzzle-scores">
+            <div class="puzzle-stat"><span>得分</span><strong id="puzzle-score">0</strong><span id="puzzle-gain" aria-hidden="true"></span></div>
+            <div class="puzzle-stat"><span title="保存在当前浏览器">本机最高</span><strong id="puzzle-best">0</strong></div>
+          </div>
+        </div>
+        <div class="board-shell">
+          <div id="puzzle-board" class="puzzle-board" role="grid" aria-label="2048 棋盘" aria-rowcount="4" aria-colcount="4" aria-describedby="puzzle-help" tabindex="0">
+            <div class="puzzle-slots" role="presentation">
+              <div class="puzzle-slot-row" role="row">
+                <div id="puzzle-cell-0" class="puzzle-cell" role="gridcell"></div><div id="puzzle-cell-1" class="puzzle-cell" role="gridcell"></div><div id="puzzle-cell-2" class="puzzle-cell" role="gridcell"></div><div id="puzzle-cell-3" class="puzzle-cell" role="gridcell"></div>
+              </div>
+              <div class="puzzle-slot-row" role="row">
+                <div id="puzzle-cell-4" class="puzzle-cell" role="gridcell"></div><div id="puzzle-cell-5" class="puzzle-cell" role="gridcell"></div><div id="puzzle-cell-6" class="puzzle-cell" role="gridcell"></div><div id="puzzle-cell-7" class="puzzle-cell" role="gridcell"></div>
+              </div>
+              <div class="puzzle-slot-row" role="row">
+                <div id="puzzle-cell-8" class="puzzle-cell" role="gridcell"></div><div id="puzzle-cell-9" class="puzzle-cell" role="gridcell"></div><div id="puzzle-cell-10" class="puzzle-cell" role="gridcell"></div><div id="puzzle-cell-11" class="puzzle-cell" role="gridcell"></div>
+              </div>
+              <div class="puzzle-slot-row" role="row">
+                <div id="puzzle-cell-12" class="puzzle-cell" role="gridcell"></div><div id="puzzle-cell-13" class="puzzle-cell" role="gridcell"></div><div id="puzzle-cell-14" class="puzzle-cell" role="gridcell"></div><div id="puzzle-cell-15" class="puzzle-cell" role="gridcell"></div>
+              </div>
+            </div>
+            <div id="puzzle-tiles" class="puzzle-tiles" aria-hidden="true"></div>
+          </div>
+          <div id="puzzle-overlay" class="puzzle-overlay" role="region" aria-labelledby="puzzle-message" hidden>
+            <div>
+              <h2 id="puzzle-message"></h2>
+              <p id="puzzle-description"></p>
+              <div class="puzzle-overlay-buttons"><button id="puzzle-continue" class="puzzle-primary" type="button" hidden>继续玩</button><button id="puzzle-again" type="button">再来一局</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="puzzle-actions"><button id="puzzle-undo" type="button" disabled>↶ 撤回一步</button><button id="puzzle-restart" class="puzzle-primary" type="button">重新开始</button></div>
+        <p class="puzzle-note">随时停下，刷新也能接着玩。进度保存在本机。</p>
+        <p id="puzzle-status" class="puzzle-sr-only" role="status" aria-live="polite"></p>
+        <noscript><p>启用 JavaScript 即可开始游戏。</p></noscript>
+      </section>
+    </div>
+  </main>
+  <footer class="site-footer"><div class="container"><p>© 2026 Chengqian Huang · <a href="https://github.com/ChengqianHuang/chengqianhuang.github.io" target="_blank" rel="noopener">本站源码</a></p></div></footer>
+  <script src="/theme.js"></script>
+  <script type="module" src="/game-2048.js?v=1"></script>
+</body>
+</html>
