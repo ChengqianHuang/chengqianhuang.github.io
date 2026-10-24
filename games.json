@@ -1,5 +1,13 @@
 [
   {
+    "id": "bomber",
+    "title": "炸弹竞技场",
+    "description": "炸墙捡道具，连锁引爆。和电脑或朋友同场对战，先赢两局。",
+    "controls": "键盘 / 触屏 · 支持本地双人",
+    "url": "/games/bomber.html",
+    "cover": "/game-assets/bomber.svg"
+  },
+  {
     "id": "pixel-assault",
     "title": "像素突围",
     "description": "跑跳连射，打开武器补给箱，穿过战线击破关底装甲车。",

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>炸弹竞技场 - Chengqian Huang</title>
+<script>(function(){var t=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)})();</script>
+<link rel="stylesheet" href="/style.css?v=3"><link rel="stylesheet" href="/games.css?v=2"><link rel="stylesheet" href="/bomber.css?v=2"></head><body class="home game-page">
+  <header class="site-header">
+    <div class="container">
+      <a class="site-title" href="/">Chengqian Huang</a>
+      <nav>
+        <a href="/games.html" aria-current="location">小游戏</a>
+        <a href="/#post-list">文章</a>
+        <a href="/pelican.html">鹈鹕测试</a>
+        <a href="/about.html">关于</a>
+        <a href="https://github.com/ChengqianHuang" target="_blank" rel="noopener">GitHub</a>
+        <button id="theme-toggle" type="button"></button>
+      </nav>
+    </div>
+  </header>
+<main><div class="game-breadcrumb container"><a href="/games.html">← 全部游戏</a><span>炸弹竞技场</span></div>
+<section class="bomber-main container" aria-labelledby="bomber-title"><div class="bomber-heading"><h1 id="bomber-title">炸弹竞技场</h1><p>炸开一条路，给自己留条退路。</p></div>
+<div id="bomber-machine" class="bomber-machine">
+<div class="bomber-toolbar"><div class="bomber-options"><select id="bomber-mode" aria-label="对战模式"><option value="solo">单人 · 对战电脑</option><option value="duo">本地双人 · 同屏对战</option></select><select id="bomber-arena" aria-label="选择场地"><option value="garden">青苔庭院</option><option value="dock">货运码头</option><option value="forge">熔炉工坊</option></select></div><div class="bomber-tools"><button id="bomber-sound" aria-pressed="false" type="button">音效关</button><button id="bomber-fullscreen" type="button">全屏</button><button id="bomber-pause" type="button" disabled>暂停</button><button id="bomber-restart" type="button" disabled>重开</button></div></div>
+<div class="bomber-scores" aria-label="比赛比分"><div id="bomber-teams-left"></div><div class="bomber-clock"><strong id="bomber-clock">02:00</strong><small id="bomber-round">第 1 局 · 先赢两局</small></div><div id="bomber-teams-right"></div></div>
+<div class="bomber-stage"><canvas id="bomber-canvas" width="520" height="440" tabindex="0" aria-label="炸弹竞技场游戏画面" aria-describedby="bomber-help">游戏需要支持 Canvas 的浏览器。</canvas><div id="bomber-overlay" class="bomber-overlay"><div class="bomber-card"><div class="eyebrow">BOMB / MOVE / SURVIVE</div><h2 id="bomber-message">炸弹竞技场</h2><p id="bomber-description">放下炸弹，炸开木箱、拾取道具。躲开十字火焰，成为最后站着的人。</p><button id="bomber-start" type="button">开始对战</button></div></div></div>
+<div class="bomber-readout"><span id="bomber-stats">你：炸弹 1 · 火力 2 · 速度 1</span><span id="bomber-hint">炸弹约 2 秒后爆炸，记得转弯躲避</span></div>
+<div class="bomber-touch" aria-label="触屏操作"><div class="bomber-pad"><button data-dir="up" aria-label="向上移动">↑</button><button data-dir="left" aria-label="向左移动">←</button><button data-dir="right" aria-label="向右移动">→</button><button data-dir="down" aria-label="向下移动">↓</button></div><button id="bomber-drop" type="button" aria-label="放置炸弹">放炸弹</button></div>
+<p id="bomber-help" class="bomber-help">方向键 / WASD 移动 · Space / J 放炸弹 · Esc 暂停</p><p id="bomber-status" class="bomber-sr" role="status" aria-live="polite"></p>
+</div><p class="bomber-note">火力增加爆炸距离，炸弹增加同时放置数量，靴子提升移动速度。炸弹会连锁引爆；最后 30 秒从外围开始缩圈。<span id="bomber-duo-note">本地双人需要两人共用键盘。</span></p><noscript>游戏需要 JavaScript。</noscript></section></main>
+  <footer class="site-footer"><div class="container"><p>© 2026 Chengqian Huang · <a href="https://github.com/ChengqianHuang/chengqianhuang.github.io" target="_blank" rel="noopener">本站源码</a></p></div></footer>
+<script src="/theme.js"></script><script type="module" src="/bomber.js?v=2"></script></body></html>

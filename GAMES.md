@@ -17,3 +17,5 @@
 修改游戏规则后运行对应检查：`node scripts/test_2048.mjs` 或 `node scripts/test_breakout.mjs`。打砖块检查包括八关物理模拟、碰撞、多球、道具和暂停。
 
 像素突围：`node scripts/test_assault.mjs`，检查跳跃、子弹碰撞、检查点、武器、手雷及整关通关。运行逻辑在 `assault-engine.mjs`，输入与战斗特效在 `assault.js`，角色绘制在 `assault-sprites.mjs`，场景与地形在 `assault-environment.mjs`。美术模块只读取游戏状态，不修改碰撞和规则。
+
+炸弹竞技场：`node scripts/test_bomber.mjs`，检查炸弹通行、十字爆炸遮挡、连锁引爆、道具、比分和缩圈，以及多组电脑完整对战。规则在 `bomber-engine.mjs`，绘制在 `bomber-art.mjs`，输入及界面在 `bomber.js`。
