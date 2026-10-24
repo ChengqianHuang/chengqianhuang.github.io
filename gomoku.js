@@ -1,9 +1,9 @@
 import {GomokuGame,N,coordinate} from './gomoku-engine.mjs?v=1';
-import {chooseMove} from './gomoku-ai.mjs?v=1';
+import {chooseMove} from './gomoku-ai.mjs?v=2';
 const $=id=>document.getElementById(`gomoku-${id}`),game=new GomokuGame(),canvas=$('canvas'),ctx=canvas.getContext('2d'),machine=$('machine');
 const mobile=()=>matchMedia('(max-width: 600px), (pointer: coarse)').matches;
 const levels={casual:'休闲',standard:'标准',challenge:'挑战'};
-let human=1,level='standard',busy=false,paused=false,worker=null,token=0,resultTimer=0,selected=null,hover=null,cursor=112,pointerStart=null;
+let human=1,level='challenge',busy=false,paused=false,worker=null,token=0,resultTimer=0,selected=null,hover=null,cursor=112,pointerStart=null;
 const MARGIN=44,STEP=632/14;
 function point(index){return[MARGIN+index%N*STEP,MARGIN+Math.floor(index/N)*STEP];}
 function stone(x,y,side,alpha=1){ctx.save();ctx.globalAlpha=alpha;ctx.shadowColor='#3e321e55';ctx.shadowBlur=5;ctx.shadowOffsetY=3;const g=ctx.createRadialGradient(x-8,y-9,2,x,y,21);if(side===1){g.addColorStop(0,'#687177');g.addColorStop(.4,'#30393f');g.addColorStop(1,'#131b21');}else{g.addColorStop(0,'#fffef7');g.addColorStop(.65,'#f2f1e8');g.addColorStop(1,'#bdc3b5');}ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,19.6,0,Math.PI*2);ctx.fill();ctx.shadowColor='transparent';ctx.strokeStyle=side===1?'#0f1920':'#afb4a5';ctx.lineWidth=.8;ctx.stroke();ctx.restore();}
@@ -36,7 +36,7 @@ function aiMove(){
  if(paused||game.winner||game.draw||game.turn===human)return;cancelAI();busy=true;update();const id=token,started=performance.now();
  const accept=index=>{if(id!==token||paused)return;resultTimer=setTimeout(()=>{if(id!==token||paused)return;worker?.terminate();worker=null;busy=false;if(!Number.isInteger(index)||game.board[index]||index<0||index>=225){index=chooseMove(game.board,game.turn,{difficulty:'casual',timeLimit:40}).index;}if(!game.play(index)){$('status').textContent='电脑暂时无法落子，请重新开局。';return;}selected=hover=null;update();},Math.max(0,260-(performance.now()-started)));};
  const fallback=()=>{if(id!==token)return;worker?.terminate();worker=null;accept(chooseMove(game.board,game.turn,{difficulty:level,timeLimit:80}).index);};
- try{worker=new Worker(new URL('./gomoku-worker.mjs?v=1',import.meta.url),{type:'module'});worker.onmessage=e=>{if(e.data.token===id)accept(e.data.index);};worker.onerror=e=>{e.preventDefault();fallback();};worker.postMessage({board:game.board,side:game.turn,difficulty:level,token:id});}catch{resultTimer=setTimeout(fallback,0);}
+ try{worker=new Worker(new URL('./gomoku-worker.mjs?v=2',import.meta.url),{type:'module'});worker.onmessage=e=>{if(e.data.token===id)accept(e.data.index);};worker.onerror=e=>{e.preventDefault();fallback();};worker.postMessage({board:game.board,side:game.turn,difficulty:level,token:id});}catch{resultTimer=setTimeout(fallback,0);}
 }
 function play(index){if(busy||paused||game.turn!==human||game.winner||game.draw)return;if(game.play(index)){selected=hover=null;cursor=index;update();aiMove();}}
 function focusBoard(){machine.scrollIntoView({block:'start',behavior:'instant'});canvas.focus({preventScroll:true});}

@@ -18,3 +18,59 @@ const fork=board([[6,7,2],[8,7,2],[7,6,2],[7,8,2],[5,5,1],[9,9,1]]);assert.ok(th
 const open=board([[7,7,1],[8,8,2],[6,8,1],[7,8,2],[5,7,1],[8,7,2]]);const started=performance.now(),r=chooseMove(open,2,{difficulty:'challenge',timeLimit:250});assert.ok(r.index>=0&&!open[r.index]);assert.ok(performance.now()-started<600,'Search must honor its time budget');
 assert.equal(chooseMove(new Int8Array(CELLS).fill(1),2).index,-1);assert.equal(chooseMove(new Int8Array(CELLS),1).index,112);
 console.log(`Gomoku passed: lines, edges, overlines, occupied cells, undo, win/block/gap tactics at all levels, forks, immutable search, timed search (${r.depth} completed plies).`);
+
+// A fork is slower than the opponent's open-four attack: defend the live three.
+const counterAttack = board([[6,7,2],[8,7,2],[7,6,2],[7,8,2],[4,3,1],[5,3,1],[6,3,1]]);
+const defensive = chooseMove(counterAttack,2,{difficulty:'challenge',timeLimit:500});
+assert.ok([at(3,3),at(7,3)].includes(defensive.index),'Do not play a double three while allowing an immediate open four');
+const sealed = board([[4,7,2],[5,7,1],[7,7,1],[8,7,2]]);
+assert.ok(threat(sealed,at(6,7),1)<15000,'A three sealed at both ends is not a live three');
+
+const winningMoves = (b,side) => {
+ const result=[];
+ for(let i=0;i<CELLS;i++)if(!b[i]){b[i]=side;if(winningLine(b,i))result.push(i);b[i]=0;}
+ return result;
+};
+// Verify certificates against the actual game rules, independently of the AI's
+// pattern table. Every reply is forced, ending in two wins or a completed five.
+function verifyProof(initial,side,line){
+ const b=Int8Array.from(initial);
+ for(let step=0;step<line.length;step+=2){
+  const attack=line[step];assert.equal(b[attack],0);b[attack]=side;
+  if(winningLine(b,attack)){assert.equal(step,line.length-1);return;}
+  assert.equal(winningMoves(b,3-side).length,0,'Defender can counter-win: invalid proof');
+  const wins=winningMoves(b,side);assert.ok(wins.length>0,'Every attack must force a reply');
+  const reply=line[step+1];assert.ok(wins.includes(reply));assert.equal(b[reply],0);b[reply]=3-side;
+  assert.equal(winningLine(b,reply),null);
+  if(wins.length>1){assert.equal(step,line.length-3);assert.ok(wins.includes(line[step+2]));}
+ }
+ assert.fail('Proof did not end in five');
+}
+const combinations=[
+ [112,82,111,98,66,114,130,96,97,110,68,83,65,67,81,113,33,49,51,84,36,21,35],
+ [112,113,96,128,97,111,127,142,98,99,140,84,82,67,124,110,114,66,94,95,109,139,108,156],
+];
+let longest=0;
+for(const sequence of combinations)for(let symmetry=0;symmetry<8;symmetry++){
+ const transform=index=>{let x=index%15,y=Math.floor(index/15);if(symmetry&4)x=14-x;for(let n=0;n<(symmetry&3);n++)[x,y]=[14-y,x];return at(x,y);};
+ const game=new GomokuGame();for(const index of sequence){assert.equal(game.winner,0);assert.ok(game.play(transform(index)));}
+ const before=Array.from(game.board),result=chooseMove(game.board,game.turn,{difficulty:'challenge',timeLimit:500});
+ assert.ok(result.proof,'Find continuous-four combinations in all eight board orientations');
+ assert.equal(result.index,result.proof[0]);verifyProof(game.board,game.turn,result.proof);
+ assert.deepEqual(Array.from(game.board),before);longest=Math.max(longest,result.proof.length);
+}
+// Force timeout mid-search and verify that unwinding leaves the input untouched.
+const quiet=board([[7,7,1],[8,8,2],[6,8,1],[9,6,2]]),before=Array.from(quiet);let ticks=0;
+const interrupted=chooseMove(quiet,1,{difficulty:'challenge',timeLimit:20,now:()=>ticks++});
+assert.ok(interrupted.index>=0&&!quiet[interrupted.index]);assert.deepEqual(Array.from(quiet),before);
+assert.ok(ticks<30,'Timeout must unwind promptly');
+assert.equal(chooseMove(new Int8Array(224),1).index,-1);
+console.log(`Stronger AI passed: counter-threat defense, sealed patterns, ${combinations.length*8} independently verified forcing lines (up to ${longest} plies), timeout recovery.`);
+
+const underPressure=new GomokuGame();
+for(const index of [112,113,96,128,97,111,98])underPressure.play(index);
+const resistance=chooseMove(underPressure.board,2,{difficulty:'challenge',timeLimit:500});
+assert.ok([95,99].includes(resistance.index),'Even a losing position must block the immediate open-four attack');
+const sharedDefense=board([[6,7,2],[8,7,2],[7,6,2],[7,8,2],[4,3,1],[5,3,1],[7,3,1],[3,4,1],[3,5,1],[3,6,1]]);
+assert.equal(chooseMove(sharedDefense,2,{difficulty:'challenge',timeLimit:500}).index,at(3,3),'Use the shared endpoint to defend a broken three and a crossing live three');
+console.log('Defensive regression passed: resist forced loss and cover intersecting threats.');
