@@ -1,0 +1,23 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>五子棋 - Chengqian Huang</title>
+<script>(function(){var t=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)})();</script><link rel="stylesheet" href="/style.css?v=3"><link rel="stylesheet" href="/games.css?v=2"><link rel="stylesheet" href="/gomoku.css?v=1"></head><body class="home game-page">
+  <header class="site-header">
+    <div class="container">
+      <a class="site-title" href="/">Chengqian Huang</a>
+      <nav>
+        <a href="/games.html" aria-current="location">小游戏</a>
+        <a href="/#post-list">文章</a>
+        <a href="/pelican.html">鹈鹕测试</a>
+        <a href="/about.html">关于</a>
+        <a href="https://github.com/ChengqianHuang" target="_blank" rel="noopener">GitHub</a>
+        <button id="theme-toggle" type="button"></button>
+      </nav>
+    </div>
+  </header>
+<main><div class="game-breadcrumb container"><a href="/games.html">← 全部游戏</a><span>五子棋</span></div><section class="gomoku-main container" aria-labelledby="gomoku-title"><div class="gomoku-heading"><h1 id="gomoku-title">五子棋</h1><p>黑棋先行，连成五颗即可获胜。</p></div>
+<div class="gomoku-machine" id="gomoku-machine"><div class="gomoku-play"><div class="gomoku-turn"><span id="gomoku-status" class="gomoku-status" role="status" aria-live="polite">轮到你落子</span><span class="gomoku-count" id="gomoku-count">第 1 手</span></div><div class="gomoku-board-frame"><canvas id="gomoku-canvas" width="720" height="720" tabindex="0" aria-label="15 乘 15 五子棋棋盘" aria-describedby="gomoku-instruction">请使用支持 Canvas 的浏览器。</canvas><div class="gomoku-pause-overlay" id="gomoku-pause-overlay" hidden><strong>对局已暂停</strong><button id="gomoku-resume" type="button">继续对局</button></div></div><div class="gomoku-confirm-row"><span id="gomoku-selection">点选交叉点，再点落子</span><button id="gomoku-confirm" type="button" disabled>落子</button></div><div class="gomoku-coordinate"><span id="gomoku-last">空局，试试从天元 H8 开始</span><span id="gomoku-level-label">标准 · 自由五子棋</span></div></div>
+<aside class="gomoku-panel" aria-label="对局设置"><div class="gomoku-players"><div class="gomoku-player"><span class="gomoku-stone" id="gomoku-human-stone"></span><span>你</span><small id="gomoku-human-label">黑棋 · 先手</small></div><div class="gomoku-player"><span class="gomoku-stone white" id="gomoku-ai-stone"></span><span>电脑</span><small id="gomoku-ai-label">白棋 · 后手</small></div></div>
+<div class="gomoku-field"><label for="gomoku-level">电脑难度</label><select id="gomoku-level"><option value="casual">休闲 · 轻松练习</option><option value="standard" selected>标准 · 攻防兼顾</option><option value="challenge">挑战 · 多步搜索</option></select></div><div class="gomoku-field"><label for="gomoku-side">你的执子</label><select id="gomoku-side"><option value="1">执黑 · 你先手</option><option value="2">执白 · 电脑先手</option></select></div><p id="gomoku-settings-note" class="gomoku-settings-note">选项在重新开局时生效</p>
+<div class="gomoku-actions"><button id="gomoku-new" type="button">重新开局</button><button id="gomoku-undo" type="button" disabled>悔棋</button><button id="gomoku-pause" type="button" disabled>暂停</button></div><div id="gomoku-result" class="gomoku-result" hidden></div><div class="gomoku-recent"><h2>最近落子</h2><ol id="gomoku-history"><li>尚未落子</li></ol></div></aside></div>
+<p class="gomoku-note" id="gomoku-instruction">15×15 棋盘，不设禁手，五颗及以上连线获胜。电脑思考时也可悔棋或重开。<span id="gomoku-input-help">点击交叉点落子；也可用方向键选点，Enter 或 Space 落子。</span></p><noscript>游戏需要 JavaScript。</noscript></section></main>
+  <footer class="site-footer"><div class="container"><p>© 2026 Chengqian Huang · <a href="https://github.com/ChengqianHuang/chengqianhuang.github.io" target="_blank" rel="noopener">本站源码</a></p></div></footer>
+<script src="/theme.js"></script><script type="module" src="/gomoku.js?v=2"></script></body></html>

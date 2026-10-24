@@ -1,5 +1,13 @@
 [
   {
+    "id": "gomoku",
+    "title": "五子棋",
+    "description": "和电脑下一局。三个难度，可选先后手，支持悔棋复盘。",
+    "controls": "鼠标 / 触屏 / 键盘 · 单人对弈",
+    "url": "/games/gomoku.html",
+    "cover": "/game-assets/gomoku.svg"
+  },
+  {
     "id": "bomber",
     "title": "炸弹竞技场",
     "description": "炸墙捡道具，连锁引爆。和电脑或朋友同场对战，先赢两局。",
