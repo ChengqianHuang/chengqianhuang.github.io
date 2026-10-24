@@ -151,7 +151,8 @@ export class AssaultGame {
   }
   enemyFire(enemy, count = 1, speed = 210) {
     const p = this.player;
-    const x = enemy.x + enemy.w / 2, y = enemy.y + (enemy.type === 'turret' ? 10 : 17);
+    const x = enemy === this.boss ? enemy.x - 58 : enemy.x + enemy.w / 2;
+    const y = enemy === this.boss ? enemy.y + 26 : enemy.y + (enemy.type === 'turret' ? 10 : 17);
     const angle = Math.atan2(p.y + p.h / 2 - y, p.x + 12 - x);
     for (let i = 0; i < count; i++) {
       const a = angle + (i - (count - 1) / 2) * .13;
