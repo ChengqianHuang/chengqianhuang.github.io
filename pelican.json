@@ -1,6 +1,7 @@
 {
   "prompt": "Draw an SVG of a pelican riding a bicycle.",
   "results": [
+    "pelican-results/deepseek-v4-1-flash-1017-workbuddy-2026-10-25-animated-01.json",
     "pelican-results/kimi-k3-1-pro-workbuddy-2026-10-25-animated-01.json",
     "pelican-results/longcat-2-5-preview-opencode-2026-10-20-animated-01.json",
     "pelican-results/deepseek-v4-pro-workbuddy-2026-10-20-animated-01.json",

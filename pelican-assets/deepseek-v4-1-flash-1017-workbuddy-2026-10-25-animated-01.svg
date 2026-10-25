@@ -1,0 +1,197 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" width="900" height="560" role="img" aria-labelledby="pelicanTitle">
+  <title id="pelicanTitle">A pelican pedalling a teal bicycle</title>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E4F0F5"/>
+      <stop offset="0.62" stop-color="#F3F1E7"/>
+      <stop offset="1" stop-color="#FBF2E4"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0.15" y1="0" x2="0.7" y2="1">
+      <stop offset="0" stop-color="#FFFDF9"/>
+      <stop offset="1" stop-color="#EEE4D5"/>
+    </linearGradient>
+    <linearGradient id="pouchFill" x1="0" y1="0" x2="0.25" y2="1">
+      <stop offset="0" stop-color="#F9D9AC"/>
+      <stop offset="1" stop-color="#EDA275"/>
+    </linearGradient>
+  </defs>
+  <style>
+    @media (prefers-reduced-motion: no-preference) {
+      .spin-r{transform-box:view-box;transform-origin:258px 352px;animation:spin 1.7s linear infinite}
+      .spin-f{transform-box:view-box;transform-origin:632px 352px;animation:spin 1.7s linear infinite}
+      .crank{transform-box:view-box;transform-origin:430px 370px;animation:spin 1.7s linear infinite}
+      .leg-n{transform-box:view-box;transform-origin:0 0;animation:thigh-n 1.7s linear infinite}
+      .shin-n{transform-box:view-box;transform-origin:0 0;animation:shin-n 1.7s linear infinite}
+      .leg-f{transform-box:view-box;transform-origin:0 0;animation:thigh-f 1.7s linear infinite}
+      .shin-f{transform-box:view-box;transform-origin:0 0;animation:shin-f 1.7s linear infinite}
+      .pedal-n{transform-box:view-box;transform-origin:0 0;animation:pedal-n 1.7s linear infinite}
+      .pedal-f{transform-box:view-box;transform-origin:0 0;animation:pedal-f 1.7s linear infinite}
+      .bob{transform-box:view-box;transform-origin:0 0;animation:bob 0.85s ease-in-out infinite}
+      .nod{transform-box:view-box;transform-origin:408px 80px;animation:nod 0.85s ease-in-out infinite}
+      .road{transform-box:view-box;transform-origin:0 0;animation:road .344s linear infinite}
+      .cloud-a{transform-box:view-box;transform-origin:0 0;animation:drift 46s linear infinite}
+      .cloud-b{transform-box:view-box;transform-origin:0 0;animation:drift 62s linear infinite}
+      .sun{transform-box:view-box;transform-origin:742px 92px;animation:glow 5.1s ease-in-out infinite}
+    }
+    @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    @keyframes bob{0%,100%{transform:translate(0,0)}50%{transform:translate(0,-4px)}}
+    @keyframes nod{0%,100%{transform:rotate(-1.2deg)}50%{transform:rotate(1.5deg)}}
+    @keyframes road{from{transform:translate(0,0)}to{transform:translate(-150px,0)}}
+    @keyframes drift{from{transform:translate(0,0)}to{transform:translate(-260px,0)}}
+    @keyframes glow{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
+    @keyframes thigh-n{0%{transform:translate(352px,203px) rotate(24.21deg)} 4.17%{transform:translate(352px,203px) rotate(28.97deg)} 8.33%{transform:translate(352px,203px) rotate(32.93deg)} 12.5%{transform:translate(352px,203px) rotate(35.85deg)} 16.67%{transform:translate(352px,203px) rotate(37.62deg)} 20.83%{transform:translate(352px,203px) rotate(38.27deg)} 25%{transform:translate(352px,203px) rotate(37.91deg)} 29.17%{transform:translate(352px,203px) rotate(36.67deg)} 33.33%{transform:translate(352px,203px) rotate(34.62deg)} 37.5%{transform:translate(352px,203px) rotate(31.8deg)} 41.67%{transform:translate(352px,203px) rotate(28.22deg)} 45.83%{transform:translate(352px,203px) rotate(23.91deg)} 50%{transform:translate(352px,203px) rotate(18.95deg)} 54.17%{transform:translate(352px,203px) rotate(13.57deg)} 58.33%{transform:translate(352px,203px) rotate(8.24deg)} 62.5%{transform:translate(352px,203px) rotate(3.58deg)} 66.67%{transform:translate(352px,203px) rotate(0.24deg)} 70.83%{transform:translate(352px,203px) rotate(-1.34deg)} 75%{transform:translate(352px,203px) rotate(-1.07deg)} 79.17%{transform:translate(352px,203px) rotate(0.91deg)} 83.33%{transform:translate(352px,203px) rotate(4.28deg)} 87.5%{transform:translate(352px,203px) rotate(8.66deg)} 91.67%{transform:translate(352px,203px) rotate(13.69deg)} 95.83%{transform:translate(352px,203px) rotate(19deg)} 100%{transform:translate(352px,203px) rotate(24.21deg)}}
+    @keyframes shin-n{0%{transform:translate(465.09px,253.85px) rotate(87.74deg)} 4.17%{transform:translate(460.49px,263.05px) rotate(88.32deg)} 8.33%{transform:translate(456.08px,270.4px) rotate(90deg)} 12.5%{transform:translate(452.51px,275.62px) rotate(92.8deg)} 16.67%{transform:translate(450.22px,278.68px) rotate(96.64deg)} 20.83%{transform:translate(449.36px,279.8px) rotate(101.28deg)} 25%{transform:translate(449.83px,279.19px) rotate(106.4deg)} 29.17%{transform:translate(451.46px,277.05px) rotate(111.64deg)} 33.33%{transform:translate(454.05px,273.44px) rotate(116.62deg)} 37.5%{transform:translate(457.39px,268.34px) rotate(120.98deg)} 41.67%{transform:translate(461.26px,261.64px) rotate(124.35deg)} 45.83%{transform:translate(465.36px,253.25px) rotate(126.37deg)} 50%{transform:translate(469.28px,243.26px) rotate(126.73deg)} 54.17%{transform:translate(472.54px,232.1px) rotate(125.24deg)} 58.33%{transform:translate(474.72px,220.77px) rotate(122.02deg)} 62.5%{transform:translate(475.76px,210.74px) rotate(117.47deg)} 66.67%{transform:translate(476px,203.52px) rotate(112.23deg)} 70.83%{transform:translate(475.97px,200.09px) rotate(106.92deg)} 75%{transform:translate(475.98px,200.7px) rotate(102.01deg)} 79.17%{transform:translate(475.98px,204.98px) rotate(97.75deg)} 83.33%{transform:translate(475.65px,212.25px) rotate(94.21deg)} 87.5%{transform:translate(474.59px,221.67px) rotate(91.42deg)} 91.67%{transform:translate(472.48px,232.35px) rotate(89.38deg)} 95.83%{transform:translate(469.25px,243.36px) rotate(88.13deg)} 100%{transform:translate(465.09px,253.85px) rotate(87.74deg)}}
+    @keyframes thigh-f{0%{transform:translate(336px,195px) rotate(18.05deg)} 4.17%{transform:translate(336px,195px) rotate(12.89deg)} 8.33%{transform:translate(336px,195px) rotate(8.03deg)} 12.5%{transform:translate(336px,195px) rotate(4.05deg)} 16.67%{transform:translate(336px,195px) rotate(1.47deg)} 20.83%{transform:translate(336px,195px) rotate(0.62deg)} 25%{transform:translate(336px,195px) rotate(1.55deg)} 29.17%{transform:translate(336px,195px) rotate(4.08deg)} 33.33%{transform:translate(336px,195px) rotate(7.94deg)} 37.5%{transform:translate(336px,195px) rotate(12.8deg)} 41.67%{transform:translate(336px,195px) rotate(18.31deg)} 45.83%{transform:translate(336px,195px) rotate(24.1deg)} 50%{transform:translate(336px,195px) rotate(29.76deg)} 54.17%{transform:translate(336px,195px) rotate(34.81deg)} 58.33%{transform:translate(336px,195px) rotate(38.74deg)} 62.5%{transform:translate(336px,195px) rotate(41.17deg)} 66.67%{transform:translate(336px,195px) rotate(42.06deg)} 70.83%{transform:translate(336px,195px) rotate(41.66deg)} 75%{transform:translate(336px,195px) rotate(40.26deg)} 79.17%{transform:translate(336px,195px) rotate(38.07deg)} 83.33%{transform:translate(336px,195px) rotate(35.22deg)} 87.5%{transform:translate(336px,195px) rotate(31.75deg)} 91.67%{transform:translate(336px,195px) rotate(27.69deg)} 95.83%{transform:translate(336px,195px) rotate(23.08deg)} 100%{transform:translate(336px,195px) rotate(18.05deg)}}
+    @keyframes shin-f{0%{transform:translate(453.89px,233.43px) rotate(118.42deg)} 4.17%{transform:translate(456.88px,222.66px) rotate(116.92deg)} 8.33%{transform:translate(458.78px,212.32px) rotate(113.81deg)} 12.5%{transform:translate(459.69px,203.76px) rotate(109.5deg)} 16.67%{transform:translate(459.96px,198.19px) rotate(104.53deg)} 20.83%{transform:translate(459.99px,196.35px) rotate(99.46deg)} 25%{transform:translate(459.95px,198.35px) rotate(94.65deg)} 29.17%{transform:translate(459.69px,203.83px) rotate(90.31deg)} 33.33%{transform:translate(458.81px,212.14px) rotate(86.54deg)} 37.5%{transform:translate(456.92px,222.48px) rotate(83.37deg)} 41.67%{transform:translate(453.72px,233.96px) rotate(80.81deg)} 45.83%{transform:translate(449.19px,245.63px) rotate(78.94deg)} 50%{transform:translate(443.65px,256.55px) rotate(77.9deg)} 54.17%{transform:translate(437.81px,265.79px) rotate(77.92deg)} 58.33%{transform:translate(432.73px,272.59px) rotate(79.31deg)} 62.5%{transform:translate(429.35px,276.62px) rotate(82.24deg)} 66.67%{transform:translate(428.06px,278.07px) rotate(86.54deg)} 70.83%{transform:translate(428.64px,277.42px) rotate(91.79deg)} 75%{transform:translate(430.63px,275.13px) rotate(97.47deg)} 79.17%{transform:translate(433.62px,271.47px) rotate(103.13deg)} 83.33%{transform:translate(437.3px,266.51px) rotate(108.37deg)} 87.5%{transform:translate(441.45px,260.25px) rotate(112.84deg)} 91.67%{transform:translate(445.8px,252.61px) rotate(116.21deg)} 95.83%{transform:translate(450.08px,243.61px) rotate(118.15deg)} 100%{transform:translate(453.89px,233.43px) rotate(118.42deg)}}
+    @keyframes pedal-n{0%{transform:translate(468.06px,387.75px)} 4.17%{transform:translate(462.17px,397px)} 8.33%{transform:translate(454.09px,404.4px)} 12.5%{transform:translate(444.36px,409.47px)} 16.67%{transform:translate(433.66px,411.84px)} 20.83%{transform:translate(422.71px,411.36px)} 25%{transform:translate(412.25px,408.06px)} 29.17%{transform:translate(403px,402.17px)} 33.33%{transform:translate(395.6px,394.09px)} 37.5%{transform:translate(390.53px,384.36px)} 41.67%{transform:translate(388.16px,373.66px)} 45.83%{transform:translate(388.64px,362.71px)} 50%{transform:translate(391.94px,352.25px)} 54.17%{transform:translate(397.83px,343px)} 58.33%{transform:translate(405.91px,335.6px)} 62.5%{transform:translate(415.64px,330.53px)} 66.67%{transform:translate(426.34px,328.16px)} 70.83%{transform:translate(437.29px,328.64px)} 75%{transform:translate(447.75px,331.94px)} 79.17%{transform:translate(457px,337.83px)} 83.33%{transform:translate(464.4px,345.91px)} 87.5%{transform:translate(469.47px,355.64px)} 91.67%{transform:translate(471.84px,366.34px)} 95.83%{transform:translate(471.36px,377.29px)} 100%{transform:translate(468.06px,387.75px)}}
+    @keyframes pedal-f{0%{transform:translate(391.94px,352.25px)} 4.17%{transform:translate(397.83px,343px)} 8.33%{transform:translate(405.91px,335.6px)} 12.5%{transform:translate(415.64px,330.53px)} 16.67%{transform:translate(426.34px,328.16px)} 20.83%{transform:translate(437.29px,328.64px)} 25%{transform:translate(447.75px,331.94px)} 29.17%{transform:translate(457px,337.83px)} 33.33%{transform:translate(464.4px,345.91px)} 37.5%{transform:translate(469.47px,355.64px)} 41.67%{transform:translate(471.84px,366.34px)} 45.83%{transform:translate(471.36px,377.29px)} 50%{transform:translate(468.06px,387.75px)} 54.17%{transform:translate(462.17px,397px)} 58.33%{transform:translate(454.09px,404.4px)} 62.5%{transform:translate(444.36px,409.47px)} 66.67%{transform:translate(433.66px,411.84px)} 70.83%{transform:translate(422.71px,411.36px)} 75%{transform:translate(412.25px,408.06px)} 79.17%{transform:translate(403px,402.17px)} 83.33%{transform:translate(395.6px,394.09px)} 87.5%{transform:translate(390.53px,384.36px)} 91.67%{transform:translate(388.16px,373.66px)} 95.83%{transform:translate(388.64px,362.71px)} 100%{transform:translate(391.94px,352.25px)}}
+  </style>
+
+  <!-- sky -->
+  <rect x="0" y="0" width="900" height="470" fill="url(#sky)"/>
+  <g class="sun">
+    <line x1="800" y1="92" x2="812" y2="92" stroke="#F6C97E" stroke-width="4" stroke-linecap="round" opacity=".75"/><line x1="783.01" y1="133.01" x2="791.5" y2="141.5" stroke="#F6C97E" stroke-width="4" stroke-linecap="round" opacity=".75"/><line x1="742" y1="150" x2="742" y2="162" stroke="#F6C97E" stroke-width="4" stroke-linecap="round" opacity=".75"/><line x1="700.99" y1="133.01" x2="692.5" y2="141.5" stroke="#F6C97E" stroke-width="4" stroke-linecap="round" opacity=".75"/><line x1="684" y1="92" x2="672" y2="92" stroke="#F6C97E" stroke-width="4" stroke-linecap="round" opacity=".75"/><line x1="700.99" y1="50.99" x2="692.5" y2="42.5" stroke="#F6C97E" stroke-width="4" stroke-linecap="round" opacity=".75"/><line x1="742" y1="34" x2="742" y2="22" stroke="#F6C97E" stroke-width="4" stroke-linecap="round" opacity=".75"/><line x1="783.01" y1="50.99" x2="791.5" y2="42.5" stroke="#F6C97E" stroke-width="4" stroke-linecap="round" opacity=".75"/>
+    <circle cx="742" cy="92" r="46" fill="#FFDF9E"/>
+    <circle cx="742" cy="92" r="34" fill="#FFD07A"/>
+  </g>
+  <g class="cloud-a" opacity=".85">
+    <ellipse cx="150" cy="96" rx="54" ry="22" fill="#FFFFFF"/>
+    <ellipse cx="196" cy="86" rx="38" ry="26" fill="#FFFFFF"/>
+    <ellipse cx="112" cy="88" rx="30" ry="18" fill="#FFFFFF"/>
+  </g>
+  <g class="cloud-b" opacity=".7">
+    <ellipse cx="470" cy="66" rx="42" ry="15" fill="#FFFFFF"/>
+    <ellipse cx="502" cy="58" rx="27" ry="18" fill="#FFFFFF"/>
+  </g>
+
+  <!-- hills -->
+  <path d="M -30 470 C 70 392 190 388 292 470 Z" fill="#DCEBE0"/>
+  <path d="M 210 470 C 316 404 430 400 528 470 Z" fill="#CFE4D6"/>
+  <path d="M 500 470 C 590 410 706 404 786 470 Z" fill="#C3DCC9"/>
+
+  <!-- ground -->
+  <rect x="0" y="470" width="900" height="90" fill="#E9DDCA"/>
+  <rect x="0" y="470" width="900" height="4" fill="#D3C2A8"/>
+  <g class="road">
+    <rect x="-150" y="488" width="66" height="7" rx="3.5" fill="#D6C6AE"/><rect x="0" y="488" width="66" height="7" rx="3.5" fill="#D6C6AE"/><rect x="150" y="488" width="66" height="7" rx="3.5" fill="#D6C6AE"/><rect x="300" y="488" width="66" height="7" rx="3.5" fill="#D6C6AE"/><rect x="450" y="488" width="66" height="7" rx="3.5" fill="#D6C6AE"/><rect x="600" y="488" width="66" height="7" rx="3.5" fill="#D6C6AE"/><rect x="750" y="488" width="66" height="7" rx="3.5" fill="#D6C6AE"/><rect x="900" y="488" width="66" height="7" rx="3.5" fill="#D6C6AE"/><rect x="1050" y="488" width="66" height="7" rx="3.5" fill="#D6C6AE"/><rect x="-75" y="506" width="66" height="7" rx="3.5" fill="#D6C6AE"/><rect x="75" y="506" width="66" height="7" rx="3.5" fill="#D6C6AE"/><rect x="225" y="506" width="66" height="7" rx="3.5" fill="#D6C6AE"/><rect x="375" y="506" width="66" height="7" rx="3.5" fill="#D6C6AE"/><rect x="525" y="506" width="66" height="7" rx="3.5" fill="#D6C6AE"/><rect x="675" y="506" width="66" height="7" rx="3.5" fill="#D6C6AE"/><rect x="825" y="506" width="66" height="7" rx="3.5" fill="#D6C6AE"/><rect x="975" y="506" width="66" height="7" rx="3.5" fill="#D6C6AE"/>
+  </g>
+
+  <ellipse cx="446" cy="468" rx="252" ry="13" fill="#8A6E4E" opacity=".13"/>
+
+  <!-- far side of the drivetrain -->
+  <g class="crank">
+    <line x1="430" y1="370" x2="391.94" y2="352.25" stroke="#59636D" stroke-width="8" stroke-linecap="round"/>
+  </g>
+
+  <!-- wheels -->
+  <g class="spin-r">
+    <circle cx="258" cy="352" r="118" fill="none" stroke="#242A31" stroke-width="13"/>
+    <circle cx="258" cy="352" r="118" fill="none" stroke="#3B444D" stroke-width="4" stroke-dasharray="16 12"/>
+    <circle cx="258" cy="352" r="101" fill="none" stroke="#C3CED6" stroke-width="5"/>
+    <line x1="271" y1="352" x2="356" y2="352" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="270.01" y1="356.97" x2="348.54" y2="389.5" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="267.19" y1="361.19" x2="327.3" y2="421.3" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="262.97" y1="364.01" x2="295.5" y2="442.54" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="258" y1="365" x2="258" y2="450" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="253.03" y1="364.01" x2="220.5" y2="442.54" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="248.81" y1="361.19" x2="188.7" y2="421.3" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="245.99" y1="356.97" x2="167.46" y2="389.5" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="245" y1="352" x2="160" y2="352" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="245.99" y1="347.03" x2="167.46" y2="314.5" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="248.81" y1="342.81" x2="188.7" y2="282.7" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="253.03" y1="339.99" x2="220.5" y2="261.46" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="258" y1="339" x2="258" y2="254" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="262.97" y1="339.99" x2="295.5" y2="261.46" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="267.19" y1="342.81" x2="327.3" y2="282.7" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="270.01" y1="347.03" x2="348.54" y2="314.5" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <circle cx="332" cy="352" r="6" fill="#E4572E"/>
+    <circle cx="258" cy="352" r="14" fill="#39424B"/>
+    <circle cx="258" cy="352" r="5" fill="#C3CED6"/>
+    </g>
+  <g class="spin-f">
+    <circle cx="632" cy="352" r="118" fill="none" stroke="#242A31" stroke-width="13"/>
+    <circle cx="632" cy="352" r="118" fill="none" stroke="#3B444D" stroke-width="4" stroke-dasharray="16 12"/>
+    <circle cx="632" cy="352" r="101" fill="none" stroke="#C3CED6" stroke-width="5"/>
+    <line x1="645" y1="352" x2="730" y2="352" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="644.01" y1="356.97" x2="722.54" y2="389.5" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="641.19" y1="361.19" x2="701.3" y2="421.3" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="636.97" y1="364.01" x2="669.5" y2="442.54" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="632" y1="365" x2="632" y2="450" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="627.03" y1="364.01" x2="594.5" y2="442.54" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="622.81" y1="361.19" x2="562.7" y2="421.3" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="619.99" y1="356.97" x2="541.46" y2="389.5" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="619" y1="352" x2="534" y2="352" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="619.99" y1="347.03" x2="541.46" y2="314.5" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="622.81" y1="342.81" x2="562.7" y2="282.7" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="627.03" y1="339.99" x2="594.5" y2="261.46" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="632" y1="339" x2="632" y2="254" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="636.97" y1="339.99" x2="669.5" y2="261.46" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="641.19" y1="342.81" x2="701.3" y2="282.7" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <line x1="644.01" y1="347.03" x2="722.54" y2="314.5" stroke="#AEBAC3" stroke-width="2.6" stroke-linecap="round"/>
+    <circle cx="706" cy="352" r="6" fill="#E4572E"/>
+    <circle cx="632" cy="352" r="14" fill="#39424B"/>
+    <circle cx="632" cy="352" r="5" fill="#C3CED6"/>
+    </g>
+
+  <!-- far leg sits behind the frame but in front of the wheels -->
+  <g class="leg-f" transform="translate(336,195) rotate(18.05)"><path d="M 4 -8.5 C 44 -12 90 -10 118 -4 L 116 5 C 90 9 44 10 4 7.5 C -2 5 -2 -6 4 -8.5 Z" fill="#D08A46" stroke="#A96A2E" stroke-width="2"/><circle cx="117" cy="0" r="6.4" fill="#D08A46" stroke="#A96A2E" stroke-width="2"/></g><g class="shin-f" transform="translate(453.89,233.43) rotate(118.42)"><path d="M 2 -5.5 C 44 -6.5 88 -6 124 -3 L 124 3 C 88 6 44 6.5 2 5.5 C -2 2 -2 -2 2 -5.5 Z" fill="#D08A46" stroke="#A96A2E" stroke-width="1.8"/><circle cx="123" cy="0" r="5.4" fill="#D08A46" stroke="#A96A2E" stroke-width="1.8"/></g>
+  <g class="pedal-f" transform="translate(391.94,352.25)"><rect x="-21" y="6" width="42" height="6" rx="3" fill="#4E5862"/><path d="M -14 4 Q -19 -3 -11 -6 L 12 -7 Q 28 -6 31 0 Q 32 5 24 5 L -14 5 Z" fill="#D08A46" stroke="#A96A2E" stroke-width="2.2"/><path d="M 12 -4 L 25 -4 M 14 1 L 26 1" stroke="#A96A2E" stroke-width="1.7" stroke-linecap="round"/></g>
+
+  <!-- frame -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M 258 352 L 430 370" stroke="#2A7A70" stroke-width="11"/>
+    <path d="M 258 352 L 352 206" stroke="#2A7A70" stroke-width="9"/>
+    <path d="M 352 206 L 430 370" stroke="#2A7A70" stroke-width="13"/>
+    <path d="M 582 212 L 430 370" stroke="#2A7A70" stroke-width="13"/>
+    <path d="M 352 206 L 582 212" stroke="#2A7A70" stroke-width="12"/>
+    <path d="M 582 212 L 596 256" stroke="#1F5F58" stroke-width="16"/>
+    <path d="M 596 256 C 610 292 620 322 632 352" stroke="#2A7A70" stroke-width="11"/>
+  </g>
+  <circle cx="258" cy="352" r="8" fill="#1F5F58"/>
+  <circle cx="632" cy="352" r="8" fill="#1F5F58"/>
+
+  <!-- drivetrain -->
+  <g fill="none" stroke="#97A3AC" stroke-width="2.8">
+    <path d="M 430 346 L 258 339"/>
+    <path d="M 430 394 L 258 365"/>
+  </g>
+  <circle cx="258" cy="352" r="13" fill="none" stroke="#59636D" stroke-width="4"/>
+  <g class="crank">
+    <circle cx="430" cy="370" r="24" fill="none" stroke="#3B444D" stroke-width="5"/>
+    <circle cx="430" cy="370" r="18" fill="none" stroke="#59636D" stroke-width="2" stroke-dasharray="3 5"/>
+    <line x1="430" y1="370" x2="468.06" y2="387.75" stroke="#39424B" stroke-width="8" stroke-linecap="round"/>
+  </g>
+
+  <!-- saddle + handlebar -->
+  <path d="M 320 206 Q 330 197 350 197 L 378 200 Q 396 202 398 208 Q 399 214 384 213 L 338 215 Q 318 215 320 206 Z" fill="#8A5A44" stroke="#6C4433" stroke-width="2.4"/>
+  <path d="M 582 212 C 585 202 589 196 594 192" fill="none" stroke="#39424B" stroke-width="9" stroke-linecap="round"/>
+  <path d="M 592 194 C 604 188 618 184 634 184" fill="none" stroke="#39424B" stroke-width="9" stroke-linecap="round"/>
+  <path d="M 620 185 L 640 184" stroke="#8A5A44" stroke-width="12" stroke-linecap="round"/>
+
+  <!-- pelican: neck behind the body so the join has no seam -->
+  <g class="bob">
+    <path d="M 252 164 L 200 142 Q 195 138 203 138 L 232 142 L 206 120 Q 202 115 210 119 L 256 148 Z" fill="#E7DCCB" stroke="#CBBBA5" stroke-width="2.4"/>
+    <path d="M 350 120 C 356 92 372 74 394 68 C 404 66 410 72 410 84 L 404 102 C 386 104 372 114 366 134 Z" fill="url(#body)" stroke="#CBBBA5" stroke-width="2.8"/>
+    <path d="M 244 176 C 232 142 250 106 292 92 C 336 76 386 88 402 118 C 416 146 406 182 374 196 C 336 214 264 208 244 176 Z" fill="url(#body)" stroke="#CBBBA5" stroke-width="3"/>
+    <path d="M 286 132 Q 316 146 330 168 M 272 150 Q 300 162 312 182 M 262 166 Q 284 176 292 190" fill="none" stroke="#CBBBA5" stroke-width="2" stroke-linecap="round" opacity=".6"/>
+    <path d="M 388 126 C 442 138 502 158 560 176 L 594 185 Q 608 190 604 197 Q 598 202 588 197 L 550 190 C 494 174 438 158 386 154 C 374 150 376 132 388 126 Z" fill="#EFE3D0" stroke="#C5B49E" stroke-width="2.4"/>
+    <path d="M 404 138 C 458 152 512 170 566 188" fill="none" stroke="#C5B49E" stroke-width="1.7" stroke-linecap="round" opacity=".8"/>
+    <path d="M 396 146 C 450 160 504 178 558 196" fill="none" stroke="#C5B49E" stroke-width="1.7" stroke-linecap="round" opacity=".55"/>
+    <path d="M 586 190 q 20 2 23 9 M 583 199 q 18 2 20 8" fill="none" stroke="#EFE3D0" stroke-width="7" stroke-linecap="round"/>
+    <g class="nod">
+      <circle cx="408" cy="78" r="30" fill="#FFFDF8" stroke="#CBBBA5" stroke-width="2.8"/>
+      <path d="M 434 81 C 444 106 462 126 488 126 C 514 126 542 108 558 89 C 552 86 544 84 536 84 C 500 82 468 81 434 81 Z" fill="url(#pouchFill)" stroke="#D08A5C" stroke-width="2.6"/>
+      <path d="M 448 90 C 464 104 482 114 502 116" fill="none" stroke="#D08A5C" stroke-width="1.8" opacity=".5"/>
+      <path d="M 432 56 C 486 58 542 66 572 74 C 582 76 590 80 590 85 C 590 88 580 89 570 88 C 536 84 484 81 432 81 Z" fill="#F2A24B" stroke="#C97C2E" stroke-width="2.6"/>
+      <path d="M 440 70 L 552 80" stroke="#C97C2E" stroke-width="1.8" opacity=".45"/>
+      <circle cx="448" cy="65" r="2.2" fill="#C97C2E" opacity=".5"/>
+      <circle cx="416" cy="66" r="5.5" fill="#2B2F36"/>
+      <circle cx="414.5" cy="64.5" r="1.8" fill="#FFFFFF"/>
+      <path d="M 404 54 Q 414 50 424 54" fill="none" stroke="#CBBBA5" stroke-width="2.4" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <!-- near leg over the frame -->
+  <g class="leg-n" transform="translate(352,203) rotate(24.21)"><path d="M 4 -8.5 C 44 -12 90 -10 118 -4 L 116 5 C 90 9 44 10 4 7.5 C -2 5 -2 -6 4 -8.5 Z" fill="#E2903F" stroke="#B96F2A" stroke-width="2"/><circle cx="117" cy="0" r="6.4" fill="#E2903F" stroke="#B96F2A" stroke-width="2"/></g><g class="shin-n" transform="translate(465.09,253.85) rotate(87.74)"><path d="M 2 -5.5 C 44 -6.5 88 -6 124 -3 L 124 3 C 88 6 44 6.5 2 5.5 C -2 2 -2 -2 2 -5.5 Z" fill="#E2903F" stroke="#B96F2A" stroke-width="1.8"/><circle cx="123" cy="0" r="5.4" fill="#E2903F" stroke="#B96F2A" stroke-width="1.8"/></g>
+  <g class="pedal-n" transform="translate(468.06,387.75)"><rect x="-21" y="6" width="42" height="6" rx="3" fill="#39424B"/><path d="M -14 4 Q -19 -3 -11 -6 L 12 -7 Q 28 -6 31 0 Q 32 5 24 5 L -14 5 Z" fill="#E2903F" stroke="#B96F2A" stroke-width="2.2"/><path d="M 12 -4 L 25 -4 M 14 1 L 26 1" stroke="#B96F2A" stroke-width="1.7" stroke-linecap="round"/></g>
+</svg>

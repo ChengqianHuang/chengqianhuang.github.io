@@ -1,0 +1,52 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "deepseek-v4-1-flash-1017-workbuddy-2026-10-25-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "DeepSeek",
+    "name": "DeepSeek-V4.1-Flash-1017",
+    "id": null,
+    "identitySource": "user-reported"
+  },
+  "harness": {
+    "name": "WorkBuddy",
+    "version": "5.8.3",
+    "mode": "agent",
+    "context": "existing-conversation",
+    "tools": [
+      "bash",
+      "playwright",
+      "python3"
+    ]
+  },
+  "run": {
+    "generatedAt": "2026-10-25T21:37:56+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 5,
+    "totalAttempts": 5,
+    "selection": "best-of-n",
+    "parameters": {},
+    "postProcessing": "none",
+    "notes": "Not a blind first draw. Geometry is emitted by a Python generator and was revised five times, with a headless-Chromium screenshot after each revision, so the submitted file is the fifth render rather than the first. Every revision changed the drawing, not just formatting: v1 had the shin pivot around the hip because nested CSS transforms resolve transform-origin in the parent's rotated space; v2 moved the shin to an absolute sibling; v3 redrew the bill, pouch and wing and reordered the pelican so the neck sits behind the body; v4 thinned the legs and pointed the bill; v5 raised the hip so the thigh is tucked under the belly. The submitted bytes were never hand-edited, so postProcessing stays none. Animation is CSS only: wheel and crank rotation at 1.7 s per turn, a two-bone IK solve for both legs baked into 24 keyframes per revolution so the feet stay on the pedal spindles, a 4 px body bob, a head nod, a scrolling road and drifting clouds. Verification, three separate checks: (1) computed transforms of .spin-f, .crank, .leg-n and .pedal-n sampled 330 ms apart differ, and two screenshots 420 ms apart differ; (2) with prefers-reduced-motion: reduce emulated, 0 of 166 elements report a computed animation-name, against 16 of 166 with no-preference, and the wheel's transform is none; (3) the poster is character-for-character the artifact with its <style> block removed (whitespace-normalised), so the paused state is the same drawing, not a redraw. Caveat found while testing: Chromium does not expose the user preference to an SVG loaded through <img>, so animation still runs there under reduce; the gallery has to swap in the poster itself, which pelican.js already does via matchMedia. Context is existing-conversation: the protocol, schema, validator and gallery loader were read in this session before the drawing was written. Model identity was stated by the user in session (\"DeepSeek-V4.1-Flash-1017\") and is not independently verified, so it is recorded as user-reported with model.id null. Known cosmetic defects, recorded rather than corrected: the wing reads as one long blade with only two finger strokes over the grip; bill and pouch are oversized relative to a head that is small for the body; both legs share one screen plane and overlap near the top of the stroke; the far foot is partly hidden by the chainring at some phases."
+  },
+  "artifact": {
+    "path": "pelican-assets/deepseek-v4-1-flash-1017-workbuddy-2026-10-25-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 900,
+    "height": 560,
+    "sha256": "9105d8df76de6512a4b28042fdc8911ca9c2f85058fa114021a19bd7930747d2"
+  },
+  "source": null,
+  "animation": {
+    "mechanism": "css",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/deepseek-v4-1-flash-1017-workbuddy-2026-10-25-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 900,
+    "height": 560,
+    "sha256": "b1d60f29896732a7700d1ec7f44d6f84fb3aadcb128382f030be83310ba13453"
+  }
+}
