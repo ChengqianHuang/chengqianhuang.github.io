@@ -3,3 +3,5 @@
 .demo-button{border:0;background:none;color:#d3c7a8;font-size:11px;padding:9px 0 0;letter-spacing:.02em}.demo-button:hover{color:#ffe2a3}.menu .record{margin-top:7px;margin-bottom:15px}@media(max-height:550px) and (orientation:landscape){.demo-button{padding-top:5px}}
 
 @media(max-width:900px){#touch-controls:not([hidden]){display:flex}.map-wrap{bottom:155px}.speedometer{bottom:155px}}
+
+@media(max-height:780px) and (min-width:901px){.menu{padding-top:24px;padding-bottom:55px}.menu h1{font-size:54px}.menu-help>div{margin:4px 0}.menu .record{margin-bottom:10px}}
