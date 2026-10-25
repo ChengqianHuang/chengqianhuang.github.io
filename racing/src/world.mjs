@@ -1,9 +1,10 @@
 import * as T from 'three';
 import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 import {batch,material,sign,labelTexture} from './art.mjs';
-import {sample,LENGTH,WIDTH,barriers,nearest} from './track.mjs';
+import {TRACKS,GATES} from './track.mjs';
+import {createScenery} from './scenery.mjs';
 
-function ribbon(offset,width,y) {
+function ribbon(sample,offset,width,y) {
   const vertices=[],uv=[],index=[];
   for(let i=0;i<=720;i++)for(const side of [-1,1]){
     const p=sample(i/720,offset+side*width/2);vertices.push(p.x,y,p.z);uv.push(p.x/3,p.z/3);
@@ -11,17 +12,24 @@ function ribbon(offset,width,y) {
   }
   const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(vertices,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(index);g.computeVertexNormals();return g;
 }
-export async function createWorld(scene,renderer,physics,progress) {
+let sharedAssets;
+async function loadAssets(renderer){
   const loader=new T.TextureLoader();
   const textures=await Promise.all(['diff','normal','rough'].map(t=>loader.loadAsync(`/racing/assets/asphalt_${t}.jpg`)));
   textures.forEach(t=>{t.wrapS=t.wrapT=T.RepeatWrapping;t.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());});textures[0].colorSpace=T.SRGBColorSpace;
   const hdr=await new HDRLoader().loadAsync('/racing/assets/venice_sunset_1k.hdr');
-  const pmrem=new T.PMREMGenerator(renderer);scene.environment=pmrem.fromEquirectangular(hdr).texture;scene.environmentIntensity=.65;hdr.dispose();pmrem.dispose();
-  progress('正在布置港区赛道…');
-  scene.fog=new T.FogExp2(0xbeb8a6,.0016);
-  const sky=new T.Mesh(new T.SphereGeometry(900,32,20),new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms:{},
+  const pmrem=new T.PMREMGenerator(renderer),environment=pmrem.fromEquirectangular(hdr).texture;hdr.dispose();pmrem.dispose();
+  return {textures,environment};
+}
+export async function createWorld(scene,renderer,physics,progress,track=TRACKS[0]) {
+  const {sample,LENGTH,WIDTH,barriers,nearest}=track;
+  const {textures,environment}=await (sharedAssets??=loadAssets(renderer));
+  scene.environment=environment;scene.environmentIntensity=.65;
+  progress(`正在布置${track.name}…`);
+  scene.fog=new T.FogExp2(track.id==='coast'?0xb0c5c4:track.id==='oldtown'?0xb8ae98:0xbeb8a6,.0016);
+  const sky=new T.Mesh(new T.SphereGeometry(900,32,20),new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms:{horizon:{value:new T.Vector3(...(track.id==='coast'?[.50,.64,.68]:track.id==='oldtown'?[.69,.51,.35]:[.69,.60,.44]))}},
     vertexShader:'varying vec3 vPos;void main(){vPos=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-    fragmentShader:`varying vec3 vPos;float hash(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+1.),f.x),f.y);}void main(){vec3 d=normalize(vPos);float h=max(d.y,0.);vec3 col=mix(vec3(.69,.60,.44),vec3(.19,.36,.48),pow(h,.38));float cloud=noise(d.xz/(h+.18)*3.)*.6+noise(d.xz/(h+.18)*8.)*.25;float c=smoothstep(.48,.70,cloud)*smoothstep(.02,.2,h)*(1.-smoothstep(.5,.9,h));col=mix(col,vec3(.72,.70,.62),c*.42);float sun=pow(max(dot(d,normalize(vec3(-.65,.28,-.6))),0.),90.);col+=vec3(.75,.38,.12)*sun*.6;gl_FragColor=vec4(col,1.);#include <tonemapping_fragment>\n#include <colorspace_fragment>}`.replace(';#include',';\n#include')
+    fragmentShader:`uniform vec3 horizon;varying vec3 vPos;float hash(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+1.),f.x),f.y);}void main(){vec3 d=normalize(vPos);float h=max(d.y,0.);vec3 col=mix(horizon,vec3(.19,.36,.48),pow(h,.38));float cloud=noise(d.xz/(h+.18)*3.)*.6+noise(d.xz/(h+.18)*8.)*.25;float c=smoothstep(.48,.70,cloud)*smoothstep(.02,.2,h)*(1.-smoothstep(.5,.9,h));col=mix(col,vec3(.72,.70,.62),c*.42);float sun=pow(max(dot(d,normalize(vec3(-.65,.28,-.6))),0.),90.);col+=vec3(.75,.38,.12)*sun*.6;gl_FragColor=vec4(col,1.);#include <tonemapping_fragment>\n#include <colorspace_fragment>}`.replace(';#include',';\n#include')
   }));scene.add(sky);
   const sunDirection=new T.Vector3(-.65,.28,-.6).normalize();
   const solar=new T.Mesh(new T.SphereGeometry(6.5,24,16),new T.MeshBasicMaterial({color:0xffe3a1,fog:false}));solar.position.copy(sunDirection).multiplyScalar(700);scene.add(solar);
@@ -29,42 +37,45 @@ export async function createWorld(scene,renderer,physics,progress) {
   const sun=new T.DirectionalLight(0xffcc8d,3.1);sun.position.copy(sunDirection).multiplyScalar(100);sun.castShadow=true;
   sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-55;sun.shadow.camera.right=55;sun.shadow.camera.top=55;sun.shadow.camera.bottom=-55;sun.shadow.camera.near=1;sun.shadow.camera.far=240;sun.shadow.normalBias=.035;sun.shadow.bias=-.0002;scene.add(sun,sun.target);
   const concrete=material(0x9b9586,.95),steel=material(0x465456,.5,.65),dark=material(0x283c41,.7,.45),white=material(0xd8d3bb,.85),orange=material(0xd96c37,.65),red=material(0xaf4934,.7);
-  const groundCanvas=document.createElement('canvas');groundCanvas.width=groundCanvas.height=512;const gc=groundCanvas.getContext('2d');gc.fillStyle='#7a7b70';gc.fillRect(0,0,512,512);
+  const groundCanvas=document.createElement('canvas');groundCanvas.width=groundCanvas.height=512;const gc=groundCanvas.getContext('2d');gc.fillStyle=track.id==='coast'?'#a49b75':track.id==='oldtown'?'#8b887c':'#7a7b70';gc.fillRect(0,0,512,512);
   let gritSeed=311;for(let i=0;i<38000;i++){gritSeed=(gritSeed*1664525+1013904223)>>>0;const x=(gritSeed>>>16)%512;gritSeed=(gritSeed*1664525+1013904223)>>>0;const y=(gritSeed>>>16)%512;gc.fillStyle=i%2?'#ffffff09':'#00000014';gc.fillRect(x,y,1+i%3,1+i%3);}
   gc.strokeStyle='#252d2728';gc.lineWidth=1;for(let i=0;i<8;i++){gc.beginPath();gc.moveTo(i*73,0);gc.lineTo(i*73+20,200);gc.lineTo(i*73-9,512);gc.stroke();}
   const groundTexture=new T.CanvasTexture(groundCanvas);groundTexture.wrapS=groundTexture.wrapT=T.RepeatWrapping;groundTexture.repeat.set(32,22);groundTexture.colorSpace=T.SRGBColorSpace;groundTexture.anisotropy=8;
   const groundMaterial=new T.MeshStandardMaterial({map:groundTexture,roughness:.92,bumpMap:groundTexture,bumpScale:.08});
-  const ground=new T.Mesh(new T.BoxGeometry(380,3,260),groundMaterial);ground.position.y=-1.5;ground.receiveShadow=true;scene.add(ground);
+  const ground=new T.Mesh(new T.BoxGeometry(track.ground[0],3,track.ground[1]),groundMaterial);ground.position.y=-1.5;ground.receiveShadow=true;scene.add(ground);
   const asphalt=new T.MeshStandardMaterial({color:0x878b88,map:textures[0],normalMap:textures[1],roughnessMap:textures[2],roughness:.9,normalScale:new T.Vector2(.55,.55)});
-  const shoulder=new T.Mesh(ribbon(0,WIDTH+2.2,.012),material(0xc0b69c,.9));shoulder.receiveShadow=true;scene.add(shoulder);
-  const road=new T.Mesh(ribbon(0,WIDTH,.024),asphalt);road.receiveShadow=true;scene.add(road);
+  const shoulder=new T.Mesh(ribbon(sample,0,WIDTH+2.2,.012),material(0xc0b69c,.9));shoulder.receiveShadow=true;scene.add(shoulder);
+  const road=new T.Mesh(ribbon(sample,0,WIDTH,.024),asphalt);road.receiveShadow=true;scene.add(road);
   const b=batch(scene);
   for(const side of [-1,1]){
-    const line=new T.Mesh(ribbon(side*(WIDTH/2-.3),.13,.035),white);line.receiveShadow=true;scene.add(line);
+    const line=new T.Mesh(ribbon(sample,side*(WIDTH/2-.3),.13,.035),white);line.receiveShadow=true;scene.add(line);
     for(let i=0;i<240;i++){
       const p=sample(i/240,side*(WIDTH/2+.2));b.box(i%2?white:red,p.x,.06,p.z,.55,.10,LENGTH/240+.04,p.yaw);
     }
   }
   for(let i=0;i<95;i++) {const p=sample(i/95);b.box(white,p.x,.037,p.z,.11,.006,2.2,p.yaw);}
   for(const r of barriers){b.box(concrete,r.x,.22,r.z,.65,.44,r.length,r.yaw);b.box(steel,r.x,.73,r.z,.14,.25,r.length,r.yaw);b.box(steel,r.x,.49,r.z,.13,.66,.13,r.yaw);}
-  // Expansion seams, quay edges and mooring hardware give the larger spaces scale.
-  const seam=material(0x686b61,.95);for(let x=-180;x<=180;x+=15) b.box(seam,x,.008,0,.035,.012,252);
-  for(let z=-120;z<=120;z+=15)b.box(concrete,0,.01,z,375,.015,.035);
-  for(const z of [-129,129]){
-    b.box(dark,0,-.5,z,380,1.5,.7);
-    for(let x=-180;x<=180;x+=12){b.cylinder(dark,x,.3,z- Math.sign(z)*2,.27,.4,.6);b.cylinder(orange,x,.62,z-Math.sign(z)*2,.42,.42,.12);}
+  const [groundWidth,groundDepth]=track.ground;
+  const seam=material(0x686b61,.95);for(let x=-groundWidth/2+10;x<groundWidth/2;x+=15)b.box(seam,x,.008,0,.035,.012,groundDepth-8);
+  for(const z of [-groundDepth/2+1,groundDepth/2-1]){
+    b.box(dark,0,-.5,z,groundWidth,1.5,.7);
+    if(track.id==='harbor')for(let x=-180;x<=180;x+=12){b.cylinder(dark,x,.3,z-Math.sign(z)*2,.27,.4,.6);b.cylinder(orange,x,.62,z-Math.sign(z)*2,.42,.42,.12);}
   }
-  // Start gantry and a physical checker stripe.
-  const start=sample(0);
-  for(const z of [start.z-9,start.z+9]) {b.box(steel,start.x,3.2,z,.5,6.4,.5);b.beam(steel,[start.x-1,0,z],[start.x,5,z],.12);}
-  b.box(dark,start.x,6.25,start.z,.5,1.45,18.5);
-  sign(scene,'HARBOR  /  07',start.x-.28,6.2,start.z,16,1.05,-Math.PI/2,{bg:'#17343b',fg:'#f2dda5',font:65});
-  sign(scene,'HARBOR  /  07',start.x+.28,6.2,start.z,16,1.05,Math.PI/2,{bg:'#17343b',fg:'#f2dda5',font:65});
-  for(let row=0;row<3;row++)for(let j=0;j<16;j++)b.box((row+j)%2?white:dark,start.x+(row-1)*.65,.043,start.z-6.5+j*.87,.65,.015,.87);
-  for(let i=0;i<4;i++){const p=sample(-.012-Math.floor(i/2)*.011,i%2===0?-2.2:2.2);b.box(white,p.x,.045,p.z,.12,.015,2.2);}
-  // Ramp geometry matches the collision slab.
-  b.box(steel,-20,.45,65.2,12,.35,3.7,0,0,.15);
-  for(let i=0;i<6;i++)b.box(orange,-24+i*1.65,.63+(-4+i*1.65)*.15,65.2,.18,.03,3.65,0,0,.15);
+  // The gantry and checker line use the actual start tangent on every circuit.
+  const start=sample(0),span=WIDTH+4;
+  for(const side of [-1,1]){const p=sample(0,side*span/2);b.box(steel,p.x,3.2,p.z,.5,6.4,.5);}
+  b.box(dark,start.x,6.25,start.z,span+.5,1.45,.5,start.yaw);
+  for(const side of [-1,1])sign(scene,track.label,start.x+start.tx*.28*side,6.2,start.z+start.tz*.28*side,span-2,1.05,start.yaw+(side===1?0:Math.PI),{bg:'#17343b',fg:'#f2dda5',font:65});
+  for(let row=0;row<3;row++)for(let j=0;j<16;j++){
+    const p=sample(0,(j-7.5)*WIDTH/16);b.box((row+j)%2?white:dark,p.x+start.tx*(row-1)*.65,.043,p.z+start.tz*(row-1)*.65,WIDTH/16,.015,.65,start.yaw);
+  }
+  for(let i=0;i<4;i++){const p=track.grid(i);b.box(white,p.x,.045,p.z,2.2,.015,.12,p.yaw);}
+  if(track.ramp){const {x,z}=track.ramp;
+    b.box(steel,x,.45,z,12,.35,3.7,0,0,.15);
+    for(let i=0;i<6;i++)b.box(orange,x-4+i*1.65,.63+(-4+i*1.65)*.15,z,.18,.03,3.65,0,0,.15);
+  }
+  let updateScenery=()=>{};
+  if(track.id==='harbor'){
   // Shipping containers have corrugations, corner castings, door bars and labels.
   const containerMats=[material(0x3f696b,.77,.25),material(0xaf6042,.8,.2),material(0xc3aa68,.8,.2),material(0x546e78,.8,.2)];
   function container(x,z,y=0,color=0,yaw=0){
@@ -103,13 +114,6 @@ export async function createWorld(scene,renderer,physics,progress) {
     for(let i=0;i<4;i++){b.box(dark,x-9+i*6,2.5,z+10.04,4.5,4.8,.05);for(let j=0;j<9;j++)b.box(steel,x-9+i*6,j*.5+.4,z+10.08,4.5,.045,.04);}
     sign(scene,'DOCK  04',x,7.8,z+10.06,14,1.8,0,{bg:'#77847c',font:75});
   }
-  // Corner boards, warning chevrons and light masts.
-  for(let i=0;i<16;i++){
-    const p=sample(i/16,10.8);b.cylinder(steel,p.x,4.5,p.z,.1,.18,9);
-    b.box(dark,p.x,9,p.z,1.8,.18,.5,p.yaw);
-    b.box(new T.MeshStandardMaterial({color:0xffe2a0,emissive:0xffc76d,emissiveIntensity:2}),p.x,8.9,p.z,1.5,.03,.35,p.yaw);
-    if(i>3&&i%2===0){const board=sample(i/16,-9.2);sign(scene,'❯  ❯  ❯',board.x,1.55,board.z,6,1.25,board.yaw+Math.PI,{bg:'#233b40',fg:'#f0bc59',font:78});}
-  }
   // Distant skyline stays outside the playable quay.
   let seed=31;const rand=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
   const cityMats=[material(0x777e7a),material(0x848a82),material(0x9c9e8f)];
@@ -137,6 +141,14 @@ export async function createWorld(scene,renderer,physics,progress) {
     for(let j=0;j<4;j++){const crown=new T.IcosahedronGeometry(2.1+j*.18,1);crown.scale(1,1.25,1);b.add(crown,leaf,x+Math.cos(j*2)*1.1,5+j*.4,z+Math.sin(j*2)*1.1);}
   }
   for(let i=0;i<20;i++){const p=sample(i/20,11.3);b.cylinder(orange,p.x,.4,p.z,.12,.16,.8);b.cylinder(white,p.x,.50,p.z,.165,.165,.14);}
+  }else updateScenery=createScenery(scene,track);
+  // Corner boards, warning chevrons and light masts.
+  for(let i=0;i<16;i++){
+    const p=sample(i/16,WIDTH/2+3.8);b.cylinder(steel,p.x,4.5,p.z,.1,.18,9);
+    b.box(dark,p.x,9,p.z,1.8,.18,.5,p.yaw);
+    b.box(new T.MeshStandardMaterial({color:0xffe2a0,emissive:0xffc76d,emissiveIntensity:2}),p.x,8.9,p.z,1.5,.03,.35,p.yaw);
+    if(i>3&&i%2===0){const board=sample(i/16,-WIDTH/2-2.2),after=sample(i/16+.02);const turn=Math.atan2(Math.sin(after.yaw-board.yaw),Math.cos(after.yaw-board.yaw));sign(scene,turn<0?'❯  ❯  ❯':'❮  ❮  ❮',board.x,1.55,board.z,6,1.25,board.yaw+Math.PI,{bg:'#233b40',fg:'#f0bc59',font:78});}
+  }
   b.finish();
   const water=new T.Mesh(new T.PlaneGeometry(2400,2400,1,1),new T.ShaderMaterial({uniforms:{time:{value:0}},transparent:false,
     vertexShader:'varying vec3 vWorld;void main(){vWorld=(modelMatrix*vec4(position,1.)).xyz;gl_Position=projectionMatrix*viewMatrix*vec4(vWorld,1.);}',
@@ -144,7 +156,11 @@ export async function createWorld(scene,renderer,physics,progress) {
   }));water.rotation.x=-Math.PI/2;water.position.y=-1.8;scene.add(water);
   const props=physics.props.map(()=>{const g=new T.Group(),p=batch(g);p.box(material(0xb39561,.9),0,0,0,.8,1,.8);for(const y of [-.35,.35])p.box(dark,0,y,0,.82,.075,.82);p.finish();scene.add(g);return g;});
   const gate=new T.Group();const gateMat=new T.MeshBasicMaterial({color:0xf7c45a,transparent:true,opacity:.65,depthWrite:false});
-  for(const side of [-1,1]){const mesh=new T.Mesh(new T.ConeGeometry(.32,1.4,4),gateMat);mesh.position.set(side*6,1.2,0);mesh.rotation.z=Math.PI;gate.add(mesh);}scene.add(gate);
-  return {sun,water,gate,update(time,car,next){water.material.uniforms.time.value=time;sun.position.set(car.x,0,car.z).addScaledVector(sunDirection,110);sun.target.position.set(car.x,0,car.z);const p=sample(next/24);gate.position.set(p.x,.25+Math.sin(time*2)*.13,p.z);gate.rotation.y=p.yaw;
+  for(const side of [-1,1]){const mesh=new T.Mesh(new T.ConeGeometry(.32,1.4,4),gateMat);mesh.position.set(side*(WIDTH/2-1),1.2,0);mesh.rotation.z=Math.PI;gate.add(mesh);}scene.add(gate);
+  return {sun,water,gate,dispose(){
+    const geometries=new Set(),materials=new Set(),maps=new Set(),shared=new Set([...textures,environment]);
+    scene.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)for(const m of Array.isArray(o.material)?o.material:[o.material]){materials.add(m);for(const value of Object.values(m))if(value?.isTexture&&!shared.has(value))maps.add(value);}o.shadow?.dispose();});
+    geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());maps.forEach(t=>t.dispose());scene.clear();
+  },update(time,car,next){updateScenery(time);water.material.uniforms.time.value=time;sun.position.set(car.x,0,car.z).addScaledVector(sunDirection,110);sun.target.position.set(car.x,0,car.z);const p=sample(next/GATES);gate.position.set(p.x,.25+Math.sin(time*2)*.13,p.z);gate.rotation.y=p.yaw;
     props.forEach((mesh,i)=>{const p=physics.props[i].body.GetPosition(),q=physics.props[i].body.GetRotation();mesh.position.set(p.GetX(),p.GetY(),p.GetZ());mesh.quaternion.set(q.GetX(),q.GetY(),q.GetZ(),q.GetW());});}};
 }

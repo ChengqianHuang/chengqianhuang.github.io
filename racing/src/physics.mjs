@@ -1,7 +1,7 @@
 import initJolt from 'jolt-physics/wasm';
-import { barriers } from './track.mjs';
+import { TRACKS } from './track.mjs';
 
-export async function createPhysics(options={}) {
+export async function createPhysics(options={},track=TRACKS[0]) {
   const J=await initJolt(options);
   const settings=new J.JoltSettings();
   const pair=new J.ObjectLayerPairFilterTable(2);
@@ -14,7 +14,7 @@ export async function createPhysics(options={}) {
   const jolt=new J.JoltInterface(settings);J.destroy(settings);J.destroy(l0);J.destroy(l1);
   const system=jolt.GetPhysicsSystem(), bi=system.GetBodyInterface();
   const up=new J.Vec3(0,1,0),zero=new J.Vec3(0,0,0);
-  const cars=[],props=[];
+  const cars=[],props=[],levelBodies=[];
   function box(x,y,z,sx,sy,sz,yaw=0,mass=0) {
     const size=new J.Vec3(sx/2,sy/2,sz/2),shape=new J.BoxShape(size,.04);
     const pos=new J.RVec3(x,y,z),rot=J.Quat.prototype.sRotation(up,yaw);
@@ -23,20 +23,21 @@ export async function createPhysics(options={}) {
     if(mass){cfg.mOverrideMassProperties=J.EOverrideMassProperties_CalculateInertia;cfg.mMassPropertiesOverride.mMass=mass;}
     const body=bi.CreateBody(cfg);bi.AddBody(body.GetID(),J.EActivation_Activate);
     J.destroy(cfg);J.destroy(pos);J.destroy(rot);J.destroy(size);
-    return body;
+    levelBodies.push(body);return body;
   }
-  box(0,-1,0,380,2,260);
-  for(const b of barriers)box(b.x,.48,b.z,.6,.96,b.length,b.yaw);
-  // A shallow launch ramp on the outside of the opening straight; the racing line stays level.
-  const rampPos=new J.RVec3(-20,.45,65.2),rampRot= new J.Quat(0,0,Math.sin(.075),Math.cos(.075));
-  // Ramp is aligned along world X. Both drawing and collision use the same rotation.
-  const rampBody=box(-20,.48,65.2,12,.35,3.7);
-  bi.SetPositionAndRotation(rampBody.GetID(),rampPos,rampRot,J.EActivation_DontActivate);
-  J.destroy(rampPos);J.destroy(rampRot);
-  for(let i=0;i<12;i++) {
-    const p={x:32+i*2.4,y:.5,z:65.8};
-    props.push({body:box(p.x,p.y,p.z,.8,1,.8,0,24),start:p});
+  function setTrack(nextTrack) {
+    for(const body of levelBodies){const id=body.GetID();bi.RemoveBody(id);bi.DestroyBody(id);}
+    levelBodies.length=0;props.length=0;track=nextTrack;
+    box(0,-1,0,track.ground[0],2,track.ground[1]);
+    for(const b of track.barriers)box(b.x,.48,b.z,.6,.96,b.length,b.yaw);
+    if(track.ramp){
+      const {x,z}=track.ramp,pos=new J.RVec3(x,.45,z),rot=new J.Quat(0,0,Math.sin(.075),Math.cos(.075));
+      const body=box(x,.45,z,12,.35,3.7);bi.SetPositionAndRotation(body.GetID(),pos,rot,J.EActivation_DontActivate);J.destroy(pos);J.destroy(rot);
+    }
+    for(const p of track.props)props.push({body:box(p.x,p.y,p.z,.8,1,.8,0,24),start:p});
+    cars.forEach((car,i)=>reset(car,track.grid(i)));
   }
+  setTrack(track);
   function addCar(p) {
     const half=new J.Vec3(.95,.40,2.06),offset=new J.Vec3(0,-.32,0);
     const base=new J.BoxShapeSettings(half),shapeSettings=new J.OffsetCenterOfMassShapeSettings(offset,base);
@@ -104,5 +105,5 @@ export async function createPhysics(options={}) {
     jolt.Step(dt,2);cars.forEach(read);
   }
   function resetProps(){for(const p of props){const pos=new J.RVec3(p.start.x,p.start.y,p.start.z),q=new J.Quat(0,0,0,1);bi.SetPositionAndRotation(p.body.GetID(),pos,q,J.EActivation_Activate);bi.SetLinearAndAngularVelocity(p.body.GetID(),zero,zero);J.destroy(pos);J.destroy(q);}}
-  return {J,jolt,system,bi,cars,props,addCar,reset,resetProps,step,read,box};
+  return {J,jolt,system,bi,cars,props,addCar,reset,resetProps,step,read,box,setTrack};
 }
