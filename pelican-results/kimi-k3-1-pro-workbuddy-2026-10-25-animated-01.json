@@ -1,0 +1,51 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "kimi-k3-1-pro-workbuddy-2026-10-25-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "Moonshot AI",
+    "name": "Kimi-K3.1-Pro",
+    "id": null,
+    "identitySource": "system-reported"
+  },
+  "harness": {
+    "name": "WorkBuddy",
+    "version": "5.8.3",
+    "mode": "agent",
+    "context": "fresh",
+    "tools": [
+      "widget_guidelines",
+      "show_widget"
+    ]
+  },
+  "run": {
+    "generatedAt": "2026-10-25T20:59:27+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 1,
+    "totalAttempts": 1,
+    "selection": "first",
+    "parameters": {},
+    "postProcessing": "none",
+    "notes": "固定动画提示词是本会话第一条用户消息；生成前未阅读 PELICAN.md、协议、schema 或任何已有提交作品，故 context 为 fresh。宿主注入了持久化身份与用户记忆，但没有既有对话轮次。一次生成即采用（attempt 1/1，selection first）；artifact 是 show_widget 首次输出的原始 SVG，保存后未修改图形或字节，postProcessing 为 none。生成时仅使用 widget_guidelines 与 show_widget，未使用图片生成或几何脚本。纯 CSS 动画：前后轮辐条组分别以 2.8 s 线性旋转，曲柄以 1.8 s 旋转；双腿采用大腿/小腿嵌套分组关键帧，远侧腿延迟 -0.9 s 形成交替踩踏。@media (prefers-reduced-motion: reduce) 对车轮、曲柄和腿部统一设置 animation: none !important。poster 在生成后由脚本仅移除原 SVG 的整个 style 块得到，原图保持不变。模型名 Kimi-K3.1-Pro 来自运行环境声明，且用户在同轮提交请求中再次指定；未独立核实具体模型 ID，因此 model.id 为 null。WorkBuddy 5.8.3 从应用包 Info.plist 核实。已知限制：腿部是近似铰接旋转而非 IK 解算，脚不能在整周精确锁定踏板；链条静止；车轮与曲柄周期独立，不表示真实传动比；双脚与踏板会随腿组改变角度；两腿共用同一屏幕平面。提交前使用 headless Chrome 渲染 100 ms 与 1000 ms 动画帧，截图哈希不同；force-prefers-reduced-motion 下截图与 poster 截图 SHA-256 完全一致；本地画廊首位卡片和详情弹窗均已渲染检查。"
+  },
+  "artifact": {
+    "path": "pelican-assets/kimi-k3-1-pro-workbuddy-2026-10-25-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 680,
+    "height": 460,
+    "sha256": "809fcdfce4c173ea3409985bea08c43c63d5a1215943e7878b953a79d19dd8e6"
+  },
+  "source": null,
+  "animation": {
+    "mechanism": "css",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/kimi-k3-1-pro-workbuddy-2026-10-25-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 680,
+    "height": 460,
+    "sha256": "6bf6608b71d77dc23ddb19ebdf6bb9ab5d0ceabc70c9072b9ebc57818a587b81"
+  }
+}

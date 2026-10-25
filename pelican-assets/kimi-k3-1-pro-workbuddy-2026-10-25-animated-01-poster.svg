@@ -1,0 +1,37 @@
+<svg viewBox="0 0 680 460" width="100%" role="img" aria-labelledby="pelican-title pelican-desc" xmlns="http://www.w3.org/2000/svg">
+<title id="pelican-title">Pelican riding a bicycle</title>
+<desc id="pelican-desc">A white pelican with a long amber bill pedals a teal bicycle. The wheels, crank, and legs animate, and all motion stops when reduced motion is preferred.</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+<g id="spokes" fill="none" stroke="#888780" stroke-width="1.25"><line x1="0" y1="-61" x2="0" y2="61"/><line x1="-61" y1="0" x2="61" y2="0"/><line x1="-52.8" y1="-30.5" x2="52.8" y2="30.5"/><line x1="-52.8" y1="30.5" x2="52.8" y2="-30.5"/><line x1="-30.5" y1="-52.8" x2="30.5" y2="52.8"/><line x1="-30.5" y1="52.8" x2="30.5" y2="-52.8"/></g>
+</defs>
+<circle cx="82" cy="76" r="23" fill="#FAC775"/>
+<g fill="none" stroke="#EF9F27" stroke-width="3" stroke-linecap="round"><path d="M82 43V34"/><path d="M82 118V109"/><path d="M49 76H40"/><path d="M124 76H115"/><path d="M59 53L52 46"/><path d="M105 99L112 106"/></g>
+<path d="M132 104C134 88 151 82 163 91C171 73 201 77 204 96C221 92 231 103 228 114H137C131 112 129 108 132 104Z" fill="#E6F1FB"/>
+<path d="M514 66C516 53 530 48 540 56C548 42 570 46 573 60C587 57 598 66 595 77H519C513 75 511 70 514 66Z" fill="#E6F1FB"/>
+<g fill="none" stroke="#B5D4F4" stroke-width="3" stroke-linecap="round"><path d="M67 294H110"/><path d="M52 313H95"/><path d="M76 332H107"/></g>
+<g class="wheel rear"><circle cx="180" cy="350" r="70" fill="#FFFFFF" stroke="#2C2C2A" stroke-width="7"/><circle cx="180" cy="350" r="62" fill="none" stroke="#B4B2A9" stroke-width="2"/><use href="#spokes" transform="translate(180 350)"/><circle cx="180" cy="350" r="8" fill="#F1EFE8" stroke="#2C2C2A" stroke-width="2"/></g>
+<g class="wheel front"><circle cx="500" cy="350" r="70" fill="#FFFFFF" stroke="#2C2C2A" stroke-width="7"/><circle cx="500" cy="350" r="62" fill="none" stroke="#B4B2A9" stroke-width="2"/><use href="#spokes" transform="translate(500 350)"/><circle cx="500" cy="350" r="8" fill="#F1EFE8" stroke="#2C2C2A" stroke-width="2"/></g>
+<g class="upper far"><path d="M300 250L285 298" fill="none" stroke="#BA7517" stroke-width="13" stroke-linecap="round"/><g class="lower far"><path d="M285 298L316 350" fill="none" stroke="#BA7517" stroke-width="11" stroke-linecap="round"/><path d="M307 345L326 346L334 354L318 354L304 359L307 351Z" fill="#EF9F27" stroke="#854F0B" stroke-width="1.5" stroke-linejoin="round"/></g></g>
+<g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M180 344L340 332M180 356L340 368" stroke="#888780" stroke-width="2"/><path d="M180 350L270 258L340 350L180 350ZM270 258L430 270L340 350L430 270L500 350" stroke="#1D9E75" stroke-width="7"/><path d="M270 258L278 242M430 270L448 225" stroke="#0F6E56" stroke-width="6"/><path d="M250 247Q272 239 297 248" stroke="#2C2C2A" stroke-width="9"/><path d="M448 225C459 213 474 211 482 220L487 235" stroke="#2C2C2A" stroke-width="5"/></g>
+<g class="upper near"><path d="M325 255L370 300" fill="none" stroke="#EF9F27" stroke-width="14" stroke-linecap="round"/><g class="lower near"><path d="M370 300L364 350" fill="none" stroke="#EF9F27" stroke-width="12" stroke-linecap="round"/><path d="M355 345L374 346L383 354L366 354L352 359L355 351Z" fill="#FAC775" stroke="#854F0B" stroke-width="1.5" stroke-linejoin="round"/></g></g>
+<path d="M247 197Q208 177 178 195Q207 211 238 228Z" fill="#E6F1FB" stroke="#5F5E5A" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M350 188C384 169 362 131 392 109" fill="none" stroke="#5F5E5A" stroke-width="41" stroke-linecap="round"/>
+<path d="M350 188C384 169 362 131 392 109" fill="none" stroke="#FFFFFF" stroke-width="35" stroke-linecap="round"/>
+<ellipse cx="305" cy="210" rx="88" ry="65" transform="rotate(-12 305 210)" fill="#FFFFFF" stroke="#5F5E5A" stroke-width="2.5"/>
+<path d="M272 184C302 165 338 176 348 203C337 234 301 250 269 230Q250 207 272 184Z" fill="#E6F1FB" stroke="#185FA5" stroke-width="2.5"/>
+<g fill="none" stroke="#85B7EB" stroke-width="2" stroke-linecap="round"><path d="M278 203Q302 220 331 213"/><path d="M275 215Q297 232 320 229"/></g>
+<path d="M345 195C382 194 405 224 449 226" fill="none" stroke="#5F5E5A" stroke-width="26" stroke-linecap="round"/>
+<path d="M345 195C382 194 405 224 449 226" fill="none" stroke="#FFFFFF" stroke-width="21" stroke-linecap="round"/>
+<path d="M438 218Q451 215 460 226Q449 237 438 231Z" fill="#E6F1FB" stroke="#185FA5" stroke-width="2"/>
+<circle cx="397" cy="93" r="32" fill="#FFFFFF" stroke="#5F5E5A" stroke-width="2.5"/>
+<path d="M384 65Q379 51 391 58M393 62Q395 48 403 60" fill="none" stroke="#5F5E5A" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M415 88C466 84 531 92 578 105C531 114 470 115 416 108Z" fill="#EF9F27" stroke="#854F0B" stroke-width="2" stroke-linejoin="round"/>
+<path d="M417 107C460 120 522 119 563 108C541 151 472 163 429 128Q420 119 417 107Z" fill="#FAC775" stroke="#BA7517" stroke-width="2" stroke-linejoin="round"/>
+<path d="M438 105L555 105" fill="none" stroke="#BA7517" stroke-width="1.5" stroke-linecap="round"/>
+<circle cx="405" cy="83" r="5.5" fill="#2C2C2A"/><circle cx="407" cy="81" r="1.7" fill="#FFFFFF"/>
+<circle cx="340" cy="350" r="21" fill="#FFFFFF" stroke="#2C2C2A" stroke-width="3"/>
+<g class="crank" fill="none" stroke="#2C2C2A" stroke-linecap="round"><path d="M316 350H364" stroke-width="5"/><path d="M303 350H321M359 350H377" stroke-width="5"/><circle cx="340" cy="350" r="5" fill="#2C2C2A" stroke="none"/></g>
+<path d="M50 434H630" fill="none" stroke="#D3D1C7" stroke-width="2" stroke-linecap="round"/>
+<g fill="none" stroke="#97C459" stroke-width="3" stroke-linecap="round"><path d="M100 434L94 424M100 434L108 426M586 434L580 424M586 434L594 427"/></g>
+</svg>
