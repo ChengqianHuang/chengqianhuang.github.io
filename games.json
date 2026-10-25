@@ -1,5 +1,13 @@
 [
   {
+    "id": "harbor-rush",
+    "title": "港湾疾驰",
+    "description": "开着四驱赛车跑港区环线。和电脑抢位，或独自挑战最快单圈。",
+    "controls": "WASD / 方向键 · 3D 赛车 · 电脑体验优先",
+    "url": "/games/harbor-rush.html",
+    "cover": "/game-assets/harbor-rush.jpg"
+  },
+  {
     "id": "gomoku",
     "title": "五子棋",
     "description": "和电脑下一局。三个难度，可选先后手，支持悔棋复盘。",

@@ -28,7 +28,7 @@
 
 ## 架构
 
-- 免构建：纯静态 HTML/CSS/JS，无 SSG、无 CI
+- 博客与普通小游戏是纯静态 HTML/CSS/JS，无 SSG；3D 赛车在 `racing/` 独立构建，产物随仓库提交。CI 校验鹈鹕记录与赛车构建。
 - 文章渲染：浏览器端 marked.js（CDN），front matter 在 `post.js` 内解析
 - `.nojekyll`：跳过 GitHub Pages 的 Jekyll 处理，保证 `_` 开头文件也能被服务
 - 暗色模式：CSS `prefers-color-scheme` 自动跟随系统
