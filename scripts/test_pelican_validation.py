@@ -41,6 +41,7 @@ class SubmissionValidation(unittest.TestCase):
         self.assertIn('SHA-256 mismatch', '\n'.join(validate(self.root)))
     def test_false_first_attempt_rejected(self):
         self.record['run']['selection'] = 'first'
+        self.record['run']['attempt'] = 1
         self.record['run']['totalAttempts'] = 3; self.save()
         self.assertIn('first requires one attempt', '\n'.join(validate(self.root)))
     def test_wrong_prompt_rejected(self):
