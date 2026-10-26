@@ -1,5 +1,13 @@
 [
   {
+    "id": "periapsis",
+    "title": "引力边界",
+    "description": "掠过行星，穿越轨道站。三条太空航线，挑战穿环连击与高速擦身飞行。",
+    "controls": "鼠标 / WASD · 3D 飞行 · 电脑体验优先",
+    "url": "/games/periapsis.html",
+    "cover": "/game-assets/periapsis.jpg"
+  },
+  {
     "id": "demolition",
     "title": "拆楼公司",
     "description": "瞄准支撑，带出连锁坍塌。六个拆楼合同与自由模式，还能慢动作回看这一炮。",

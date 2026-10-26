@@ -2,3 +2,5 @@ racing/dist/** linguist-generated=true
 racing/dist/racing.js -whitespace
 demolition/dist/** linguist-generated=true
 demolition/dist/demolition.js -whitespace
+
+periapsis/dist/* linguist-generated=true -whitespace

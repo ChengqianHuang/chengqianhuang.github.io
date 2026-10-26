@@ -1,0 +1,26 @@
+name: Validate Periapsis flight game
+on:
+  push:
+    branches: [main]
+    paths: ['periapsis/**', 'games/periapsis.html', 'scripts/test_periapsis.mjs', '.github/workflows/validate-periapsis.yml']
+  pull_request:
+    paths: ['periapsis/**', 'games/periapsis.html', 'scripts/test_periapsis.mjs', '.github/workflows/validate-periapsis.yml']
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: periapsis
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: periapsis/package-lock.json
+      - run: npm ci --ignore-scripts
+      - run: npm test
+      - run: npm run build
+      - run: git diff --exit-code -- dist
