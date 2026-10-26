@@ -1,0 +1,26 @@
+name: Validate demolition game
+on:
+  push:
+    branches: [main]
+    paths: ['demolition/**', 'games/demolition.html', 'scripts/test_demolition.mjs', '.github/workflows/validate-demolition.yml']
+  pull_request:
+    paths: ['demolition/**', 'games/demolition.html', 'scripts/test_demolition.mjs', '.github/workflows/validate-demolition.yml']
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: demolition
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: demolition/package-lock.json
+      - run: npm ci --ignore-scripts
+      - run: npm test
+      - run: npm run build
+      - run: git diff --exit-code -- dist

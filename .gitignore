@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 
 racing/node_modules/
+demolition/node_modules/

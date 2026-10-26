@@ -1,5 +1,13 @@
 [
   {
+    "id": "demolition",
+    "title": "拆楼公司",
+    "description": "瞄准支撑，带出连锁坍塌。六个拆楼合同与自由模式，还能慢动作回看这一炮。",
+    "controls": "鼠标 / 触屏 · 3D 物理拆除 · 电脑体验优先",
+    "url": "/games/demolition.html",
+    "cover": "/game-assets/demolition.jpg"
+  },
+  {
     "id": "harbor-rush",
     "title": "港湾疾驰",
     "description": "港区、海堤、旧城三条赛道。和电脑抢位，或独自挑战最快单圈。",

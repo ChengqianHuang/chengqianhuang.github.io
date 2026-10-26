@@ -14,6 +14,8 @@
 
 达到 6 个左右再按实际需要增加分类，目前不加搜索、筛选或分页。
 
+拆楼公司：入口 `games/demolition.html`，独立源码与构建位于 `demolition/`。六个合同和一个自由模式，共用支撑蓝图与 Jolt 刚体碰撞；支持弹道瞄准、连锁爆破、保护目标、慢动作和上一炮回放。在 `demolition/` 运行 `npm ci --ignore-scripts`、`npm test`、`npm run build`；源码与 `dist/` 同时提交。检查覆盖六关完整解法、静止稳定性、物理命中、倒塌传播、弹药 / 保护目标失败、重复切关和自由模式弹丸回收。HUD 及回放只读取物理快照，不能修改胜负。环境光复用站内的 `racing/assets/venice_sunset_1k.hdr`，不得删除该共享素材。
+
 修改游戏规则后运行对应检查：`node scripts/test_2048.mjs` 或 `node scripts/test_breakout.mjs`。打砖块检查包括八关物理模拟、碰撞、多球、道具和暂停。
 
 像素突围：`node scripts/test_assault.mjs`，检查跳跃、子弹碰撞、检查点、武器、手雷及整关通关。运行逻辑在 `assault-engine.mjs`，输入与战斗特效在 `assault.js`，角色绘制在 `assault-sprites.mjs`，场景与地形在 `assault-environment.mjs`。美术模块只读取游戏状态，不修改碰撞和规则。
