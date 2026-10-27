@@ -7,14 +7,14 @@ export const POWERS = {
   shield: { label: '护底', icon: '▰', color: '#8ec9ed' },
 };
 export const LEVELS = [
-  { name: '热身', rows: 4, keep: () => true },
-  { name: '回廊', rows: 5, keep: (r, c) => r % 2 === 0 || c % 3 !== 1 },
-  { name: '菱形', rows: 5, keep: (r, c) => Math.abs(c - 4) + Math.abs(r - 2) <= 4 },
-  { name: '双塔', rows: 6, keep: (r, c) => c < 3 || c > 5 || r === 2 },
-  { name: '棋盘', rows: 6, keep: (r, c) => (r + c) % 2 === 0 || r === 5 },
-  { name: '拱门', rows: 6, keep: (r, c) => r < 2 ? c >= 2 - r && c <= 6 + r : c < 2 || c > 6 || r === 5 },
-  { name: '要塞', rows: 6, keep: (r, c) => r === 0 || r === 5 || c === 0 || c === 8 || (r === 2 && c % 2 === 0) },
-  { name: '终局', rows: 6, keep: () => true },
+  {name:'启航港口', rule:'找准角度', hint:'用挡板边缘改变方向，把球送到砖阵上方。'},
+  {name:'钢铁回廊', rule:'绕过钢墙', hint:'灰色钢墙不会碎。从两侧和墙间空隙，把球弹进上层。'},
+  {name:'运输轨道', rule:'提前瞄准', hint:'四条传送带交错移动。瞄准砖块即将经过的位置。'},
+  {name:'双塔断电', rule:'先拆开关', hint:'先击破左右两枚电源开关，才能打掉中央的护盾砖。'},
+  {name:'潮汐闸门', rule:'抓住窗口', hint:'三道闸门轮流开启。虚线表示开放，实心闸板会反弹球。'},
+  {name:'引爆矿脉', rule:'连锁爆破', hint:'厚矿石需要三次撞击。优先打橙色炸药，引爆整簇矿脉。'},
+  {name:'下沉工厂', rule:'争分夺秒', hint:'砖阵每 18 秒下降一层。优先清掉底排，保留回球空间。'},
+  {name:'核心熔炉', rule:'三阶段核心战', hint:'击破两侧供能器，攻击移动核心；每损失一段装甲，它会重新供能。'},
 ];
 export const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -34,10 +34,11 @@ export class BreakoutGame {
     this.reset();
   }
 
-  reset() {
+  reset(startLevel = 1) {
     this.score = 0;
     this.lives = 3;
-    this.level = 1;
+    this.startLevel = clamp(Math.floor(Number(startLevel)) || 1, 1, LEVELS.length);
+    this.level = this.startLevel;
     this.time = 0;
     this.paddle = { x: W / 2, target: W / 2, y: 398, w: 128, h: 12, vx: 0 };
     this.makeBricks();
@@ -46,24 +47,76 @@ export class BreakoutGame {
   }
 
   makeBricks() {
-    const layout = LEVELS[this.level - 1];
-    const cols = 9, gap = 8, width = (W - 2 * (WALL + 12) - gap * (cols - 1)) / cols;
+    this.stageTime = 0;
+    this.bossPhase = 1;
     this.bricks = [];
-    for (let row = 0; row < layout.rows; row++) {
-      for (let col = 0; col < cols; col++) {
-        if (!layout.keep(row, col)) continue;
-        const bomb = this.level >= 2 && (row * 3 + col + this.level) % 13 === 0;
-        const armor = !bomb && this.level >= 2 && (row + col + this.level) % 4 === 0;
-        const hp = armor ? this.level >= 7 && row === 0 ? 3 : 2 : 1;
-        this.bricks.push({ x: WALL + 12 + col * (width + gap), y: 48 + row * 29,
-          w: width, h: 21, hp, maxHp: hp, type: bomb ? 'bomb' : armor ? 'armor' : 'normal',
-          color: COLORS[(row + this.level - 1) % COLORS.length], power: null, flash: 0 });
-      }
+    const width = (W - 2 * (WALL + 12) - 8 * 8) / 9;
+    const add=(col,row,type='normal',hp=1,extra={})=>{
+      const x=WALL+12+col*(width+8),y=48+row*29;
+      const brick={x,y,baseX:x,baseY:y,w:width,h:21,hp,maxHp:hp,type,
+        color:COLORS[(row+this.level-1)%COLORS.length],power:null,flash:0,...extra};
+      this.bricks.push(brick);return brick;
+    };
+    if(this.level===1){
+      for(let r=0;r<4;r++)for(let c=0;c<9;c++)add(c,r);
+    }else if(this.level===2){
+      for(let r=0;r<4;r++)for(let c=0;c<9;c++)if(c!==4||r<2)add(c,r,(r+c)%5===0?'armor':'normal',(r+c)%5===0?2:1);
+      for(const x of [98,310,522])add(0,0,'steel',1,{x,baseX:x,y:206,baseY:206,w:100,h:15,target:false});
+    }else if(this.level===3){
+      for(let r=0;r<4;r++)for(let c=2;c<=6;c++)add(c,r,'normal',1,{motion:r%2? -1:1,baseY:54+r*39,y:54+r*39});
+    }else if(this.level===4){
+      for(let r=0;r<4;r++)for(let c=2;c<=6;c++)add(c,r,'armor',2,{protected:true});
+      add(0,5,'switch',2,{color:'#75ddc6'});add(8,5,'switch',2,{color:'#75ddc6'});
+    }else if(this.level===5){
+      for(let r=0;r<4;r++)for(let c=1;c<=7;c++)add(c,r);
+      [90,285,480].forEach((x,i)=>add(0,0,'gate',1,{x,baseX:x,y:206,baseY:206,w:150,h:16,target:false,gateIndex:i,open:i===0}));
+    }else if(this.level===6){
+      for(let r=0;r<5;r++)for(let c=0;c<9;c++)add(c,r,[1,4,7].includes(c)?'bomb':'armor',[1,4,7].includes(c)?1:3,{color:'#ba9e83'});
+    }else if(this.level===7){
+      for(let r=0;r<4;r++)for(let c=0;c<9;c++)if((r+c)%5!==0)add(c,r,r===3&&c%3===0?'bomb':'normal');
+    }else{
+      add(4,0,'core',9,{x:304,baseX:304,y:73,baseY:73,w:112,h:42,color:'#e9aa75'});
+      this.addGenerators();
     }
-    // Spread one of each capsule through every level, including an early drop.
-    [this.bricks.length - 5, Math.floor(this.bricks.length / 2), 3].forEach((index, i) => {
-      this.bricks[index].power = ['wide', 'multi', 'shield'][(i + this.level - 1) % 3];
+    // Supplies always belong to breakable targets, never steel or gates.
+    const targets=this.bricks.filter(b=>b.target!==false&&b.type!=='core');
+    [targets.length-1,Math.floor(targets.length/2),0].forEach((index,i)=>{
+      if(targets[index])targets[index].power=['wide','multi','shield'][(i+this.level-1)%3];
     });
+    this.initialTargets=this.remaining;
+    this.updateMechanisms(0);
+  }
+
+  addGenerators() {
+    for(const x of [105,550]){
+      this.bricks.push({x,y:164,baseX:x,baseY:164,w:65,h:29,hp:2,maxHp:2,type:'switch',
+        color:'#78d3c5',power:x===105?(this.bossPhase===2?'wide':'multi'):'shield',flash:0,generator:true});
+    }
+  }
+
+  updateMechanisms(dt) {
+    this.stageTime+=dt;
+    for(const b of this.bricks){
+      if(b.motion)b.x=b.baseX+Math.sin(this.stageTime*.7)*104*b.motion;
+      if(b.type==='gate'){
+        const wantsOpen=(this.stageTime+b.gateIndex*2)%6<3.2;
+        // A closing shutter waits for an overlapping ball to leave; never crush or teleport it.
+        const occupied=(this.balls||[]).some(ball=>ball.x+R>b.x&&ball.x-R<b.x+b.w&&ball.y+R>b.y&&ball.y-R<b.y+b.h);
+        b.open=wantsOpen||occupied;
+      }
+      if(this.level===7)b.y=b.baseY+Math.min(6,Math.floor(this.stageTime/18))*18;
+      if(b.type==='core')b.x=b.baseX+Math.sin(this.stageTime*(.65+(this.bossPhase-1)*.2))*168;
+    }
+  }
+
+  get switchesLeft(){return this.bricks.filter(b=>b.type==='switch'&&b.hp>0).length;}
+  isProtected(b){return (b.protected||b.type==='core')&&this.switchesLeft>0;}
+  get objective(){
+    if(this.level===4)return this.switchesLeft?`电源开关 ${this.switchesLeft} / 2 · 中央护盾开启`:'护盾已关闭 · 清除中央砖阵';
+    if(this.level===5)return `开放闸门 ${this.bricks.filter(b=>b.type==='gate'&&b.open).length} / 3 · 虚线可穿过`;
+    if(this.level===7)return this.stageTime<108?`${Math.ceil(18-this.stageTime%18)} 秒后下降 · 已下降 ${Math.floor(this.stageTime/18)} / 6 层`:'砖阵已到最低层 · 清空剩余目标';
+    if(this.level===8){const core=this.bricks.find(b=>b.type==='core');return `核心 ${core?.hp||0} / 9 · 阶段 ${this.bossPhase} / 3 · ${this.switchesLeft?'先拆供能器':'核心已暴露'}`;}
+    return LEVELS[this.level-1].hint;
   }
 
   serve() {
@@ -79,7 +132,7 @@ export class BreakoutGame {
   }
 
   start() {
-    if (['ready', 'lost', 'won'].includes(this.mode)) this.reset();
+    if (['ready', 'lost', 'won'].includes(this.mode)) this.reset(this.startLevel);
     else if (this.mode === 'level') {
       this.level++;
       this.makeBricks();
@@ -88,7 +141,7 @@ export class BreakoutGame {
     this.mode = 'playing';
   }
 
-  get remaining() { return this.bricks.filter(brick => brick.hp > 0).length; }
+  get remaining() { return this.bricks.filter(brick => brick.hp > 0 && brick.target !== false).length; }
 
   activatePower(kind) {
     if (kind === 'wide') {
@@ -112,7 +165,17 @@ export class BreakoutGame {
 
   damageBrick(brick, damage = 1) {
     if (brick.hp <= 0) return;
+    if(brick.target===false||this.isProtected(brick)){
+      brick.flash=.09;this.emit({type:'armor',x:brick.x+brick.w/2,y:brick.y+brick.h/2,color:'#a7d7df'});return;
+    }
+    // Each core phase absorbs at most its remaining three-hit armor segment.
+    if(brick.type==='core')damage=Math.min(damage,brick.hp%3||3);
     brick.hp = Math.max(0, brick.hp - damage);
+    if(brick.type==='core'&&brick.hp>0&&brick.hp%3===0){
+      this.bossPhase=4-brick.hp/3;
+      this.addGenerators();
+      this.emit({type:'phase',phase:this.bossPhase});
+    }
     brick.flash = .09;
     const x = brick.x + brick.w / 2, y = brick.y + brick.h / 2;
     if (brick.hp > 0) {
@@ -131,7 +194,7 @@ export class BreakoutGame {
       for (const neighbor of this.bricks) {
         if (neighbor.hp <= 0) continue;
         const dx = Math.abs(neighbor.x - brick.x), dy = Math.abs(neighbor.y - brick.y);
-        if ((dx < brick.w + 10 && dy < 3) || (dy < brick.h + 10 && dx < 3)) this.damageBrick(neighbor, 2);
+        if (this.level===6 ? Math.hypot(dx,dy)<88 : (dx < brick.w + 10 && dy < 3) || (dy < brick.h + 10 && dx < 3)) this.damageBrick(neighbor, 2);
       }
     }
   }
@@ -147,7 +210,11 @@ export class BreakoutGame {
 
   step(dt, direction = 0) {
     if (this.mode !== 'playing') return;
+    if(!Number.isFinite(dt)||dt<=0)return;
+    // Match low/variable frame callers to the same collision and mechanism timestep.
+    if(dt>STEP+1e-9){let left=Math.min(dt,.1);while(left>1e-9&&this.mode==='playing'){const part=Math.min(STEP,left);this.step(part,direction);left-=part;}return;}
     this.time += dt;
+    this.updateMechanisms(dt);
     this.wideTime = Math.max(0, this.wideTime - dt);
     this.paddle.w = this.wideTime > 0 ? 180 : 128;
     const p = this.paddle;
@@ -191,7 +258,7 @@ export class BreakoutGame {
         this.emit({ type: 'save', x: ball.x, y: H - 15, color: '#8ec9ed' });
       }
       for (const brick of this.bricks) {
-        if (brick.hp <= 0) continue;
+        if (brick.hp <= 0 || (brick.type==='gate'&&brick.open)) continue;
         const dx = ball.x - clamp(ball.x, brick.x, brick.x + brick.w);
         const dy = ball.y - clamp(ball.y, brick.y, brick.y + brick.h);
         const d2 = dx * dx + dy * dy;

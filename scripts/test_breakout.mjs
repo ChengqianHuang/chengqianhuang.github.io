@@ -7,8 +7,8 @@ const create = () => new BreakoutGame({ random });
 const layouts = new Set();
 for (let level = 1; level <= LEVELS.length; level++) {
   const game = create(); game.level = level; game.makeBricks();
-  assert.ok(game.bricks.length >= 20);
-  assert.equal(new Set(game.bricks.filter(b => b.power).map(b => b.power)).size, 3);
+  assert.ok(game.remaining >= (level === 8 ? 3 : 20));
+  assert.equal(new Set(game.bricks.filter(b => b.power).map(b => b.power)).size, level === 8 ? 2 : 3);
   assert.ok(game.bricks.every(b => b.x >= WALL && b.x + b.w <= W - WALL && b.y + b.h < game.paddle.y - 100));
   layouts.add(JSON.stringify(game.bricks.map(b => [b.x, b.y, b.hp])));
 }
@@ -19,12 +19,12 @@ const tough = armor.bricks.find(b => b.type === 'armor');
 armor.damageBrick(tough); assert.equal(tough.hp, 1);
 armor.damageBrick(tough); assert.equal(tough.hp, 0);
 const score = armor.score; armor.damageBrick(tough); assert.equal(armor.score, score);
-const bomb = armor.bricks.find(b => b.type === 'bomb');
-const neighbors = armor.bricks.filter(b => b !== bomb && b.hp > 0 &&
-  ((Math.abs(b.x - bomb.x) < bomb.w + 10 && Math.abs(b.y - bomb.y) < 3) ||
-   (Math.abs(b.y - bomb.y) < bomb.h + 10 && Math.abs(b.x - bomb.x) < 3)));
-armor.damageBrick(bomb);
-assert.ok(neighbors.length > 0 && neighbors.every(b => b.hp === 0), 'Explosions damage adjacent bricks');
+const mine=create();mine.reset(6);
+const bomb=mine.bricks.find(b=>b.type==='bomb');
+const neighbors=mine.bricks.filter(b=>b!==bomb&&Math.hypot(b.x-bomb.x,b.y-bomb.y)<88);
+const hpBefore=neighbors.map(b=>b.hp);mine.damageBrick(bomb);
+assert.ok(neighbors.length>0&&neighbors.every((b,i)=>b.hp<hpBefore[i]),'Explosions damage a cluster of neighboring ore');
+assert.ok(mine.bricks.filter(b=>b.type==='bomb'&&b.hp===0).length>1,'A mine blast chains through a vein');
 
 const powers = create(); powers.start(); powers.activatePower('multi'); powers.activatePower('multi');
 assert.equal(powers.balls.length, 3);
@@ -64,6 +64,55 @@ complete.start(); assert.equal(complete.level, 2); assert.ok(complete.remaining 
 complete.level = 8; for (const brick of complete.bricks) brick.hp = 0;
 complete.step(STEP); assert.equal(complete.mode, 'won');
 
+// Mechanisms must change real collision/health rules, not only presentation.
+{
+  const g=create();g.reset(2);const steel=g.bricks.find(b=>b.type==='steel');
+  const remaining=g.remaining;g.damageBrick(steel,99);assert.equal(steel.hp,1);assert.equal(g.score,0);assert.equal(g.remaining,remaining);
+  g.mode='playing';g.balls=[{x:steel.x+steel.w/2,y:steel.y+steel.h+R+.5,vx:0,vy:-500,trail:[]}];g.step(STEP);assert.ok(g.balls[0].vy>0,'steel actually reflects the ball');
+  for(const b of g.bricks)if(b.target!==false)b.hp=0;g.step(STEP);assert.equal(g.mode,'level','steel is not a clear objective');
+}
+{
+  const g=create();g.reset(4);const target=g.bricks.find(b=>b.protected);g.damageBrick(target,99);assert.equal(target.hp,2);assert.equal(g.score,0);
+  const switches=g.bricks.filter(b=>b.type==='switch');g.damageBrick(switches[0],2);g.damageBrick(target,2);assert.equal(target.hp,2,'one live switch keeps the shield');
+  g.damageBrick(switches[1],2);assert.equal(g.isProtected(target),false);g.damageBrick(target,2);assert.equal(target.hp,0);
+}
+{
+  const g=create();g.reset(5);const gate=g.bricks.find(b=>b.type==='gate');
+  g.mode='playing';g.stageTime=1;g.updateMechanisms(0);assert.equal(gate.open,true);
+  g.balls=[{x:gate.x+gate.w/2,y:gate.y+gate.h+R+.5,vx:0,vy:-500,trail:[]}];g.step(STEP);assert.ok(g.balls[0].vy<0,'open shutters allow passage');
+  g.stageTime=4;g.balls=[];g.updateMechanisms(0);assert.equal(gate.open,false);
+  g.balls=[{x:gate.x+gate.w/2,y:gate.y+gate.h+R+.5,vx:0,vy:-500,trail:[]}];g.step(STEP);assert.ok(g.balls[0].vy>0,'closed shutters reflect balls');
+  g.stageTime=4;g.balls=[{x:gate.x+gate.w/2,y:gate.y+8,vx:0,vy:100,trail:[]}];g.updateMechanisms(0);assert.equal(gate.open,true,'closing gate waits for a ball inside');
+  g.balls[0].y=300;g.updateMechanisms(0);assert.equal(gate.open,false);
+}
+{
+  const g=create();g.reset(3);const original=g.bricks[0].x;
+  for(let i=0;i<200;i++){g.updateMechanisms(.13);assert.ok(g.bricks.every(b=>b.x>=WALL&&b.x+b.w<=W-WALL));}
+  assert.notEqual(g.bricks[0].x,original);g.mode='paused';const paused=JSON.stringify(g);g.step(1);assert.equal(JSON.stringify(g),paused);
+  g.reset(7);g.updateMechanisms(17.9);assert.equal(g.bricks[0].y,g.bricks[0].baseY);g.updateMechanisms(.2);assert.equal(g.bricks[0].y,g.bricks[0].baseY+18);
+  g.updateMechanisms(200);assert.equal(g.bricks[0].y,g.bricks[0].baseY+108);assert.ok(g.bricks.every(b=>b.y+b.h<g.paddle.y-100));
+  const time=g.stageTime;g.serve();assert.equal(g.stageTime,time,'losing a life cannot reset the pressure timer');
+}
+{
+  const g=create();g.reset(8);const core=g.bricks.find(b=>b.type==='core');
+  for(let phase=1;phase<=3;phase++){
+    const hp=core.hp;g.damageBrick(core,99);assert.equal(core.hp,hp,'generators shield the core');
+    for(const b of g.bricks.filter(b=>b.type==='switch'&&b.hp>0))g.damageBrick(b,2);
+    g.damageBrick(core,99);assert.equal(core.hp,9-phase*3,'a hit cannot skip multiple armor phases');
+    if(phase<3){assert.equal(g.bossPhase,phase+1);assert.equal(g.switchesLeft,2);}
+  }
+  g.mode='playing';g.step(STEP);assert.equal(g.mode,'won');
+  g.start();assert.equal(g.level,8);assert.equal(g.startLevel,8);assert.equal(g.score,0);assert.equal(g.bossPhase,1);assert.equal(g.switchesLeft,2);
+}
+{
+  const g=create();g.reset(3);g.start();assert.equal(g.level,3);g.stageTime=20;
+  for(const b of g.bricks)b.hp=0;g.step(STEP);g.start();assert.equal(g.level,4);assert.equal(g.stageTime,0);assert.equal(g.switchesLeft,2);
+  const snap=JSON.stringify(g);g.step(-1);g.step(NaN);assert.equal(JSON.stringify(g),snap);
+  const fine=create(),coarse=create();fine.reset(5);coarse.reset(5);coarse.balls=structuredClone(fine.balls);fine.mode=coarse.mode='playing';
+  for(let i=0;i<240;i++)fine.step(STEP);for(let i=0;i<30;i++)coarse.step(1/30);
+  assert.ok(Math.abs(fine.balls[0].x-coarse.balls[0].x)<1e-6);assert.ok(Math.abs(fine.balls[0].y-coarse.balls[0].y)<1e-6);
+}
+
 // Exercise the actual physics across all layouts, using a simple predictive paddle.
 const results = [];
 for (let level = 1; level <= LEVELS.length; level++) {
@@ -81,8 +130,8 @@ for (let level = 1; level <= LEVELS.length; level++) {
       if (unfolded < 0) unfolded += span * 2;
       target = left + (unfolded > span ? span * 2 - unfolded : unfolded);
     }
-    if (game.remaining <= 4 && ball.vy > 0) {
-      const brick = game.bricks.filter(b => b.hp > 0).sort((a,b) => Math.abs(a.x + a.w/2 - target) - Math.abs(b.x + b.w/2 - target))[0];
+    if ((game.remaining <= 4 || game.switchesLeft>0) && ball.vy > 0) {
+      const brick = game.bricks.filter(b => b.hp > 0&&b.target!==false&&!game.isProtected(b)).sort((a,b) => Math.abs(a.x + a.w/2 - target) - Math.abs(b.x + b.w/2 - target))[0];
       const angle = Math.max(-1, Math.min(1, Math.atan2(brick.x + brick.w / 2 - target, game.paddle.y - R - brick.y - brick.h / 2)));
       game.paddle.target = target - angle / 1.08 * game.paddle.w / 2;
     } else game.paddle.target = target + Math.sin(game.time * .8) * 25;
@@ -114,4 +163,5 @@ for(let level=1;level<=LEVELS.length;level++){
   assert.equal(JSON.stringify(game),before,'rendering must not mutate physics or records');
 }
 delete globalThis.document;
+console.log('Mechanisms passed: steel, moving targets, power switches, timed shutters, ore chains, descending rows, core phases and selected starts.');
 console.log('Presentation passed: eight themes, damaged armor, effects, all capsules, multi-ball and read-only rendering.');

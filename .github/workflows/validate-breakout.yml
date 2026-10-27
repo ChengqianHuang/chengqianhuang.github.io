@@ -15,5 +15,5 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: node --check breakout.js && node --check breakout-art.mjs
+      - run: node --check breakout.js && node --check breakout-art.mjs && node --check breakout-scenes.mjs
       - run: node scripts/test_breakout.mjs

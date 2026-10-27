@@ -1,11 +1,11 @@
-import { BreakoutGame, W, H, STEP, LEVELS, POWERS } from './breakout-engine.mjs?v=2';
-import {createBreakoutArt} from './breakout-art.mjs?v=1';
+import { BreakoutGame, W, H, STEP, LEVELS, POWERS } from './breakout-engine.mjs?v=3';
+import {createBreakoutArt} from './breakout-art.mjs?v=2';
 
 const canvas = document.getElementById('breakout-canvas');
 const ctx = canvas.getContext('2d');
 const controls = canvas.closest('.arcade-machine');
 const ui = {};
-for (const name of ['overlay', 'message', 'description', 'start', 'score', 'best', 'lives', 'level', 'pause', 'restart', 'sound', 'status', 'level-name', 'remaining', 'effects', 'combo', 'progress', 'fullscreen']) {
+for (const name of ['overlay', 'message', 'description', 'start', 'score', 'best', 'lives', 'level', 'pause', 'restart', 'sound', 'status', 'level-name', 'remaining', 'effects', 'combo', 'progress', 'fullscreen', 'select', 'objective']) {
   ui[name] = document.getElementById(`breakout-${name}`);
 }
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
@@ -15,8 +15,6 @@ const art = createBreakoutArt(ctx, reduced);
 let hitStop = 0, finishDelay = 0;
 let frameId = 0, lastTime = 0, accumulator = 0, lastUI = '', activePointer = null;
 try {
-  const saved = Number(localStorage.getItem('breakout-best-v1'));
-  if (Number.isFinite(saved) && saved >= 0) best = Math.min(999999999, Math.floor(saved));
   enabledSound = localStorage.getItem('breakout-sound-v1') !== 'off';
 } catch { /* Storage is optional. */ }
 
@@ -68,20 +66,36 @@ function effect(event) {
     if (event.type === 'explosion') hitStop = .045;
   }
   if (event.type === 'power') announce(`获得${POWERS[event.kind].label}。`);
+  if(event.type==='phase')announce(`核心进入第 ${event.phase} 阶段，先拆除两侧供能器。`);
 }
 const game = new BreakoutGame({ emit: effect });
+game.reset(new URL(location.href).searchParams.get('level') || 1);
+function bestKey(){return `breakout-best-v2-start-${game.startLevel}`;}
+function loadBest(){
+  best=0;try{const value=Number(localStorage.getItem(bestKey()));if(Number.isFinite(value)&&value>=0)best=Math.min(999999999,Math.floor(value));}catch{}
+}
+loadBest();
+for(const [i,level] of LEVELS.entries()){
+  const option=document.createElement('option');option.value=String(i+1);option.textContent=`${String(i+1).padStart(2,'0')} / ${level.name}`;ui.select.append(option);
+}
+ui.select.value=String(game.startLevel);
+ui.select.addEventListener('change',()=>{
+  game.reset(Number(ui.select.value));art.clear();hitStop=0;finishDelay=0;loadBest();lastUI='';
+  const url=new URL(location.href);url.searchParams.set('level',String(game.startLevel));history.replaceState(null,'',url);
+  presentOverlay(false,false);
+});
 
 function updateUI() {
   if (game.score > best) {
     best = game.score;
-    try { localStorage.setItem('breakout-best-v1', String(best)); } catch { /* Keep playing. */ }
+    try { localStorage.setItem(bestKey(), String(best)); } catch { /* Keep playing. */ }
   }
   const powers = [];
   if (game.wideTime > 0) powers.push(`加长 ${Math.ceil(game.wideTime)}s`);
   if (game.balls.length > 1) powers.push(`${game.balls.length} 球`);
   if (game.shield) powers.push('护底 ×1');
   const effects = powers.join(' · ') || '接住带符号的补给胶囊';
-  const signature = `${game.score}/${best}/${game.lives}/${game.level}/${game.mode}/${game.remaining}/${effects}/${game.combo}`;
+  const signature = `${game.score}/${best}/${game.lives}/${game.level}/${game.mode}/${game.remaining}/${effects}/${game.combo}/${game.objective}`;
   if (signature === lastUI) return;
   lastUI = signature;
   ui.score.textContent = String(game.score).padStart(4, '0');
@@ -89,23 +103,25 @@ function updateUI() {
   ui.lives.textContent = game.lives;
   ui.level.textContent = game.level;
   ui['level-name'].textContent = `${String(game.level).padStart(2, '0')} / ${LEVELS[game.level - 1].name}`;
-  ui.remaining.textContent = `${game.remaining} 块`;
+  ui.remaining.textContent = game.level===8?'核心战':`${game.remaining} 个目标`;
   ui.effects.textContent = effects;
   ui.combo.textContent = game.combo ? `${game.combo} 连击 · ×${Math.min(5, 1+Math.floor((game.combo-1)/3))}` : '连续击破可叠加分数';
-  ui.progress.style.width = `${(1-game.remaining/game.bricks.length)*100}%`;
+  const progress=game.level===8?1-(game.bricks.find(b=>b.type==='core')?.hp||0)/9:1-game.remaining/game.initialTargets;
+  ui.progress.style.width = `${progress*100}%`;
+  ui.objective.textContent=game.objective;
   controls.dataset.mode = game.mode;
   ui.pause.disabled = !['playing', 'paused'].includes(game.mode);
   ui.pause.textContent = game.mode === 'paused' ? '继续' : '暂停';
   ui.restart.disabled = game.mode === 'ready';
 }
-function presentOverlay(automatic = false) {
+function presentOverlay(automatic = false, focus = true) {
   const messages = {
-    ready: ['准备开打', '移动挡板接球，用边缘改变方向。', '开始游戏 ↗'],
+    ready: [`${String(game.level).padStart(2,'0')} / ${LEVELS[game.level-1].name}`, LEVELS[game.level-1].hint, '开始游戏 ↗'],
     paused: ['休息一下', automatic ? '游戏已自动暂停，回来后接着玩。' : '小球和道具都停住了，准备好再继续。', '继续游戏'],
     life: ['再接一球', `还剩 ${game.lives} 次机会，打掉的砖块会保留。`, '继续挑战'],
     level: [`第 ${game.level} 关完成`, `过关奖励 ${game.level * 100} 分。当前 ${game.score} 分，还剩 ${game.lives} 次机会。`, '下一关'],
     lost: ['这一局结束', `拿下 ${game.score} 分。试试用挡板边缘改变球的方向。`, '再玩一次'],
-    won: ['八关，全部打掉了！', `拿下 ${game.score} 分。再挑战一次最高分？`, '再玩一次'],
+    won: [game.startLevel===1?'八关全部完成！':'核心已击破！', `拿下 ${game.score} 分。再挑战一次最高分？`, '再玩一次'],
   };
   const message = messages[game.mode];
   if (!message) return;
@@ -114,7 +130,7 @@ function presentOverlay(automatic = false) {
   [ui.message.textContent, ui.description.textContent, ui.start.textContent] = message;
   ui.overlay.hidden = false;
   updateUI(); announce(`${message[0]}。${message[1]}`); draw();
-  ui.start.focus({preventScroll:true});
+  if(focus)ui.start.focus({preventScroll:true});
 }
 function begin() {
   unlockAudio();
@@ -217,4 +233,4 @@ ui.fullscreen.addEventListener('click', async () => {
 document.addEventListener('fullscreenchange', () => {
   ui.fullscreen.textContent = document.fullscreenElement ? '退出全屏' : '全屏'; resize();
 });
-soundButton(); updateUI(); resize();
+soundButton(); presentOverlay(false,false); resize();

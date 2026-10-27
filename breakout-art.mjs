@@ -1,15 +1,7 @@
 // Presentation only: never changes the simulation, collision bounds or score.
-import {W,H,WALL,R,POWERS} from './breakout-engine.mjs?v=2';
-export const STAGES = [
-  {name:'COPPER WORKS', ink:'#eaa87a', cool:'#75c7bd', top:'#1d3039', bottom:'#0a141e'},
-  {name:'TIDAL ARRAY', ink:'#8acfc9', cool:'#adc5dc', top:'#153e46', bottom:'#091a29'},
-  {name:'AMBER VAULT', ink:'#e2be72', cool:'#9cbbb0', top:'#37352e', bottom:'#141d24'},
-  {name:'TWIN REACTORS', ink:'#a6c9e5', cool:'#75bba9', top:'#263e52', bottom:'#0d1926'},
-  {name:'CHECKER WORKS', ink:'#e3a98f', cool:'#83b4ad', top:'#3b3031', bottom:'#151e29'},
-  {name:'THE ARCH', ink:'#aecbb5', cool:'#e4b782', top:'#263e38', bottom:'#101d23'},
-  {name:'IRON KEEP', ink:'#c3cbd3', cool:'#d69a75', top:'#303a46', bottom:'#111a25'},
-  {name:'LAST LIGHT', ink:'#efb16f', cool:'#83cfca', top:'#3d3330', bottom:'#111c28'},
-];
+import {W,H,WALL,R,POWERS} from './breakout-engine.mjs?v=3';
+import {SCENES,paintScenery,paintAtmosphere} from './breakout-scenes.mjs?v=1';
+export const STAGES=SCENES;
 const TAU=Math.PI*2;
 export function createBreakoutArt(ctx,reduced){
   let bits=[],rings=[],labels=[],trails=new Map(),shocks=[],shake=0,kick=0,clock=0,backdrop=null,backdropLevel=0;
@@ -44,9 +36,7 @@ export function createBreakoutArt(ctx,reduced){
     const b=backdrop.getContext('2d');b.scale(2,2);const s=STAGES[level-1];
     let g=b.createLinearGradient(0,0,W,H);g.addColorStop(0,s.top);g.addColorStop(1,s.bottom);b.fillStyle=g;b.fillRect(0,0,W,H);
     g=b.createRadialGradient(W*.5,0,10,W*.5,100,410);g.addColorStop(0,s.ink+'18');g.addColorStop(1,s.ink+'00');b.fillStyle=g;b.fillRect(0,0,W,H);
-    b.strokeStyle='#bfdae407';b.lineWidth=.65;
-    for(let x=40;x<W;x+=24){b.beginPath();b.moveTo(x,24);b.lineTo(x,H);b.stroke();}
-    for(let y=24;y<H;y+=24){b.beginPath();b.moveTo(24,y);b.lineTo(W-24,y);b.stroke();}
+    paintScenery(b,level);
     // Recessed playing surface, metal rails and discrete calibration marks.
     b.strokeStyle='#0007';b.lineWidth=9;b.beginPath();b.moveTo(21,H-17);b.lineTo(21,21);b.lineTo(W-21,21);b.lineTo(W-21,H-17);b.stroke();
     b.strokeStyle='#65818b';b.lineWidth=2;b.beginPath();b.moveTo(WALL,H-23);b.lineTo(WALL,WALL);b.lineTo(W-WALL,WALL);b.lineTo(W-WALL,H-23);b.stroke();
@@ -56,7 +46,18 @@ export function createBreakoutArt(ctx,reduced){
     b.strokeStyle='#f0a37235';b.setLineDash([3,5]);b.beginPath();b.moveTo(36,H-16);b.lineTo(W-36,H-16);b.stroke();b.setLineDash([]);
     b.fillStyle='#b7c8ce28';b.textAlign='center';b.font='8px monospace';b.fillText('RETURN ZONE',W/2,H-6);
   }
-  function brick(b){
+  function brick(b,game){
+    if(b.type==='steel'||b.type==='gate'){
+      ctx.save();const open=b.type==='gate'&&b.open;
+      ctx.fillStyle=open?'#7acfc30b':'#1c2c38';round(b.x,b.y,b.w,b.h,2);ctx.fill();
+      ctx.strokeStyle=open?'#77dcca88':'#afbec5';ctx.lineWidth=1.5;if(open)ctx.setLineDash([5,4]);ctx.stroke();ctx.setLineDash([]);
+      if(!open){
+        ctx.fillStyle=b.type==='steel'?'#697d89':'#ba9b69';ctx.fillRect(b.x+3,b.y+3,b.w-6,3);
+        for(let x=b.x+10;x<b.x+b.w-6;x+=17){ctx.fillStyle='#c0ccd04d';ctx.fillRect(x,b.y+8,4,3);}
+      }else{ctx.fillStyle='#a6e9d4';ctx.font='8px monospace';ctx.textAlign='center';ctx.fillText('OPEN',b.x+b.w/2,b.y+b.h/2+3);}
+      if(b.flash>0&&!open){ctx.fillStyle='#e8ffff88';ctx.fillRect(b.x,b.y,b.w,b.h);}
+      ctx.restore();return;
+    }
     const color=b.type==='bomb'?'#ee9b6d':b.color;
     ctx.fillStyle='#02070d88';round(b.x+1,b.y+5,b.w,b.h,3);ctx.fill();
     ctx.fillStyle='#0b141b';round(b.x-1,b.y-1,b.w+2,b.h+3,4);ctx.fill();
@@ -72,7 +73,23 @@ export function createBreakoutArt(ctx,reduced){
       if(b.hp<b.maxHp){ctx.strokeStyle='#142631cc';ctx.beginPath();ctx.moveTo(b.x+b.w*.6,b.y+2);ctx.lineTo(b.x+b.w*.49,b.y+9);ctx.lineTo(b.x+b.w*.59,b.y+12);ctx.lineTo(b.x+b.w*.45,b.y+b.h);ctx.stroke();}
     }else if(b.type==='bomb'){
       ctx.save();ctx.translate(b.x+b.w/2,b.y+b.h/2);ctx.rotate(Math.PI/4);ctx.fillStyle='#32251e';ctx.fillRect(-4,-4,8,8);ctx.strokeStyle='#ffe9c9';ctx.strokeRect(-4,-4,8,8);ctx.restore();
-    }else if(b.power){ctx.fillStyle='#18303dbb';ctx.font='bold 12px system-ui';ctx.textAlign='center';ctx.fillText(POWERS[b.power].icon,b.x+b.w/2,b.y+15);}
+    }else if(b.power&&b.type!=='switch'&&b.type!=='core'){ctx.fillStyle='#18303dbb';ctx.font='bold 12px system-ui';ctx.textAlign='center';ctx.fillText(POWERS[b.power].icon,b.x+b.w/2,b.y+15);}
+    if(b.type==='switch'){
+      ctx.fillStyle='#123c3b';round(b.x+5,b.y+4,b.w-10,b.h-8,3);ctx.fill();
+      ctx.strokeStyle='#b6f6df';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(b.x+b.w/2,b.y+b.h/2,5,-Math.PI*.35,Math.PI*1.35);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(b.x+b.w/2,b.y+b.h/2-7);ctx.lineTo(b.x+b.w/2,b.y+b.h/2-1);ctx.stroke();
+      for(let i=0;i<b.hp;i++){ctx.fillStyle='#9cf1cc';ctx.fillRect(b.x+8+i*5,b.y+b.h-5,3,2);}
+    }
+    if(b.type==='core'){
+      ctx.fillStyle='#40291e';round(b.x+5,b.y+5,b.w-10,b.h-10,4);ctx.fill();
+      ctx.fillStyle='#ffe0ad';ctx.font='bold 10px monospace';ctx.textAlign='center';ctx.fillText('CORE / '+game.bossPhase,b.x+b.w/2,b.y+17);
+      for(let i=0;i<9;i++){ctx.fillStyle=i<b.hp?'#f5be7d':'#7b61504d';ctx.fillRect(b.x+12+i*10,b.y+26,7,5);}
+    }
+    if(game.isProtected(b)){
+      ctx.strokeStyle='#9ee8de';ctx.lineWidth=1;round(b.x-3,b.y-3,b.w+6,b.h+6,5);ctx.stroke();
+      ctx.fillStyle='#7ee8db22';round(b.x,b.y,b.w,b.h,3);ctx.fill();
+      ctx.strokeStyle='#ccfff8';ctx.strokeRect(b.x+b.w-12,b.y+6,6,5);ctx.beginPath();ctx.arc(b.x+b.w-9,b.y+6,2,Math.PI,TAU);ctx.stroke();
+    }
     if(b.flash>0){ctx.globalAlpha=Math.min(.9,b.flash/.09);ctx.fillStyle='#fff5d8';round(b.x,b.y,b.w,b.h,3);ctx.fill();ctx.globalAlpha=1;}
   }
   function draw(game,dt=0){
@@ -83,10 +100,12 @@ export function createBreakoutArt(ctx,reduced){
     background(game.level);ctx.clearRect(0,0,W,H);ctx.drawImage(backdrop,0,0,W,H);ctx.save();
     if(!reduced.matches&&shake>0)ctx.translate(Math.sin(clock*173)*shake,Math.cos(clock*127)*shake*.6);
     const s=STAGES[game.level-1];
-    // Quiet field markings leave the ball and power capsules easy to track.
-    ctx.strokeStyle=s.cool+'12';ctx.lineWidth=1;ctx.beginPath();ctx.arc(W/2,300,57,0,TAU);ctx.stroke();ctx.beginPath();ctx.arc(W/2,300,63,Math.PI*.05,Math.PI*.95);ctx.stroke();
-    ctx.fillStyle=s.cool+'2a';ctx.font='600 10px monospace';ctx.textAlign='center';ctx.fillText('BREAK / '+String(game.level).padStart(2,'0'),W/2,304);
-    for(const b of game.bricks)if(b.hp>0)brick(b);
+    paintAtmosphere(ctx,game,reduced.matches);
+    if(game.level===8&&game.switchesLeft){
+      const core=game.bricks.find(b=>b.type==='core');ctx.strokeStyle='#8cdbc355';ctx.lineWidth=1;ctx.setLineDash([4,5]);
+      for(const g of game.bricks.filter(b=>b.type==='switch'&&b.hp>0)){ctx.beginPath();ctx.moveTo(g.x+g.w/2,g.y);ctx.lineTo(core.x+core.w/2,core.y+core.h);ctx.stroke();}ctx.setLineDash([]);
+    }
+    for(const b of game.bricks)if(b.hp>0)brick(b,game);
     if(game.combo>=3){ctx.textAlign='right';ctx.fillStyle=s.ink+'cc';ctx.font='600 27px monospace';ctx.fillText(String(game.combo).padStart(2,'0'),W-43,303);ctx.font='8px monospace';ctx.fillStyle='#b8cbd599';ctx.fillText('CHAIN',W-43,317);}
     for(const e of shocks){ctx.globalAlpha=1-e.age/.25;ctx.fillStyle=s.cool;ctx.shadowColor=s.cool;ctx.shadowBlur=15;round(e.x<40?21:e.x>W-40?W-24:e.x-15,e.y<40?21:e.y-15,e.y<40?30:3,e.y<40?3:30,2);ctx.fill();ctx.shadowBlur=0;}ctx.globalAlpha=1;
     if(game.shield){ctx.strokeStyle='#8edbf2';ctx.shadowColor='#71c7db';ctx.shadowBlur=12;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(WALL,H-15);ctx.lineTo(W-WALL,H-15);ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle='#83d3ed15';ctx.fillRect(WALL,H-24,W-WALL*2,14);}

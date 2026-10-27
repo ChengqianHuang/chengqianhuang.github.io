@@ -27,7 +27,7 @@
 .arcade-buttons button:hover:enabled { border-color:#b2d3cf; background:#263e49; }
 .arcade-buttons button:disabled { opacity:.35; cursor:default; }
 .arcade-stage { position:relative; display:grid; justify-items:center; isolation:isolate; overflow:hidden; background:#0b1620; }
-#breakout-canvas { display:block; width:100%; height:auto; max-width:calc(clamp(280px,calc(100svh - 270px),650px) * 18 / 11); aspect-ratio:18/11; touch-action:none; }
+#breakout-canvas { display:block; width:100%; height:auto; max-width:calc(clamp(280px,calc(100svh - 310px),650px) * 18 / 11); aspect-ratio:18/11; touch-action:none; }
 #breakout-canvas:focus { outline:none; }
 #breakout-canvas:focus-visible { outline:2px solid #9bcfc0; outline-offset:-3px; }
 .arcade-overlay { position:absolute; inset:0; display:grid; place-items:center; background:linear-gradient(180deg,#0b162000 5%,#0b162015 32%,#0b1620a6 68%,#0b162032); }
@@ -75,4 +75,17 @@
 .arcade-toolbar p { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
 @media(max-width:700px){
  .arcade-scoreboard { flex-wrap:wrap; gap:10px; }.arcade-scoreboard .arcade-toolbar { width:100%; padding-top:4px; }.arcade-buttons { width:100%; justify-content:flex-end; }
+}
+
+.arcade-picker { display:grid; grid-template-columns:auto minmax(165px,1fr); align-items:center; gap:4px 12px; }
+.arcade-picker label { font-size:11px; color:var(--fg-muted); }
+.arcade-picker select { min-height:34px; padding:5px 30px 5px 10px; border:1px solid #73878166; border-radius:5px; background:var(--bg); color:var(--fg); font:12px system-ui; }
+.arcade-picker small { grid-column:1/-1; color:var(--fg-muted); font-size:10px; text-align:right; }
+.arcade-objective { margin:0; padding:8px 26px; color:#e5c69e; font-size:11px; line-height:1.6; border-bottom:1px solid #fff1; background:#15242d; }
+.arcade-overlay-card { max-width:440px; }
+.arcade-overlay p { max-width:350px; }
+.arcade-machine:fullscreen #breakout-canvas { max-width:calc((100svh - 220px) * 18 / 11); }
+@media(max-width:700px){
+ .arcade-intro{flex-wrap:wrap;gap:12px;}.arcade-picker{width:100%;grid-template-columns:auto 1fr;}.arcade-picker small{text-align:left;}
+ .arcade-objective{padding:8px 13px;font-size:10px;}.arcade-overlay-card{max-width:calc(100% - 30px);}.arcade-overlay p{max-width:240px;}
 }

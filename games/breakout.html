@@ -12,7 +12,7 @@
   </script>
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/games.css?v=2">
-  <link rel="stylesheet" href="/breakout.css?v=4">
+  <link rel="stylesheet" href="/breakout.css?v=5">
 </head>
 <body class="home game-page">
   <main>
@@ -20,14 +20,14 @@
     <section id="arcade" class="arcade container" tabindex="-1" aria-labelledby="arcade-title">
       <div class="arcade-card">
         <div class="arcade-intro">
-          <div><p class="arcade-label">BREAKOUT / 08 SECTORS</p><h1 id="arcade-title">打砖块<span>重新开打。</span></h1></div>
-          <p class="arcade-summary">瞄准空隙，打穿整排。<br>八个关卡 · 连锁爆破 · 三球齐发</p>
+          <div><p class="arcade-label">BREAKOUT / 08 SECTORS</p><h1 id="arcade-title">打砖块<span>八关，八种打法。</span></h1></div>
+          <div class="arcade-picker"><label for="breakout-select">选择起始关卡</label><select id="breakout-select" aria-describedby="breakout-select-hint"></select><small id="breakout-select-hint">切关会重新计分，可从任意一关开始。</small></div>
         </div>
         <div class="arcade-machine">
           <div class="arcade-scoreboard" aria-label="游戏计分板">
             <div class="arcade-score-group">
               <div><span class="arcade-stat-label">得分</span><strong id="breakout-score">0</strong></div>
-              <div><span class="arcade-stat-label" title="仅保存在当前浏览器">本机最高</span><strong id="breakout-best">0</strong></div>
+              <div><span class="arcade-stat-label" title="不同起始关卡分别保存纪录，新规则独立计分">此起点最高</span><strong id="breakout-best">0</strong></div>
             </div>
             <div class="arcade-score-group">
               <div><span class="arcade-stat-label">剩余机会</span><strong id="breakout-lives">3</strong></div>
@@ -43,8 +43,9 @@
             </div>
           </div>
           </div>
-          <div class="arcade-readout"><span><strong id="breakout-level-name">01 / 热身</strong><span id="breakout-remaining">36 块</span></span><span id="breakout-effects">接住掉落的道具</span></div>
+          <div class="arcade-readout"><span><strong id="breakout-level-name">01 / 启航港口</strong><span id="breakout-remaining">36 个目标</span></span><span id="breakout-effects">接住掉落的道具</span></div>
           <div class="arcade-progress" aria-hidden="true"><span id="breakout-progress"></span></div>
+          <p class="arcade-objective" id="breakout-objective"></p>
           <div class="arcade-stage">
             <canvas id="breakout-canvas" width="720" height="440" tabindex="0" aria-label="打砖块游戏球场" aria-describedby="arcade-help">请使用支持 Canvas 的浏览器来玩打砖块。</canvas>
             <div id="breakout-overlay" class="arcade-overlay">
@@ -62,8 +63,8 @@
       </div>
       <details class="arcade-instructions"><summary>怎么玩 <span>鼠标、键盘或触屏均可</span></summary>
         <div><p>鼠标或 A / D、← / → 移动挡板。手机上按住球场左右拖动，不需要把手指放在挡板上。空格暂停 / 继续，Esc 暂停。</p>
-        <p>挡板边缘会把球弹向侧面。一次接球之间连续击破砖块，最高获得 5 倍分数。带刻度的装甲砖需要多次击打，菱形爆炸砖会引爆相邻砖块。</p>
-        <p>砖上的符号标出补给：↔ 加长挡板 14 秒、3 三球、▰ 护底一次。每过一关补一条命，最多五条。最高分保存在当前浏览器。</p></div>
+        <p>挡板边缘会把球弹向侧面。一次接球之间连续击破砖块，最高获得 5 倍分数。带刻度的装甲砖需要多次击打，菱形爆炸砖会引爆相邻砖块。灰色钢墙无法破坏；虚线闸门可以穿过；带锁的砖块需要先打掉电源开关。</p>
+        <p>砖上的符号标出补给：↔ 加长挡板 14 秒、3 三球、▰ 护底一次。每过一关补一条命，最多五条。最高分按起始关卡分别保存在当前浏览器，旧版本纪录不会被覆盖。</p></div>
       </details>
       <noscript><p>小游戏需要 JavaScript。你也可以直接<a href="/#post-list">阅读文章</a>。</p></noscript>
     </section>
@@ -71,6 +72,6 @@
   </main>
   <footer class="site-footer"><div class="container"><p>© 2026 Chengqian Huang · <a href="https://github.com/ChengqianHuang/chengqianhuang.github.io" target="_blank" rel="noopener">本站源码</a></p></div></footer>
   <script src="/theme.js"></script>
-  <script type="module" src="/breakout.js?v=4"></script>
+  <script type="module" src="/breakout.js?v=5"></script>
 </body>
 </html>
