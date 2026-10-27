@@ -6,11 +6,14 @@ function run(f,controller=pilotInput,dt=1/60){let frames=0;while(f.status==='fly
 function advance(f,seconds,input){for(let t=0;t<seconds;t+=1/60)stepFlight(f,typeof input==='function'?input(f):input,1/60);}
 
 // Published routes and their existing records must not change when adding contracts.
-const originalBlueprints={daybreak:'acfad61edd177c94b660267da3619580aee9340827deeea761e3bbb81859ecb4',belt:'661a11c78d4be7e91e8aa2c6449638e6a451def64514f5198095ca16082723ed',nightfall:'79c7aa11791929857dd6b1cff310af0d0230c99cbcb32dd31f9db5e09852ac4c'};
+// Baselines come from the original published routes. Round only for the snapshot:
+// Math.sin/cos may differ in their final bits across CPU architectures and V8 versions.
+const originalBlueprints={daybreak:'2322d505afd0fb865e5b6f9d8d711abc2c83dac6012a90b78cffa159f7eb4a2c',belt:'8e2c7965054094a6412b849424ca0a6f5dab18dc510b5067f2d1667f434ff877',nightfall:'49ea315f4888e8c1bdb5cf463d7133094d7a13de63cd4d3d6df6986eec81b0e4'};
 assert.equal(new Set(COURSES.map(c=>c.id)).size,COURSES.length);
 for(const c of COURSES.filter(c=>originalBlueprints[c.id])){
   const {gates,rocks}=makeCourse(c);
-  assert.equal(createHash('sha256').update(JSON.stringify({gates,rocks})).digest('hex'),originalBlueprints[c.id]);
+  const snapshot=JSON.stringify({gates,rocks},(key,value)=>typeof value==='number'?Number(value.toFixed(6)):value);
+  assert.equal(createHash('sha256').update(snapshot).digest('hex'),originalBlueprints[c.id]);
 }
 
 for(const c of COURSES){
