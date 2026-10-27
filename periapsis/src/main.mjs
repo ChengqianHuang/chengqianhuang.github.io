@@ -76,7 +76,7 @@ function frame(now){
   }
 }
 
-COURSES.forEach((c,i)=>{const b=document.createElement('button');b.className='course-button';b.dataset.course=c.id;b.setAttribute('aria-pressed','false');b.innerHTML=`<span>0${i+1} / ${i?'进阶':'入门'}</span><strong>${c.name}</strong>`;b.addEventListener('click',()=>{selectCourse(c.id);focus('start');});$('course-list').append(b);});
+COURSES.forEach((c,i)=>{const b=document.createElement('button');b.className='course-button';b.dataset.course=c.id;b.setAttribute('aria-pressed','false');b.innerHTML=`<span>0${i+1} / ${c.tag||(i?'进阶':'入门')}</span><strong>${c.name}</strong>`;b.addEventListener('click',()=>{selectCourse(c.id);focus('start');});$('course-list').append(b);});
 $('start').addEventListener('click',()=>start());$('demo').addEventListener('click',()=>start(true));$('pause-button').addEventListener('click',pause);$('resume').addEventListener('click',resume);$('restart').addEventListener('click',()=>start());$('menu-button').addEventListener('click',menu);$('again').addEventListener('click',()=>start());$('result-menu').addEventListener('click',menu);$('next-course').addEventListener('click',()=>{selectCourse(COURSES[Math.min(COURSES.indexOf(course)+1,COURSES.length-1)].id);start();});
 $('sound').addEventListener('click',()=>{muted=!muted;$('sound').setAttribute('aria-pressed',String(muted));text('sound',muted?'声音：关':'声音：开');sound?.ctx.resume();});
 $('quality').addEventListener('change',e=>world?.setQuality(e.target.value));$('fullscreen').addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await stage.requestFullscreen();}catch{notice('当前浏览器不支持全屏',2);}});
