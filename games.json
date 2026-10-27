@@ -58,9 +58,9 @@
   {
     "id": "breakout",
     "title": "打砖块",
-    "description": "八关不同布局，接住加长、三球和护底道具，打出连击。",
-    "controls": "鼠标 / 方向键 / 触屏",
+    "description": "八关街机挑战：击碎装甲、连锁爆破，接住三球补给打出连击。",
+    "controls": "鼠标 / A D / 方向键 / 触屏 · 支持全屏",
     "url": "/games/breakout.html",
-    "cover": "/game-assets/breakout.svg?v=2"
+    "cover": "/game-assets/breakout.png"
   }
 ]

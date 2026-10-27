@@ -33,3 +33,5 @@
 引力边界：电脑优先的 Three.js 轨道飞行游戏，入口 `games/periapsis.html`，源码与构建在 `periapsis/`。六条航线、鼠标 / 键盘 / 触屏转向、加速过热、穿环连击、扫掠碰撞和不计纪录的观光试飞。在 `periapsis/` 执行 `npm ci --ignore-scripts`、`npm test`、`npm run build`，源码和 `dist/` 一起提交。测试覆盖六条完整航线、不同步长、无加速通关、碰撞 / 擦身防重复、漏环、过热、失败和存档。装饰场景不改动飞行规则；游戏资源全部从本站读取，NASA 地球纹理的来源与署名保留在 README。
 
 引力边界的航线参数位于 `periapsis/src/flight.mjs`：后三关分别为螺旋、左右折线和变间距冲刺；航环半径同时驱动碰撞与显示，空间站位置由航线数据提供。扩展航线时保持既有航线的航环、陨石种子和存档 ID 不变，并验证窄屏六关菜单及下一关衔接。
+
+打砖块的绘制与特效在 `breakout-art.mjs`，只读取游戏状态；八关物理布局不由绘制层改变。`breakout.js` 管理输入、短暂撞击停顿、分层音效和全屏。减少动态效果偏好关闭震动、碎片、拖尾与撞击停顿。运行 `node scripts/test_breakout.mjs`，同时验证八关通关及绘制不修改物理状态；封面 `game-assets/breakout.png` 来自实际游戏截图。

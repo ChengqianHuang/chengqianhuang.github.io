@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { BreakoutGame, LEVELS, W, H, R, WALL, STEP } from '../breakout-engine.mjs';
+import { BreakoutGame, LEVELS, W, H, R, WALL, STEP, POWERS } from '../breakout-engine.mjs';
 let seed = 81;
 const random = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32);
 const create = () => new BreakoutGame({ random });
@@ -95,3 +95,23 @@ for (let level = 1; level <= LEVELS.length; level++) {
 }
 console.log('Breakout passed: armor, explosions, power-ups, frozen pause, collisions, lives, all 8 levels.');
 console.log(results.join(' | '));
+
+// Rendering must remain a read-only observer, even with impacts and reduced motion.
+const { createBreakoutArt, STAGES } = await import('../breakout-art.mjs');
+const gradient = {addColorStop(){}};
+const context = new Proxy({}, {get:(_,key)=>key==='createLinearGradient'||key==='createRadialGradient'?()=>gradient:()=>{},set:()=>true});
+globalThis.document={createElement:()=>({getContext:()=>context})};
+const preference={matches:false}, art=createBreakoutArt(context,preference);
+assert.equal(STAGES.length,LEVELS.length);
+for(let level=1;level<=LEVELS.length;level++){
+  const game=create();game.level=level;game.makeBricks();game.serve();game.mode='playing';
+  game.activatePower('multi');game.activatePower('shield');game.activatePower('wide');
+  game.drops=Object.keys(POWERS).map((kind,i)=>({kind,x:150+i*100,y:300}));
+  const damaged=game.bricks.find(b=>b.type==='armor');if(damaged)damaged.hp=1;
+  const before=JSON.stringify(game);
+  for(const type of ['brick','armor','explosion','save','paddle','wall','power'])art.impact({type,x:100,y:120,color:'#ffcc99',kind:'wide',points:40,multiplier:2});
+  art.draw(game,1/60);art.draw(game,1);preference.matches=true;art.clear();art.draw(game,1/60);preference.matches=false;
+  assert.equal(JSON.stringify(game),before,'rendering must not mutate physics or records');
+}
+delete globalThis.document;
+console.log('Presentation passed: eight themes, damaged armor, effects, all capsules, multi-ball and read-only rendering.');

@@ -162,9 +162,9 @@ export class BreakoutGame {
       const oldX = ball.x, oldY = ball.y;
       ball.x += ball.vx * dt;
       ball.y += ball.vy * dt;
-      if (ball.x < WALL + R) { ball.x = WALL + R; ball.vx = Math.abs(ball.vx); }
-      if (ball.x > W - WALL - R) { ball.x = W - WALL - R; ball.vx = -Math.abs(ball.vx); }
-      if (ball.y < WALL + R) { ball.y = WALL + R; ball.vy = Math.abs(ball.vy); }
+      if (ball.x < WALL + R) { ball.x = WALL + R; ball.vx = Math.abs(ball.vx); this.emit({type:'wall',x:WALL,y:ball.y}); }
+      if (ball.x > W - WALL - R) { ball.x = W - WALL - R; ball.vx = -Math.abs(ball.vx); this.emit({type:'wall',x:W-WALL,y:ball.y}); }
+      if (ball.y < WALL + R) { ball.y = WALL + R; ball.vy = Math.abs(ball.vy); this.emit({type:'wall',x:ball.x,y:WALL}); }
 
       // Interpolate the crossing of the paddle top, including fast or dropped frames.
       if (ball.vy > 0 && oldY + R <= p.y && ball.y + R >= p.y) {

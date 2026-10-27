@@ -12,41 +12,16 @@
   </script>
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/games.css?v=2">
-  <link rel="stylesheet" href="/breakout.css?v=3">
+  <link rel="stylesheet" href="/breakout.css?v=4">
 </head>
 <body class="home game-page">
-  <header class="site-header">
-    <div class="container">
-      <a class="site-title" href="/">Chengqian Huang</a>
-      <nav>
-        <a href="/games.html" aria-current="location">小游戏</a>
-        <a href="/#post-list">文章</a>
-        <a href="/pelican.html">鹈鹕测试</a>
-        <a href="/about.html">关于</a>
-        <a href="https://github.com/ChengqianHuang" target="_blank" rel="noopener">GitHub</a>
-        <button id="theme-toggle" type="button"></button>
-      </nav>
-    </div>
-  </header>
   <main>
-    <div class="game-breadcrumb container"><a href="/games.html">← 全部游戏</a><span>打砖块</span></div>
+    <div class="game-breadcrumb container"><a href="/games.html">← 全部游戏</a><span>打砖块</span><button id="theme-toggle" type="button"></button></div>
     <section id="arcade" class="arcade container" tabindex="-1" aria-labelledby="arcade-title">
       <div class="arcade-card">
         <div class="arcade-intro">
-          <p class="arcade-eyebrow"><span aria-hidden="true">✳</span> 休息一下</p>
-          <div>
-            <p class="arcade-label" aria-hidden="true">BREAKOUT</p>
-            <h1 id="arcade-title">打砖块</h1>
-            <p class="arcade-summary">八关，三条命。<br>接住道具，打出连击。</p>
-          </div>
-          <div class="arcade-guide">
-            <p><span class="arcade-key">←</span> <span class="arcade-key">→</span> 或移动鼠标</p>
-            <p><span class="arcade-key">Space</span> 暂停 / 继续</p>
-            <p class="arcade-tip">用挡板的边缘接球，可以改变方向。手机上按住球场左右拖动。</p>
-            <div class="arcade-power-legend"><span>↔ 加长挡板</span><span>3 三球</span><span>▰ 护底一次</span></div>
-            <p class="arcade-tip">带圆点的砖要多打几次；✦ 爆炸砖会炸掉相邻砖块。每次过关补一次机会，最多五次。</p>
-          </div>
-          <a class="arcade-skip" href="/games.html">更多游戏 <span aria-hidden="true">↗</span></a>
+          <div><p class="arcade-label">BREAKOUT / 08 SECTORS</p><h1 id="arcade-title">打砖块<span>重新开打。</span></h1></div>
+          <p class="arcade-summary">瞄准空隙，打穿整排。<br>八个关卡 · 连锁爆破 · 三球齐发</p>
         </div>
         <div class="arcade-machine">
           <div class="arcade-scoreboard" aria-label="游戏计分板">
@@ -58,37 +33,44 @@
               <div><span class="arcade-stat-label">剩余机会</span><strong id="breakout-lives">3</strong></div>
               <div><span class="arcade-stat-label">关卡</span><strong><span id="breakout-level">1</span><span class="arcade-stat-total"> / 8</span></strong></div>
             </div>
-          </div>
-          <div class="arcade-readout"><span><strong id="breakout-level-name">01 / 热身</strong><span id="breakout-remaining">36 块</span></span><span id="breakout-effects">接住掉落的道具</span></div>
           <div class="arcade-toolbar">
-            <p id="arcade-help">鼠标 / ← → 移动 · 手机拖动 · 空格暂停</p>
+            <p id="arcade-help">鼠标 / A D / ← → 移动 · 空格暂停</p>
             <div class="arcade-buttons">
+              <button id="breakout-fullscreen" type="button">全屏</button>
               <button id="breakout-sound" type="button" aria-label="开启音效" aria-pressed="false">音效关</button>
               <button id="breakout-pause" type="button" disabled>暂停</button>
               <button id="breakout-restart" type="button" disabled>重来</button>
             </div>
           </div>
+          </div>
+          <div class="arcade-readout"><span><strong id="breakout-level-name">01 / 热身</strong><span id="breakout-remaining">36 块</span></span><span id="breakout-effects">接住掉落的道具</span></div>
+          <div class="arcade-progress" aria-hidden="true"><span id="breakout-progress"></span></div>
           <div class="arcade-stage">
             <canvas id="breakout-canvas" width="720" height="440" tabindex="0" aria-label="打砖块游戏球场" aria-describedby="arcade-help">请使用支持 Canvas 的浏览器来玩打砖块。</canvas>
             <div id="breakout-overlay" class="arcade-overlay">
               <div class="arcade-overlay-card">
-                <span class="arcade-play-mark" aria-hidden="true">▶</span>
-                <h3 id="breakout-message">经典打砖块</h3>
-                <p id="breakout-description">八关不同布局。接住道具，清空砖块。</p>
+                <span class="arcade-play-mark" aria-hidden="true">READY TO BREAK</span>
+                <h3 id="breakout-message">准备开打</h3>
+                <p id="breakout-description">移动挡板接球，用边缘改变方向。</p>
                 <button id="breakout-start" type="button">开始游戏 <span aria-hidden="true">→</span></button>
               </div>
             </div>
           </div>
-          <p class="arcade-mobile-legend">↔ 加长挡板 · 3 三球 · ▰ 护底一次 · ✦ 爆炸砖</p>
+          <div class="arcade-bottom"><span id="breakout-combo">连续击破可叠加分数</span><span>↔ 加长　3 三球　▰ 护底</span></div>
           <p id="breakout-status" class="arcade-sr-only" role="status" aria-live="polite"></p>
         </div>
       </div>
+      <details class="arcade-instructions"><summary>怎么玩 <span>鼠标、键盘或触屏均可</span></summary>
+        <div><p>鼠标或 A / D、← / → 移动挡板。手机上按住球场左右拖动，不需要把手指放在挡板上。空格暂停 / 继续，Esc 暂停。</p>
+        <p>挡板边缘会把球弹向侧面。一次接球之间连续击破砖块，最高获得 5 倍分数。带刻度的装甲砖需要多次击打，菱形爆炸砖会引爆相邻砖块。</p>
+        <p>砖上的符号标出补给：↔ 加长挡板 14 秒、3 三球、▰ 护底一次。每过一关补一条命，最多五条。最高分保存在当前浏览器。</p></div>
+      </details>
       <noscript><p>小游戏需要 JavaScript。你也可以直接<a href="/#post-list">阅读文章</a>。</p></noscript>
     </section>
 
   </main>
   <footer class="site-footer"><div class="container"><p>© 2026 Chengqian Huang · <a href="https://github.com/ChengqianHuang/chengqianhuang.github.io" target="_blank" rel="noopener">本站源码</a></p></div></footer>
   <script src="/theme.js"></script>
-  <script type="module" src="/breakout.js?v=3"></script>
+  <script type="module" src="/breakout.js?v=4"></script>
 </body>
 </html>
