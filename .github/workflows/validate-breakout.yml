@@ -1,10 +1,10 @@
 name: Validate Breakout game
 on:
   pull_request:
-    paths: ['breakout*', 'games/breakout.html', 'scripts/test_breakout.mjs', '.github/workflows/validate-breakout.yml']
+    paths: ['breakout*', 'game-assets/breakout/**', 'games/breakout.html', 'scripts/test_breakout.mjs', '.github/workflows/validate-breakout.yml']
   push:
     branches: [main]
-    paths: ['breakout*', 'games/breakout.html', 'scripts/test_breakout.mjs', '.github/workflows/validate-breakout.yml']
+    paths: ['breakout*', 'game-assets/breakout/**', 'games/breakout.html', 'scripts/test_breakout.mjs', '.github/workflows/validate-breakout.yml']
 permissions:
   contents: read
 jobs:
@@ -15,5 +15,5 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: node --check breakout.js && node --check breakout-art.mjs && node --check breakout-scenes.mjs
+      - run: node --check breakout.js && node --check breakout-art.mjs && node --check breakout-scenes.mjs && node --check breakout-materials.mjs
       - run: node scripts/test_breakout.mjs

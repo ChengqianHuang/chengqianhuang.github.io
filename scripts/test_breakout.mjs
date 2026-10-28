@@ -165,11 +165,25 @@ for(let level=1;level<=LEVELS.length;level++){
 }
 // Loading a raster scene must invalidate the old cached background exactly once.
 const water=create();water.reset(5);const waterSnapshot=JSON.stringify(water);
-art.draw(water);const bitmap={width:1696,height:928};art.setTidalImage(bitmap);
+art.draw(water);const bitmap={width:1696,height:928};art.setSceneImage(5,bitmap);
 art.draw(water);art.draw(water);
 assert.equal(drawnImages.filter(image=>image===bitmap).length,1,'cache the image instead of repainting it each frame');
 assert.equal(JSON.stringify(water),waterSnapshot);
+const {SCENE_ASSETS}=await import('../breakout-scenes.mjs');
 const {stat}=await import('node:fs/promises');
+for(let level=1;level<=8;level++){
+  const g=create();g.reset(level);g.mode='playing';
+  const before=JSON.stringify(g),image={level};art.setSceneImage(level,image);
+  art.draw(g,1/60);art.draw(g,1/60);preference.matches=true;art.draw(g,0);preference.matches=false;
+  assert.equal(drawnImages.filter(value=>value===image).length,1);
+  assert.equal(JSON.stringify(g),before);
+  assert.ok((await stat(new URL('../'+SCENE_ASSETS[level-1],import.meta.url))).size<600000);
+}
+// A delayed image from another level must not rebuild the current scene.
+const active=create();active.reset(8);art.draw(active);const renders=drawnImages.length;
+art.setSceneImage(1,{late:true});art.draw(active);
+assert.equal(drawnImages.length,renders+1);
+
 assert.ok((await stat(new URL('../game-assets/breakout/tidal-observatory.jpg',import.meta.url))).size<600000,'keep background delivery lightweight');
 delete globalThis.document;
 console.log('Mechanisms passed: steel, moving targets, power switches, timed shutters, ore chains, descending rows, core phases and selected starts.');

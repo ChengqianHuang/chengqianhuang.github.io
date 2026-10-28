@@ -1,5 +1,6 @@
+import {SCENE_ASSETS} from './breakout-scenes.mjs?v=3';
 import { BreakoutGame, W, H, STEP, LEVELS, POWERS } from './breakout-engine.mjs?v=3';
-import {createBreakoutArt} from './breakout-art.mjs?v=3';
+import {createBreakoutArt} from './breakout-art.mjs?v=4';
 
 const canvas = document.getElementById('breakout-canvas');
 const ctx = canvas.getContext('2d');
@@ -12,7 +13,7 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 const keys = new Set();
 let best = 0, enabledSound = true, audio = null, lastTone = 0, voices = 0;
 const art = createBreakoutArt(ctx, reduced);
-let tidalRequested=false;
+const requestedScenes=new Set();
 let hitStop = 0, finishDelay = 0;
 let frameId = 0, lastTime = 0, accumulator = 0, lastUI = '', activePointer = null;
 try {
@@ -150,7 +151,7 @@ function pause(automatic = false) {
   if (game.mode !== 'playing') return;
   game.mode = 'paused'; presentOverlay(automatic);
 }
-function draw(dt = 0) { loadTidalScenery();art.draw(game, dt); }
+function draw(dt = 0) { loadSceneScenery();art.draw(game, dt); }
 function frame(now) {
   frameId = 0;
   const elapsed = lastTime ? Math.min((now-lastTime)/1000,.05) : 0;
@@ -236,12 +237,12 @@ document.addEventListener('fullscreenchange', () => {
 });
 soundButton(); presentOverlay(false,false); resize();
 
-// Load only when the water level is selected; a failed request keeps procedural scenery.
-function loadTidalScenery(){
-  if(game.level!==5||tidalRequested)return;
-  tidalRequested=true;
+// Load each scene only on entry. A failed request leaves the procedural fallback playable.
+function loadSceneScenery(){
+  const level=game.level;if(requestedScenes.has(level))return;
+  requestedScenes.add(level);
   const image=new Image();image.decoding='async';
-  image.onload=()=>{art.setTidalImage(image);draw();};
-  image.src=new URL('./game-assets/breakout/tidal-observatory.jpg',import.meta.url).href;
+  image.onload=()=>{art.setSceneImage(level,image);if(game.level===level)draw();};
+  image.src=new URL(SCENE_ASSETS[level-1],import.meta.url).href;
 }
-loadTidalScenery();
+loadSceneScenery();

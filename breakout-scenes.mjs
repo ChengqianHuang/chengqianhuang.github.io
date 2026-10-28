@@ -1,3 +1,4 @@
+export const SCENE_ASSETS=['harbor','corridor','transit','power','tidal-observatory','mine','foundry','reactor'].map(name=>`./game-assets/breakout/${name}.jpg`);
 // Scenery is an observer of game time and mechanism state, never a collision source.
 export const SCENES=[
  {name:'DEPARTURE HARBOR',ink:'#edbe8b',cool:'#85d9ca',top:'#264958',bottom:'#0d2837'},
@@ -86,7 +87,8 @@ export function paintScenery(c,level){
  }
  c.restore();
 }
-export function paintAtmosphere(c,game,reduced){
+export function paintAtmosphere(c,game,reduced,illustrated=false){
+ if(illustrated&&game.level!==5){paintIllustratedAtmosphere(c,game,reduced);return;}
  const t=reduced?0:game.stageTime;
  c.save();c.beginPath();c.rect(28,28,664,384);c.clip();
  if(game.level===1){
@@ -127,6 +129,39 @@ export function paintAtmosphere(c,game,reduced){
   c.save();c.translate(360,208);c.rotate(t*.08);c.strokeStyle=game.switchesLeft?'#74caba44':'#f6b57677';c.lineWidth=4;
   for(let i=0;i<3;i++){c.beginPath();c.arc(0,0,125,i*TAU/3,i*TAU/3+1);c.stroke();}c.restore();
   glow(c,360,208,72,game.switchesLeft?'#56bfa52e':'#efa36338');
+ }
+ c.restore();
+}
+
+// Over illustrated scenes, keep only mechanism-linked cues and restrained atmosphere.
+function paintIllustratedAtmosphere(c,game,reduced){
+ const t=reduced?0:game.stageTime;c.save();c.beginPath();c.rect(28,28,664,384);c.clip();
+ if(game.level===1){
+  for(let i=0;i<10;i++){const x=70+(i*61)%580,y=256+i*11;line(c,[[x+Math.sin(t*.3+i)*6,y],[x+16+Math.sin(t*.3+i)*6,y]],'#eddbb018');}
+ }else if(game.level===3){
+  for(let r=0;r<4;r++){
+   const y=54+r*39;line(c,[[60,y+26],[660,y+26]],'#b4c9bc30');
+   for(let i=0;i<22;i++){const x=60+((i*27+t*20*(r%2?-1:1))%590+590)%590;line(c,[[x,y+27],[x+4,y+24]],'#c4c6a738');}
+  }
+ }else if(game.level===4){
+  for(const b of game.bricks.filter(b=>b.type==='switch'&&b.hp>0)){
+   const left=b.x<360,x=b.x+b.w/2;
+   line(c,[[x,b.y+b.h],[x,294],[left?65:655,294]],'#83d6ba60',1);
+   glow(c,left?53:667,305,36,'#6cddb026');
+  }
+ }else if(game.level===7){
+  const descent=Math.min(6,Math.floor(game.stageTime/18))*18,y=32+descent;
+  line(c,[[41,30],[41,y+13],[679,y+13],[679,30]],'#b7b7a43d',2);
+  for(const x of [39,677]){panel(c,x-5,y,10,19,'#6b7376');line(c,[[x-3,y+3],[x+3,y+3]],'#e0c093',2);}
+  for(let i=0;i<10;i++){const x=i%2?60:660,y=392-((t*9+i*31)%100);circle(c,x+Math.sin(i+t)*9,y,.7,'#ebb17644');}
+ }else if(game.level===8){
+  // The background chamber is passive. The live core supplies the actual status light.
+  const b=game.bricks.find(b=>b.type==='core');if(b&&b.hp>0){
+   const x=b.x+b.w/2,y=b.y+b.h/2;glow(c,x,y,70,game.switchesLeft?'#8edbba15':'#e9b27330');
+  }
+ }
+ if([2,4,6,8].includes(game.level))for(let i=0;i<12;i++){
+  const x=40+(i*67)%640,y=408-((t*3+i*29)%260);circle(c,x,y,.6,i%3?'#a9c7cc22':'#e3c69930');
  }
  c.restore();
 }

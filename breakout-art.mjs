@@ -1,10 +1,12 @@
 // Presentation only: never changes the simulation, collision bounds or score.
 import {W,H,WALL,R,POWERS} from './breakout-engine.mjs?v=3';
-import {SCENES,paintScenery,paintAtmosphere} from './breakout-scenes.mjs?v=2';
+import {SCENES,paintScenery,paintAtmosphere} from './breakout-scenes.mjs?v=3';
+import {drawMaterialBody,drawSteelBarrier} from './breakout-materials.mjs?v=1';
 export const STAGES=SCENES;
 const TAU=Math.PI*2;
 export function createBreakoutArt(ctx,reduced){
-  let bits=[],rings=[],labels=[],trails=new Map(),shocks=[],shake=0,kick=0,clock=0,backdrop=null,backdropLevel=0,tidalImage=null;
+  let bits=[],rings=[],labels=[],trails=new Map(),shocks=[],shake=0,kick=0,clock=0,backdrop=null,backdropLevel=0;
+  const sceneImages=new Map();
   const round=(x,y,w,h,r=4)=>{ctx.beginPath();ctx.roundRect(x,y,w,h,r);};
   function burst(e,count,large=false){
     if(reduced.matches)return;
@@ -36,11 +38,11 @@ export function createBreakoutArt(ctx,reduced){
     const b=backdrop.getContext('2d');b.scale(2,2);const s=STAGES[level-1];
     let g=b.createLinearGradient(0,0,W,H);g.addColorStop(0,s.top);g.addColorStop(1,s.bottom);b.fillStyle=g;b.fillRect(0,0,W,H);
     g=b.createRadialGradient(W*.5,0,10,W*.5,100,410);g.addColorStop(0,s.ink+'18');g.addColorStop(1,s.ink+'00');b.fillStyle=g;b.fillRect(0,0,W,H);
-    if(level===5&&tidalImage){
+    if(sceneImages.has(level)){
       // The art is cached at 2x; only subtle atmosphere animates over it.
-      b.drawImage(tidalImage,0,0,W,H);
+      b.drawImage(sceneImages.get(level),0,0,W,H);
       const shade=b.createLinearGradient(0,0,0,H);
-      shade.addColorStop(0,'#031b2a33');shade.addColorStop(.45,'#031b2a18');shade.addColorStop(1,'#031b2a24');
+      shade.addColorStop(0,level===1?'#031b2a66':'#031b2a33');shade.addColorStop(.45,level===1?'#031b2a55':'#031b2a18');shade.addColorStop(1,'#031b2a24');
       b.fillStyle=shade;b.fillRect(0,0,W,H);
     }else paintScenery(b,level);
     // Recessed playing surface, metal rails and discrete calibration marks.
@@ -96,7 +98,8 @@ export function createBreakoutArt(ctx,reduced){
   }
   function brick(b,game){
     if(game.level===5){if(b.type==='gate')tidalGate(b);else aquaticBrick(b);return;}
-    if(b.type==='steel'||b.type==='gate'){
+    if(b.type==='steel'){drawSteelBarrier(ctx,b);return;}
+    if(b.type==='gate'){
       ctx.save();const open=b.type==='gate'&&b.open;
       ctx.fillStyle=open?'#7acfc30b':'#1c2c38';round(b.x,b.y,b.w,b.h,2);ctx.fill();
       ctx.strokeStyle=open?'#77dcca88':'#afbec5';ctx.lineWidth=1.5;if(open)ctx.setLineDash([5,4]);ctx.stroke();ctx.setLineDash([]);
@@ -107,15 +110,7 @@ export function createBreakoutArt(ctx,reduced){
       if(b.flash>0&&!open){ctx.fillStyle='#e8ffff88';ctx.fillRect(b.x,b.y,b.w,b.h);}
       ctx.restore();return;
     }
-    const color=b.type==='bomb'?'#ee9b6d':b.color;
-    ctx.fillStyle='#02070d88';round(b.x+1,b.y+5,b.w,b.h,3);ctx.fill();
-    ctx.fillStyle='#0b141b';round(b.x-1,b.y-1,b.w+2,b.h+3,4);ctx.fill();
-    let g=ctx.createLinearGradient(0,b.y,0,b.y+b.h);g.addColorStop(0,color);g.addColorStop(.35,color);g.addColorStop(1,'#30444c');ctx.fillStyle=g;round(b.x,b.y,b.w,b.h,3);ctx.fill();
-    ctx.fillStyle='#fff5';round(b.x+2,b.y+1,b.w-4,1.5,1);ctx.fill();
-    ctx.fillStyle='#ffffff12';ctx.fillRect(b.x+4,b.y+4,b.w-8,6);
-    ctx.fillStyle='#06101d65';ctx.fillRect(b.x+3,b.y+b.h-3,b.w-6,2);
-    ctx.strokeStyle='#ffffff12';ctx.lineWidth=.5;for(let x=b.x+8;x<b.x+b.w-4;x+=6){ctx.beginPath();ctx.moveTo(x,b.y+3);ctx.lineTo(x-3,b.y+b.h-4);ctx.stroke();}
-    ctx.fillStyle='#172c38a0';ctx.fillRect(b.x+4,b.y+8,2,4);ctx.fillRect(b.x+b.w-6,b.y+8,2,4);
+    drawMaterialBody(ctx,b,game.level);
     if(b.type==='armor'){
       ctx.strokeStyle='#eef7edb0';ctx.lineWidth=1;round(b.x+2,b.y+2,b.w-4,b.h-4,2);ctx.stroke();
       for(let i=0;i<b.maxHp;i++){ctx.fillStyle=i<b.hp?'#f5f1d8':'#203743';ctx.fillRect(b.x+b.w/2+(i-(b.maxHp-1)/2)*7-2,b.y+9,4,3);}
@@ -149,7 +144,7 @@ export function createBreakoutArt(ctx,reduced){
     background(game.level);ctx.clearRect(0,0,W,H);ctx.drawImage(backdrop,0,0,W,H);ctx.save();
     if(!reduced.matches&&shake>0)ctx.translate(Math.sin(clock*173)*shake,Math.cos(clock*127)*shake*.6);
     const s=STAGES[game.level-1];
-    paintAtmosphere(ctx,game,reduced.matches);
+    paintAtmosphere(ctx,game,reduced.matches,sceneImages.has(game.level));
     if(game.level===8&&game.switchesLeft){
       const core=game.bricks.find(b=>b.type==='core');ctx.strokeStyle='#8cdbc355';ctx.lineWidth=1;ctx.setLineDash([4,5]);
       for(const g of game.bricks.filter(b=>b.type==='switch'&&b.hp>0)){ctx.beginPath();ctx.moveTo(g.x+g.w/2,g.y);ctx.lineTo(core.x+core.w/2,core.y+core.h);ctx.stroke();}ctx.setLineDash([]);
@@ -165,6 +160,7 @@ export function createBreakoutArt(ctx,reduced){
     for(const ball of game.balls){
       let trail=trails.get(ball);if(!trail){trail=[];trails.set(ball,trail);}if(dt>0&&!reduced.matches){trail.push({x:ball.x,y:ball.y});if(trail.length>14)trail.shift();}
       if(!reduced.matches){for(let i=1;i<trail.length;i++){ctx.globalAlpha=i/trail.length*.35;ctx.strokeStyle=s.ink;ctx.lineWidth=R*1.3*i/trail.length;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(trail[i-1].x,trail[i-1].y);ctx.lineTo(trail[i].x,trail[i].y);ctx.stroke();}ctx.globalAlpha=1;ctx.shadowColor=s.ink;ctx.shadowBlur=17;}
+      ctx.strokeStyle='#102e42';ctx.lineWidth=2;ctx.beginPath();ctx.arc(ball.x,ball.y,R+.7,0,TAU);ctx.stroke();
       const g=ctx.createRadialGradient(ball.x-2,ball.y-3,1,ball.x,ball.y,R);g.addColorStop(0,'#fff');g.addColorStop(.4,'#fff3d0');g.addColorStop(1,s.ink);ctx.fillStyle=g;ctx.beginPath();ctx.arc(ball.x,ball.y,R,0,TAU);ctx.fill();ctx.shadowBlur=0;
     }
     const p=game.paddle,x=p.x-p.w/2,y=p.y;ctx.fillStyle='#0008';round(x+1,y+5,p.w,p.h,5);ctx.fill();
@@ -174,5 +170,5 @@ export function createBreakoutArt(ctx,reduced){
     for(const l of labels){ctx.globalAlpha=Math.max(0,1-l.age/.7);ctx.fillStyle=l.color;ctx.font='bold 12px monospace';ctx.textAlign='center';ctx.fillText(l.text,l.x,l.y-9-l.age*40);}ctx.globalAlpha=1;ctx.restore();
   }
   function clear(){bits=[];rings=[];labels=[];shocks=[];trails.clear();shake=0;kick=0;}
-  return {draw,impact,clear,setTidalImage(image){tidalImage=image;backdrop=null;}};
+  return {draw,impact,clear,setSceneImage(level,image){sceneImages.set(level,image);if(backdropLevel===level)backdrop=null;}};
 }
