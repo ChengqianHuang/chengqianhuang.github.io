@@ -1,6 +1,6 @@
 import {SCENE_ASSETS} from './breakout-scenes.mjs?v=3';
-import { BreakoutGame, W, H, STEP, LEVELS, POWERS } from './breakout-engine.mjs?v=3';
-import {createBreakoutArt} from './breakout-art.mjs?v=4';
+import { BreakoutGame, W, H, STEP, LEVELS, POWERS } from './breakout-engine.mjs?v=4';
+import {createBreakoutArt} from './breakout-art.mjs?v=5';
 
 const canvas = document.getElementById('breakout-canvas');
 const ctx = canvas.getContext('2d');
@@ -72,7 +72,7 @@ function effect(event) {
 }
 const game = new BreakoutGame({ emit: effect });
 game.reset(new URL(location.href).searchParams.get('level') || 1);
-function bestKey(){return `breakout-best-v2-start-${game.startLevel}`;}
+function bestKey(){return `breakout-best-v3-start-${game.startLevel}`;}
 function loadBest(){
   best=0;try{const value=Number(localStorage.getItem(bestKey()));if(Number.isFinite(value)&&value>=0)best=Math.min(999999999,Math.floor(value));}catch{}
 }

@@ -41,3 +41,5 @@
 第五关使用 `game-assets/breakout/tidal-observatory.jpg` 美术底图，生成提示词见同目录 `ART.md`。按需加载并缓存到背景画布，失败时保留程序背景；水下颗粒和光束只读取关卡时间。玻璃模块、闸门及球仍由 Canvas 绘制，命中边界不变。
 
 八关均使用独立美术底图，映射为 `breakout-scenes.mjs` 的 `SCENE_ASSETS`；新增七张底图与提示词见 `game-assets/breakout/SECTORS-ART.md`。素材逐关加载、每张 JPEG 小于 600 KB，缓存解码图片和当前背景画布；异步返回的其它关卡图片不打断当前背景。材质在 `breakout-materials.mjs`，绘制保持只读。测试覆盖八张素材路径 / 大小、各场景的绘制缓存、异步切关，以及原有物理回归。
+
+矿洞改用错落晶簇与三条炸药链；晶体按三档耐久缺角，形状由 `breakout-engine.mjs` 的 `brickPolygon` 同时提供给碰撞和绘制。核心采用圆形碰撞，每阶段半径收缩 7px，九片旋转装甲逐片脱落；供能器存活时闭合虹膜并免伤。特殊目标绘制在 `breakout-specials.mjs`，只读游戏状态，遵守减少动态效果偏好。新布局的纪录键为 `breakout-best-v3-start-<level>`，保留 v1 / v2；测试新增晶体缺角、真实斜面反弹、矿脉隔离、核心收缩和空角穿过。

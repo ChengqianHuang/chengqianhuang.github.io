@@ -1,7 +1,8 @@
 // Presentation only: never changes the simulation, collision bounds or score.
-import {W,H,WALL,R,POWERS} from './breakout-engine.mjs?v=3';
+import {W,H,WALL,R,POWERS} from './breakout-engine.mjs?v=4';
 import {SCENES,paintScenery,paintAtmosphere} from './breakout-scenes.mjs?v=3';
 import {drawMaterialBody,drawSteelBarrier} from './breakout-materials.mjs?v=1';
+import {drawCrystal,drawBarrel,drawGenerator,drawCore,drawVeins} from './breakout-specials.mjs?v=1';
 export const STAGES=SCENES;
 const TAU=Math.PI*2;
 export function createBreakoutArt(ctx,reduced){
@@ -12,7 +13,7 @@ export function createBreakoutArt(ctx,reduced){
     if(reduced.matches)return;
     for(let i=0;i<count;i++){
       const a=Math.random()*TAU,s=45+Math.random()*(large?220:150);
-      bits.push({x:e.x+(Math.random()-.5)*30,y:e.y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-35,age:0,life:.35+Math.random()*.4,size:large?3+Math.random()*7:1+Math.random()*4,a,spin:(Math.random()-.5)*12,color:e.color||'#f3c485',chip:i%3===0});
+      bits.push({x:e.x+(Math.random()-.5)*30,y:e.y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-35,age:0,life:.35+Math.random()*.4,size:large?3+Math.random()*7:1+Math.random()*4,a,spin:(Math.random()-.5)*12,color:e.color||'#f3c485',material:e.material,chip:i%3===0});
     }
     if(bits.length>300)bits.splice(0,bits.length-300);
   }
@@ -21,6 +22,8 @@ export function createBreakoutArt(ctx,reduced){
       burst(e,e.type==='brick'?19:7,e.type==='brick');
       if(!reduced.matches){rings.push({x:e.x,y:e.y,age:0,size:28,color:e.color});shake=Math.max(shake,e.type==='brick'?1.5:.7);}
       if(e.type==='brick'&&!reduced.matches)labels.push({x:e.x,y:e.y,age:0,text:e.multiplier>1?`+${e.points}  ×${e.multiplier}`:`+${e.points}`,color:e.multiplier>1?'#ffe1a4':'#e5f1f3'});
+    }else if(e.type==='phase'){
+      burst({...e,material:'core'},24,true);if(!reduced.matches){rings.push({x:e.x,y:e.y,age:0,size:150,color:e.color});shake=5;}
     }else if(e.type==='paddle'){
       kick=1;burst(e,10);if(!reduced.matches)rings.push({x:e.x,y:e.y,age:0,size:23,color:'#b0f2e5'});
     }else if(e.type==='wall'){
@@ -97,6 +100,10 @@ export function createBreakoutArt(ctx,reduced){
     ctx.restore();
   }
   function brick(b,game){
+    if(b.shape==='crystal'){drawCrystal(ctx,b);return;}
+    if(b.shape==='barrel'){drawBarrel(ctx,b,reduced.matches?0:game.stageTime);return;}
+    if(b.shape==='generator'){drawGenerator(ctx,b);return;}
+    if(b.shape==='core'){drawCore(ctx,b,game,reduced.matches);return;}
     if(game.level===5){if(b.type==='gate')tidalGate(b);else aquaticBrick(b);return;}
     if(b.type==='steel'){drawSteelBarrier(ctx,b);return;}
     if(b.type==='gate'){
@@ -149,13 +156,14 @@ export function createBreakoutArt(ctx,reduced){
       const core=game.bricks.find(b=>b.type==='core');ctx.strokeStyle='#8cdbc355';ctx.lineWidth=1;ctx.setLineDash([4,5]);
       for(const g of game.bricks.filter(b=>b.type==='switch'&&b.hp>0)){ctx.beginPath();ctx.moveTo(g.x+g.w/2,g.y);ctx.lineTo(core.x+core.w/2,core.y+core.h);ctx.stroke();}ctx.setLineDash([]);
     }
+    if(game.level===6)drawVeins(ctx,game);
     for(const b of game.bricks)if(b.hp>0)brick(b,game);
     if(game.combo>=3){ctx.textAlign='right';ctx.fillStyle=s.ink+'cc';ctx.font='600 27px monospace';ctx.fillText(String(game.combo).padStart(2,'0'),W-43,303);ctx.font='8px monospace';ctx.fillStyle='#b8cbd599';ctx.fillText('CHAIN',W-43,317);}
     for(const e of shocks){ctx.globalAlpha=1-e.age/.25;ctx.fillStyle=s.cool;ctx.shadowColor=s.cool;ctx.shadowBlur=15;round(e.x<40?21:e.x>W-40?W-24:e.x-15,e.y<40?21:e.y-15,e.y<40?30:3,e.y<40?3:30,2);ctx.fill();ctx.shadowBlur=0;}ctx.globalAlpha=1;
     if(game.shield){ctx.strokeStyle='#8edbf2';ctx.shadowColor='#71c7db';ctx.shadowBlur=12;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(WALL,H-15);ctx.lineTo(W-WALL,H-15);ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle='#83d3ed15';ctx.fillRect(WALL,H-24,W-WALL*2,14);}
     for(const d of game.drops){const p=POWERS[d.kind];ctx.shadowColor=p.color;ctx.shadowBlur=10;ctx.fillStyle='#142631';round(d.x-20,d.y-11,40,22,5);ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle=p.color;ctx.lineWidth=1;ctx.stroke();ctx.fillStyle=p.color;ctx.fillRect(d.x-17,d.y-7,2,14);ctx.fillRect(d.x+15,d.y-7,2,14);ctx.font='bold 15px system-ui';ctx.textAlign='center';ctx.fillText(p.icon,d.x,d.y+5);}
     for(const e of rings){ctx.globalAlpha=(1-e.age/.4)**2;ctx.strokeStyle=e.color;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(e.x,e.y,4+e.age*e.size*5,2+e.age*e.size*2,0,0,TAU);ctx.stroke();}ctx.globalAlpha=1;
-    for(const p of bits){ctx.save();ctx.globalAlpha=Math.min(1,(1-p.age/p.life)*1.6);ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.fillStyle=p.color;ctx.fillRect(-p.size/2,-p.size/3,p.size,p.size*.65);if(p.chip){ctx.fillStyle='#fffc';ctx.fillRect(-p.size/2,-p.size/3,p.size,1);}ctx.restore();}
+    for(const p of bits){ctx.save();ctx.globalAlpha=Math.min(1,(1-p.age/p.life)*1.6);ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.fillStyle=p.color;if(p.material==='crystal'){ctx.beginPath();ctx.moveTo(-p.size/2,0);ctx.lineTo(0,-p.size);ctx.lineTo(p.size/2,0);ctx.lineTo(0,p.size/3);ctx.fill();}else ctx.fillRect(-p.size/2,-p.size/3,p.size,p.size*.65);if(p.chip){ctx.fillStyle='#fffc';ctx.fillRect(-p.size/2,-p.size/3,p.size,1);}ctx.restore();}
     for(const key of trails.keys())if(!game.balls.includes(key))trails.delete(key);
     for(const ball of game.balls){
       let trail=trails.get(ball);if(!trail){trail=[];trails.set(ball,trail);}if(dt>0&&!reduced.matches){trail.push({x:ball.x,y:ball.y});if(trail.length>14)trail.shift();}

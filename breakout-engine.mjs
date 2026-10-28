@@ -12,11 +12,45 @@ export const LEVELS = [
   {name:'运输轨道', rule:'提前瞄准', hint:'四条传送带交错移动。瞄准砖块即将经过的位置。'},
   {name:'双塔断电', rule:'先拆开关', hint:'先击破左右两枚电源开关，才能打掉中央的护盾砖。'},
   {name:'潮汐闸门', rule:'抓住窗口', hint:'三道闸门轮流开启。虚线表示开放，实心闸板会反弹球。'},
-  {name:'引爆矿脉', rule:'连锁爆破', hint:'厚矿石需要三次撞击。优先打橙色炸药，引爆整簇矿脉。'},
+  {name:'引爆矿脉', rule:'连锁爆破', hint:'晶体会逐次崩角。沿橙色导爆线击破炸药罐，引爆整条炸药链。'},
   {name:'下沉工厂', rule:'争分夺秒', hint:'砖阵每 18 秒下降一层。优先清掉底排，保留回球空间。'},
-  {name:'核心熔炉', rule:'三阶段核心战', hint:'击破两侧供能器，攻击移动核心；每损失一段装甲，它会重新供能。'},
+  {name:'核心熔炉', rule:'三阶段核心战', hint:'先拆两侧供能器，让核心开盖。每打掉三片装甲，核心会收缩并重新供能。'},
 ];
 export const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+
+// The renderer and narrow-phase collision use these same silhouettes.
+export function brickPolygon(b) {
+  let points;
+  if(b.shape==='crystal'){
+    points=b.hp===3?[[.42,0],[.76,.12],[1,.64],[.68,1],[.2,.92],[0,.38]]:
+      b.hp===2?[[.27,.18],[.69,.14],[1,.64],[.68,1],[.2,.92],[.04,.43]]:
+      [[.3,.35],[.68,.27],[.83,.62],[.62,.86],[.23,.8],[.14,.48]];
+    if(b.variant%2)points=points.map(([x,y])=>[1-x,y]).reverse();
+  }else points=[[.22,0],[.78,0],[1,.22],[1,.78],[.78,1],[.22,1],[0,.78],[0,.22]];
+  return points.map(([x,y])=>({x:b.x+x*b.w,y:b.y+y*b.h}));
+}
+export const coreRadius=b=>b.w/2-(3-Math.ceil(b.hp/3))*7;
+export function shapeContact(ball,b) {
+  if(ball.x+R<b.x||ball.x-R>b.x+b.w||ball.y+R<b.y||ball.y-R>b.y+b.h)return null;
+  if(b.shape==='core'){
+    const dx=ball.x-b.x-b.w/2,dy=ball.y-b.y-b.h/2,d=Math.hypot(dx,dy),radius=coreRadius(b);
+    return d<R+radius?{nx:d?dx/d:0,ny:d?dy/d:1,penetration:R+radius-d}:null;
+  }
+  const points=brickPolygon(b);
+  let inside=true,nearest=null;
+  for(let i=0;i<points.length;i++){
+    const a=points[i],z=points[(i+1)%points.length],ex=z.x-a.x,ey=z.y-a.y;
+    if(ex*(ball.y-a.y)-ey*(ball.x-a.x)<0)inside=false;
+    const t=clamp(((ball.x-a.x)*ex+(ball.y-a.y)*ey)/(ex*ex+ey*ey),0,1);
+    const dx=ball.x-a.x-t*ex,dy=ball.y-a.y-t*ey,d=Math.hypot(dx,dy);
+    if(!nearest||d<nearest.d)nearest={d,dx,dy,ex,ey};
+  }
+  const n=nearest;
+  if(!inside&&n.d>=R)return null;
+  const length=Math.hypot(n.ex,n.ey);
+  return {nx:n.d?(inside?-1:1)*n.dx/n.d:n.ey/length,
+    ny:n.d?(inside?-1:1)*n.dy/n.d:-n.ex/length,penetration:inside?R+n.d:R-n.d};
+}
 
 function steer(ball, speed = Math.hypot(ball.vx, ball.vy)) {
   let vx = ball.vx, vy = ball.vy;
@@ -71,11 +105,17 @@ export class BreakoutGame {
       for(let r=0;r<4;r++)for(let c=1;c<=7;c++)add(c,r);
       [90,285,480].forEach((x,i)=>add(0,0,'gate',1,{x,baseX:x,y:206,baseY:206,w:150,h:16,target:false,gateIndex:i,open:i===0}));
     }else if(this.level===6){
-      for(let r=0;r<5;r++)for(let c=0;c<9;c++)add(c,r,[1,4,7].includes(c)?'bomb':'armor',[1,4,7].includes(c)?1:3,{color:'#ba9e83'});
+      [145,360,575].forEach((center,vein)=>{
+        const crystals=[[-72,58,45,50],[-25,42,39,48],[31,61,44,58],[-78,139,48,61],[25,146,49,52],[30,213,41,47]];
+        crystals.forEach(([ox,y,w,h],i)=>add(0,0,'armor',3,{x:center+ox,baseX:center+ox,y,baseY:y,w,h,
+          shape:'crystal',variant:i+vein,vein,color:['#8ddbcf','#8fbddd','#e4bf7f'][vein]}));
+        [100,150,200].forEach(y=>add(0,0,'bomb',1,{x:center-12,baseX:center-12,y,baseY:y,w:24,h:32,
+          shape:'barrel',vein,color:'#eda45d'}));
+      });
     }else if(this.level===7){
       for(let r=0;r<4;r++)for(let c=0;c<9;c++)if((r+c)%5!==0)add(c,r,r===3&&c%3===0?'bomb':'normal');
     }else{
-      add(4,0,'core',9,{x:304,baseX:304,y:73,baseY:73,w:112,h:42,color:'#e9aa75'});
+      add(4,0,'core',9,{x:308,baseX:308,y:54,baseY:54,w:104,h:104,shape:'core',color:'#e9aa75'});
       this.addGenerators();
     }
     // Supplies always belong to breakable targets, never steel or gates.
@@ -89,7 +129,7 @@ export class BreakoutGame {
 
   addGenerators() {
     for(const x of [105,550]){
-      this.bricks.push({x,y:164,baseX:x,baseY:164,w:65,h:29,hp:2,maxHp:2,type:'switch',
+      this.bricks.push({x,y:164,baseX:x,baseY:164,w:46,h:46,shape:'generator',hp:2,maxHp:2,type:'switch',
         color:'#78d3c5',power:x===105?(this.bossPhase===2?'wide':'multi'):'shield',flash:0,generator:true});
     }
   }
@@ -174,27 +214,28 @@ export class BreakoutGame {
     if(brick.type==='core'&&brick.hp>0&&brick.hp%3===0){
       this.bossPhase=4-brick.hp/3;
       this.addGenerators();
-      this.emit({type:'phase',phase:this.bossPhase});
+      this.emit({type:'phase',phase:this.bossPhase,x:brick.x+brick.w/2,y:brick.y+brick.h/2,color:'#e9aa75'});
     }
     brick.flash = .09;
     const x = brick.x + brick.w / 2, y = brick.y + brick.h / 2;
     if (brick.hp > 0) {
       this.score += 5;
-      this.emit({ type: 'armor', x, y, color: brick.color });
+      this.emit({ type: 'armor', x, y, color: brick.color, material:brick.shape });
       return;
     }
     this.combo++;
     const multiplier = Math.min(5, 1 + Math.floor((this.combo - 1) / 3));
     const points = (15 + this.level * 5) * multiplier;
     this.score += points;
-    this.emit({ type: 'brick', x, y, color: brick.color, points, combo: this.combo, multiplier });
+    this.emit({ type: 'brick', x, y, color: brick.color, points, combo: this.combo, multiplier, material:brick.shape });
     if (brick.power) this.drops.push({ x, y, kind: brick.power });
     if (brick.type === 'bomb') {
       this.emit({ type: 'explosion', x, y, color: '#f0ad73' });
       for (const neighbor of this.bricks) {
         if (neighbor.hp <= 0) continue;
         const dx = Math.abs(neighbor.x - brick.x), dy = Math.abs(neighbor.y - brick.y);
-        if (this.level===6 ? Math.hypot(dx,dy)<88 : (dx < brick.w + 10 && dy < 3) || (dy < brick.h + 10 && dx < 3)) this.damageBrick(neighbor, 2);
+        const centerDistance=Math.hypot(neighbor.x+neighbor.w/2-x,neighbor.y+neighbor.h/2-y);
+        if (this.level===6 ? centerDistance<96 : (dx < brick.w + 10 && dy < 3) || (dy < brick.h + 10 && dx < 3)) this.damageBrick(neighbor, 2);
       }
     }
   }
@@ -259,6 +300,12 @@ export class BreakoutGame {
       }
       for (const brick of this.bricks) {
         if (brick.hp <= 0 || (brick.type==='gate'&&brick.open)) continue;
+        if(brick.shape){
+          const hit=shapeContact(ball,brick);
+          if(!hit)continue;
+          this.collideBrick(ball,brick,hit.nx,hit.ny,hit.penetration);
+          break;
+        }
         const dx = ball.x - clamp(ball.x, brick.x, brick.x + brick.w);
         const dy = ball.y - clamp(ball.y, brick.y, brick.y + brick.h);
         const d2 = dx * dx + dy * dy;

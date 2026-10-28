@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { BreakoutGame, LEVELS, W, H, R, WALL, STEP, POWERS } from '../breakout-engine.mjs';
+import { BreakoutGame, LEVELS, W, H, R, WALL, STEP, POWERS, brickPolygon, shapeContact, coreRadius } from '../breakout-engine.mjs';
 let seed = 81;
 const random = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32);
 const create = () => new BreakoutGame({ random });
@@ -25,6 +25,44 @@ const neighbors=mine.bricks.filter(b=>b!==bomb&&Math.hypot(b.x-bomb.x,b.y-bomb.y
 const hpBefore=neighbors.map(b=>b.hp);mine.damageBrick(bomb);
 assert.ok(neighbors.length>0&&neighbors.every((b,i)=>b.hp<hpBefore[i]),'Explosions damage a cluster of neighboring ore');
 assert.ok(mine.bricks.filter(b=>b.type==='bomb'&&b.hp===0).length>1,'A mine blast chains through a vein');
+
+// Silhouettes are physical: clipped corners are empty, exposed facets reflect balls.
+{
+  const g=create();g.reset(6);
+  const crystal=g.bricks.find(b=>b.shape==='crystal'),barrel=g.bricks.find(b=>b.shape==='barrel');
+  assert.equal(shapeContact({x:crystal.x-1,y:crystal.y-1},crystal),null,'no rectangular ghost corner');
+  const tip=brickPolygon(crystal)[0];
+  assert.ok(shapeContact({x:tip.x,y:tip.y-2},crystal),'intact tip can be hit');
+  g.damageBrick(crystal,2);
+  assert.equal(shapeContact({x:tip.x,y:tip.y-2},crystal),null,'broken tip is no longer solid');
+  assert.ok(shapeContact({x:crystal.x+crystal.w/2,y:crystal.y+crystal.h*.6},crystal));
+  for(const b of g.bricks){
+    for(let hp=1;hp<=b.maxHp;hp++){
+      const points=brickPolygon({...b,hp});
+      for(let i=0;i<points.length;i++){
+        const a=points[i],z=points[(i+1)%points.length],n=points[(i+2)%points.length];
+        assert.ok((z.x-a.x)*(n.y-z.y)-(z.y-a.y)*(n.x-z.x)>=-1e-6,'convex clockwise collision contour');
+      }
+    }
+  }
+  const distant=g.bricks.filter(b=>b.vein!==barrel.vein).map(b=>[b,b.hp]);
+  g.damageBrick(barrel);assert.ok(distant.every(([b,hp])=>b.hp===hp),'a chain stays in its own separated vein');
+  const bounce=create();bounce.reset(6);bounce.mode='playing';
+  const target=bounce.bricks.find(b=>b.shape==='crystal');bounce.bricks=[target];
+  const bottom=brickPolygon(target)[3];
+  bounce.balls=[{x:bottom.x,y:bottom.y+R+.5,vx:0,vy:-500,trail:[]}];bounce.step(STEP);
+  assert.equal(target.hp,2);assert.ok(bounce.balls[0].vy>0,'fast ball bounces off real crystal facet');
+}
+{
+  const g=create();g.reset(8);const core=g.bricks[0];
+  assert.equal(shapeContact({x:core.x,y:core.y},core),null,'core corners are empty');
+  const x=core.x+core.w/2,y=core.y+core.h/2,edge={x:x+coreRadius(core)+R-1,y};
+  assert.ok(shapeContact(edge,core));
+  for(const b of g.bricks.filter(b=>b.generator))g.damageBrick(b,2);
+  g.damageBrick(core,3);
+  assert.equal(coreRadius(core),45);assert.equal(shapeContact(edge,core),null,'removed armor reduces physical radius');
+  assert.ok(shapeContact({x,y},core),'contact at exact center has a finite fallback normal');
+}
 
 const powers = create(); powers.start(); powers.activatePower('multi'); powers.activatePower('multi');
 assert.equal(powers.balls.length, 3);
@@ -158,8 +196,9 @@ for(let level=1;level<=LEVELS.length;level++){
   game.activatePower('multi');game.activatePower('shield');game.activatePower('wide');
   game.drops=Object.keys(POWERS).map((kind,i)=>({kind,x:150+i*100,y:300}));
   const damaged=game.bricks.find(b=>b.type==='armor');if(damaged)damaged.hp=1;
+  if(level===8){for(const b of game.bricks.filter(b=>b.generator))game.damageBrick(b,2);game.damageBrick(game.bricks[0],1);}
   const before=JSON.stringify(game);
-  for(const type of ['brick','armor','explosion','save','paddle','wall','power'])art.impact({type,x:100,y:120,color:'#ffcc99',kind:'wide',points:40,multiplier:2});
+  for(const type of ['brick','armor','explosion','save','paddle','wall','power','phase'])art.impact({type,x:100,y:120,color:'#ffcc99',kind:'wide',points:40,multiplier:2});
   art.draw(game,1/60);art.draw(game,1);preference.matches=true;art.clear();art.draw(game,1/60);preference.matches=false;
   assert.equal(JSON.stringify(game),before,'rendering must not mutate physics or records');
 }
