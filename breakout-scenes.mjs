@@ -101,7 +101,23 @@ export function paintAtmosphere(c,game,reduced){
    if(powered){glow(c,x,282,34,'#7ad5a82d');line(c,[[x,233],[x,195],[360,195],[360,175]],'#7fdcc477',1);}
   }
  }else if(game.level===5){
-  for(let i=0;i<15;i++){const x=72+(i*47)%580+Math.sin(t*.6+i)*5,y=415-((i*39+t*11)%370);circle(c,x,y,1.5+i%3,null,'#9ed9de2b');}
+  // Slow light transmission across the glass, with tiny suspended particles.
+  for(let i=0;i<3;i++){
+    const x=110+i*94+Math.sin(t*.19+i)*13;
+    const light=c.createLinearGradient(x,30,x+80,385);light.addColorStop(0,'#b1eeec0d');light.addColorStop(1,'#8ddad100');
+    path(c,[[x,28],[x+18,28],[x+145,390],[x+76,390]],light);
+  }
+  for(let i=0;i<22;i++){
+    const x=48+(i*73)%620+Math.sin(t*.27+i)*7,y=410-((i*47+t*(3+i%3))%370),r=.5+(i%4)*.35;
+    circle(c,x,y,r,'#c4eeeb'+(i%3?'24':'45'));
+    if(i%6===0){circle(c,x,y,2.2,null,'#b7e5e72b');circle(c,x-.7,y-.8,.5,'#e1ffff66');}
+  }
+  // A small school stays in the distant lower water, away from the target rows.
+  for(let i=0;i<6;i++){
+    const x=110+((t*3+i*19)%460),y=285+Math.sin(i*2+t*.23)*9;
+    c.fillStyle='#062b3870';c.beginPath();c.ellipse(x,y,3.5,1.2,-.12,0,TAU);c.fill();
+    path(c,[[x-3,y],[x-6,y-2],[x-6,y+2]],'#062b3870');
+  }
  }else if(game.level===6){
   for(let i=0;i<10;i++){const x=90+(i*67)%570,y=410-((t*7+i*31)%300);circle(c,x,y,1,'#f4c48d26');}
  }else if(game.level===7){

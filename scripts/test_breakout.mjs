@@ -148,7 +148,8 @@ console.log(results.join(' | '));
 // Rendering must remain a read-only observer, even with impacts and reduced motion.
 const { createBreakoutArt, STAGES } = await import('../breakout-art.mjs');
 const gradient = {addColorStop(){}};
-const context = new Proxy({}, {get:(_,key)=>key==='createLinearGradient'||key==='createRadialGradient'?()=>gradient:()=>{},set:()=>true});
+const drawnImages=[];
+const context = new Proxy({}, {get:(_,key)=>key==='drawImage'?(image)=>drawnImages.push(image):key==='createLinearGradient'||key==='createRadialGradient'?()=>gradient:()=>{},set:()=>true});
 globalThis.document={createElement:()=>({getContext:()=>context})};
 const preference={matches:false}, art=createBreakoutArt(context,preference);
 assert.equal(STAGES.length,LEVELS.length);
@@ -162,6 +163,14 @@ for(let level=1;level<=LEVELS.length;level++){
   art.draw(game,1/60);art.draw(game,1);preference.matches=true;art.clear();art.draw(game,1/60);preference.matches=false;
   assert.equal(JSON.stringify(game),before,'rendering must not mutate physics or records');
 }
+// Loading a raster scene must invalidate the old cached background exactly once.
+const water=create();water.reset(5);const waterSnapshot=JSON.stringify(water);
+art.draw(water);const bitmap={width:1696,height:928};art.setTidalImage(bitmap);
+art.draw(water);art.draw(water);
+assert.equal(drawnImages.filter(image=>image===bitmap).length,1,'cache the image instead of repainting it each frame');
+assert.equal(JSON.stringify(water),waterSnapshot);
+const {stat}=await import('node:fs/promises');
+assert.ok((await stat(new URL('../game-assets/breakout/tidal-observatory.jpg',import.meta.url))).size<600000,'keep background delivery lightweight');
 delete globalThis.document;
 console.log('Mechanisms passed: steel, moving targets, power switches, timed shutters, ore chains, descending rows, core phases and selected starts.');
 console.log('Presentation passed: eight themes, damaged armor, effects, all capsules, multi-ball and read-only rendering.');

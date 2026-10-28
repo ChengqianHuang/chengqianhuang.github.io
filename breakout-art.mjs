@@ -1,10 +1,10 @@
 // Presentation only: never changes the simulation, collision bounds or score.
 import {W,H,WALL,R,POWERS} from './breakout-engine.mjs?v=3';
-import {SCENES,paintScenery,paintAtmosphere} from './breakout-scenes.mjs?v=1';
+import {SCENES,paintScenery,paintAtmosphere} from './breakout-scenes.mjs?v=2';
 export const STAGES=SCENES;
 const TAU=Math.PI*2;
 export function createBreakoutArt(ctx,reduced){
-  let bits=[],rings=[],labels=[],trails=new Map(),shocks=[],shake=0,kick=0,clock=0,backdrop=null,backdropLevel=0;
+  let bits=[],rings=[],labels=[],trails=new Map(),shocks=[],shake=0,kick=0,clock=0,backdrop=null,backdropLevel=0,tidalImage=null;
   const round=(x,y,w,h,r=4)=>{ctx.beginPath();ctx.roundRect(x,y,w,h,r);};
   function burst(e,count,large=false){
     if(reduced.matches)return;
@@ -36,7 +36,13 @@ export function createBreakoutArt(ctx,reduced){
     const b=backdrop.getContext('2d');b.scale(2,2);const s=STAGES[level-1];
     let g=b.createLinearGradient(0,0,W,H);g.addColorStop(0,s.top);g.addColorStop(1,s.bottom);b.fillStyle=g;b.fillRect(0,0,W,H);
     g=b.createRadialGradient(W*.5,0,10,W*.5,100,410);g.addColorStop(0,s.ink+'18');g.addColorStop(1,s.ink+'00');b.fillStyle=g;b.fillRect(0,0,W,H);
-    paintScenery(b,level);
+    if(level===5&&tidalImage){
+      // The art is cached at 2x; only subtle atmosphere animates over it.
+      b.drawImage(tidalImage,0,0,W,H);
+      const shade=b.createLinearGradient(0,0,0,H);
+      shade.addColorStop(0,'#031b2a33');shade.addColorStop(.45,'#031b2a18');shade.addColorStop(1,'#031b2a24');
+      b.fillStyle=shade;b.fillRect(0,0,W,H);
+    }else paintScenery(b,level);
     // Recessed playing surface, metal rails and discrete calibration marks.
     b.strokeStyle='#0007';b.lineWidth=9;b.beginPath();b.moveTo(21,H-17);b.lineTo(21,21);b.lineTo(W-21,21);b.lineTo(W-21,H-17);b.stroke();
     b.strokeStyle='#65818b';b.lineWidth=2;b.beginPath();b.moveTo(WALL,H-23);b.lineTo(WALL,WALL);b.lineTo(W-WALL,WALL);b.lineTo(W-WALL,H-23);b.stroke();
@@ -46,7 +52,50 @@ export function createBreakoutArt(ctx,reduced){
     b.strokeStyle='#f0a37235';b.setLineDash([3,5]);b.beginPath();b.moveTo(36,H-16);b.lineTo(W-36,H-16);b.stroke();b.setLineDash([]);
     b.fillStyle='#b7c8ce28';b.textAlign='center';b.font='8px monospace';b.fillText('RETURN ZONE',W/2,H-6);
   }
+  function aquaticBrick(b){
+    const row=Math.round((b.baseY-48)/29);
+    const tones=[['#9ae6db','#287e84','#104954'],['#b6dbe3','#477f94','#1b495d'],['#e7dfc2','#96977f','#4e645c'],['#f2cd91','#b28a50','#665233']];
+    const [light,mid,dark]=tones[row%4];
+    ctx.save();
+    ctx.fillStyle='#00000088';round(b.x+1,b.y+4,b.w,b.h,4);ctx.fill();
+    const shell=ctx.createLinearGradient(0,b.y,0,b.y+b.h);
+    shell.addColorStop(0,'#cee0dc');shell.addColorStop(.15,'#4f7079');shell.addColorStop(.7,'#102d3b');shell.addColorStop(1,'#7f999b');
+    ctx.fillStyle=shell;round(b.x,b.y,b.w,b.h,3);ctx.fill();
+    const glass=ctx.createLinearGradient(0,b.y+2,0,b.y+b.h-2);
+    glass.addColorStop(0,light);glass.addColorStop(.18,mid);glass.addColorStop(.55,dark);glass.addColorStop(1,mid);
+    ctx.fillStyle=glass;round(b.x+5,b.y+2,b.w-10,b.h-4,2);ctx.fill();
+    ctx.save();ctx.clip();
+    ctx.fillStyle='#f1ffff20';ctx.beginPath();ctx.moveTo(b.x+6,b.y+2);ctx.lineTo(b.x+b.w-8,b.y+2);ctx.lineTo(b.x+b.w*.56,b.y+b.h-2);ctx.lineTo(b.x+6,b.y+b.h-2);ctx.fill();
+    ctx.fillStyle='#ffffff2b';ctx.fillRect(b.x+6,b.y+3,b.w-12,1);
+    ctx.fillStyle=light+'88';ctx.fillRect(b.x+8,b.y+b.h-5,b.w-16,1);
+    ctx.restore();
+    for(const x of [b.x+2,b.x+b.w-3]){ctx.fillStyle='#0b2733';ctx.fillRect(x,b.y+5,1,11);ctx.fillStyle='#d7e9e4aa';ctx.fillRect(x,b.y+5,1,2);}
+    if(b.power){ctx.fillStyle='#eafff2';ctx.font='bold 11px system-ui';ctx.textAlign='center';ctx.shadowColor='#041a22';ctx.shadowBlur=3;ctx.fillText(POWERS[b.power].icon,b.x+b.w/2,b.y+14);ctx.shadowBlur=0;}
+    else{ctx.fillStyle=light+'99';ctx.fillRect(b.x+b.w/2-7,b.y+10,14,1);}
+    if(b.flash>0){ctx.globalAlpha=Math.min(.9,b.flash/.09);ctx.fillStyle='#f0ffed';round(b.x,b.y,b.w,b.h,3);ctx.fill();}
+    ctx.restore();
+  }
+  function tidalGate(b){
+    ctx.save();
+    if(b.open){
+      ctx.strokeStyle='#9de4cd70';ctx.lineWidth=1;ctx.setLineDash([3,6]);round(b.x+2,b.y+2,b.w-4,b.h-4,2);ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle='#d7ffed';ctx.font='7px monospace';ctx.textAlign='center';ctx.fillText('PASS',b.x+b.w/2,b.y+10);
+    }else{
+      ctx.fillStyle='#0009';round(b.x,b.y+4,b.w,b.h,2);ctx.fill();
+      const metal=ctx.createLinearGradient(0,b.y,0,b.y+b.h);metal.addColorStop(0,'#e3c591');metal.addColorStop(.2,'#786849');metal.addColorStop(.55,'#2a3d43');metal.addColorStop(1,'#8d8367');
+      ctx.fillStyle=metal;round(b.x,b.y,b.w,b.h,2);ctx.fill();
+      ctx.fillStyle='#132c34';ctx.fillRect(b.x+7,b.y+4,b.w-14,b.h-8);
+      ctx.strokeStyle='#aa946350';ctx.lineWidth=2;
+      for(let x=b.x+15;x<b.x+b.w-10;x+=13){ctx.beginPath();ctx.moveTo(x,b.y+5);ctx.lineTo(x-5,b.y+b.h-5);ctx.stroke();}
+      ctx.fillStyle='#f4d59c';ctx.fillRect(b.x+9,b.y+1,b.w-18,1);
+      if(b.flash>0){ctx.fillStyle='#edffef99';ctx.fillRect(b.x,b.y,b.w,b.h);}
+    }
+    // Compact end stops share the exact physical gate bounds.
+    for(const x of [b.x,b.x+b.w-4]){ctx.fillStyle='#0b2633';ctx.fillRect(x,b.y,4,b.h);ctx.fillStyle=b.open?'#9fe7c5':'#e8b878';ctx.fillRect(x+1,b.y+3,2,4);}
+    ctx.restore();
+  }
   function brick(b,game){
+    if(game.level===5){if(b.type==='gate')tidalGate(b);else aquaticBrick(b);return;}
     if(b.type==='steel'||b.type==='gate'){
       ctx.save();const open=b.type==='gate'&&b.open;
       ctx.fillStyle=open?'#7acfc30b':'#1c2c38';round(b.x,b.y,b.w,b.h,2);ctx.fill();
@@ -125,5 +174,5 @@ export function createBreakoutArt(ctx,reduced){
     for(const l of labels){ctx.globalAlpha=Math.max(0,1-l.age/.7);ctx.fillStyle=l.color;ctx.font='bold 12px monospace';ctx.textAlign='center';ctx.fillText(l.text,l.x,l.y-9-l.age*40);}ctx.globalAlpha=1;ctx.restore();
   }
   function clear(){bits=[];rings=[];labels=[];shocks=[];trails.clear();shake=0;kick=0;}
-  return {draw,impact,clear};
+  return {draw,impact,clear,setTidalImage(image){tidalImage=image;backdrop=null;}};
 }
