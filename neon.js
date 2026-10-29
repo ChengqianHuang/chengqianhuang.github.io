@@ -1,5 +1,5 @@
-import { NeonGame, STEP, WIDTH, HEIGHT } from './neon-engine.mjs';
-import { NeonRenderer } from './neon-renderer.mjs';
+import { NeonGame, STEP, WIDTH, HEIGHT } from './neon-engine.mjs?v=2';
+import { NeonRenderer } from './neon-renderer.mjs?v=2';
 import { NeonAudio } from './neon-audio.mjs';
 
 const $ = id => document.getElementById(id);

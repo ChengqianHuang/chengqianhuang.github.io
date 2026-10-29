@@ -1,0 +1,28 @@
+<!doctype html><meta charset="utf-8"><title>Neon repair checks</title><style>body{margin:20px;background:#111824;color:#dfe9ef;font:14px system-ui}section{position:relative;width:960px;height:540px}section canvas{position:absolute;inset:0;width:960px;height:540px}#annotations{pointer-events:none}iframe{border:0;display:block;margin-top:12px}</style><h2>激光显示 / 判定验证</h2><p id="check">Checking…</p><section><canvas id="game"></canvas><canvas id="annotations" width="960" height="540"></canvas></section><h2>不同窗口布局</h2><ul id="layouts"></ul><script type="module">
+import {NeonGame,laserHitsCircle,STEP} from '../neon-engine.mjs?v=2';import {NeonRenderer} from '../neon-renderer.mjs?v=2';
+const canvas=document.querySelector('#game'),renderer=new NeonRenderer(canvas);renderer.resize();
+const g=new NeonGame();g.state='paused';g.player.x=60;g.player.y=800;
+const failures=[];let count=0;
+for(const angle of [0,Math.PI/4,Math.PI/2,3*Math.PI/4,Math.PI,-Math.PI/4,-Math.PI/2,-3*Math.PI/4]){
+ const c=Math.cos(angle),s=Math.sin(angle),h={x:800-c*300,y:450-s*300,angle,length:600,width:28,telegraph:0,active:1};
+ const samples=[[60,0,true],[540,0,true],[300,24,true],[300,70,false]].map(([along,across,want])=>({along,across,want,x:h.x+c*along-s*across,y:h.y+s*along+c*across}));
+ const read=({x,y})=>{const pixel=new Uint8Array(4);renderer.gl.readPixels(Math.round(x/1600*canvas.width),canvas.height-1-Math.round(y/900*canvas.height),1,1,renderer.gl.RGBA,renderer.gl.UNSIGNED_BYTE,pixel);return pixel};
+ // Compare against the same background pixel, rather than assuming a fixed HDR color.
+ g.hazards=[];renderer.render(g,0);const baseline=samples.map(read);
+ g.hazards=[h];renderer.render(g,0);
+ samples.forEach((sample,i)=>{
+  const pixel=read(sample),visible=pixel[0]-baseline[i][0]>50;
+  const hit=laserHitsCircle(h,{x:sample.x,y:sample.y,r:1});count++;
+  if(visible!==sample.want||hit!==sample.want)failures.push({angle,...sample,visible,hit,pixel:[...pixel],baseline:[...baseline[i]]});
+ });
+}
+document.querySelector('#check').textContent=failures.length?'FAIL '+JSON.stringify(failures):`PASS · ${count} 个实际 GPU 像素 / 碰撞检查一致（八方向、近远端、内外边缘）。`;
+g.reset();g.start();g.bossSpawned=true;g.nextSpawn=Infinity;g.player.x=600;g.player.y=450;g.player.angle=Math.PI/4;g.hazards=[{x:400,y:250,angle:Math.PI/4,length:1900,width:28,telegraph:0,active:1}];g.step(STEP);g.state='paused';g.player.hit=0;g.player.invulnerable=0;
+const paint=()=>{renderer.render(g,1);requestAnimationFrame(paint)};paint();
+const ctx=document.querySelector('#annotations').getContext('2d');ctx.scale(.6,.6);ctx.strokeStyle='#ffe583';ctx.lineWidth=2;ctx.setLineDash([10,8]);ctx.beginPath();ctx.moveTo(400,250);ctx.lineTo(1743.5,1593.5);ctx.stroke();ctx.font='22px system-ui';ctx.fillStyle='#ffe3a3';ctx.fillText('光束与判定重合',650,435);
+for(const [w,h] of [[1280,600],[390,844],[844,390]]){
+ const frame=document.createElement('iframe');frame.width=w;frame.height=h;frame.title=`${w}×${h} 预览`;frame.src='/games/neon-rift.html';
+ frame.onload=()=>{const d=frame.contentDocument,c=d.querySelector('#neon-canvas').getBoundingClientRect(),t=d.querySelector('.neon-tools').getBoundingClientRect();const li=document.createElement('li');li.textContent=`${w}×${h}: ${c.bottom<=h&&t.bottom<=h?'PASS':'FAIL'}，球场底部 ${c.bottom.toFixed(1)}，控制按钮底部 ${t.bottom.toFixed(1)}`;document.querySelector('#layouts').append(li)};
+ document.body.append(frame);
+}
+</script>

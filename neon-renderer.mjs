@@ -1,4 +1,4 @@
-import { WIDTH, HEIGHT, TAU } from './neon-engine.mjs';
+import { WIDTH, HEIGHT, TAU, laserFrame } from './neon-engine.mjs?v=2';
 
 const QUAD = new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]);
 const MAX_PARTICLES = 65536;
@@ -130,8 +130,8 @@ layout(location=2) in vec4 aStyle;
 layout(location=3) in vec4 aColor;
 out vec2 vP;out vec4 vColor;flat out vec2 vStyle;
 void main(){
- float c=cos(aStyle.x),s=sin(aStyle.x);vec2 q=aVertex*aRect.zw;
- vec2 world=aRect.xy+mat2(c,-s,s,c)*q;
+ float c=aStyle.x,s=aStyle.w;vec2 q=aVertex*aRect.zw;
+ vec2 world=aRect.xy+vec2(c*q.x-s*q.y,s*q.x+c*q.y);
  vP=aVertex;vColor=aColor;vStyle=aStyle.yz;gl_Position=clip(world);
 }`, `#version 300 es
 precision highp float;
@@ -146,7 +146,8 @@ void main(){
  else if(shape<2.5)d=abs(vP.x)+abs(vP.y)-.86;
  else if(shape<3.5)d=sdBox(vP,vec2(.7));
  else if(shape<4.5)d=abs(length(vP)-.68)-.035;
- else d=sdPoly(vP,shape<5.5?5.0:6.0);
+ else if(shape<6.5)d=sdPoly(vP,shape<5.5?5.0:6.0);
+ else d=sdBox(vP,vec2(1.0)); // Beam: use the entire physical box, not the inset decorative box.
  float fw=max(fwidth(d),.008);float edge=1.0-smoothstep(fw,fw*2.2,abs(d));
  float body=(1.0-smoothstep(-fw,fw,d))*fill*.16;
  float a=max(edge,body)*vColor.a;if(a<.003)discard;
@@ -399,7 +400,7 @@ void main(){
     if (this.shapeCount >= MAX_SHAPES) return;
     const i = this.shapeCount++ * 12, a = this.shapes;
     a[i] = x; a[i + 1] = y; a[i + 2] = rx; a[i + 3] = ry;
-    a[i + 4] = rotation; a[i + 5] = shape; a[i + 6] = fill; a[i + 7] = 0;
+    a[i + 4] = Math.cos(rotation); a[i + 5] = shape; a[i + 6] = fill; a[i + 7] = Math.sin(rotation);
     a[i + 8] = rgb[0]; a[i + 9] = rgb[1]; a[i + 10] = rgb[2]; a[i + 11] = alpha;
   }
 
@@ -431,7 +432,7 @@ void main(){
     this.trail = this.trail.filter(t => this.time - t.birth < 0.65);
     for (const t of this.trail) {
       const a = (1 - (this.time - t.birth) / 0.65) * 0.24;
-      this.addShape(t.x, t.y, 24, 24, t.angle + Math.PI / 2, cyan, 1, 0, a);
+      this.addShape(t.x, t.y, 24, 24, t.angle - Math.PI / 2, cyan, 1, 0, a);
     }
     for (const wave of this.shockwaves) {
       const t = (this.time - wave.birth) / wave.life;
@@ -440,8 +441,10 @@ void main(){
     this.shockwaves = this.shockwaves.filter(w => this.time - w.birth < w.life);
     for (const h of game.hazards) {
       const active = h.telegraph <= 0;
-      const length = h.length, x = h.x + Math.cos(h.angle) * length / 2, y = h.y + Math.sin(h.angle) * length / 2;
-      this.addShape(x, y, length / 2, active ? h.width : 2, h.angle, color(active ? '#ff245f' : '#ff9e45'), 3, active ? 1 : 0, active ? 1.5 : 0.7 + Math.sin(this.time * 30) * 0.3);
+      const beam = laserFrame(h);
+      this.addShape(beam.x, beam.y, beam.halfLength, beam.halfWidth, beam.angle,
+        color(active ? '#ff245f' : '#ff9e45'), 7, active ? 1 : 0,
+        active ? 1.5 : 0.55 + Math.sin(this.time * 12) * 0.15);
     }
     for (const item of game.pickups) {
       const rgb = color(item.kind === 'health' ? '#6dff9a' : '#b679ff');
@@ -463,7 +466,7 @@ void main(){
     for (const e of game.enemies) {
       const rgb = e.hit > 0 ? color('#ffffff') : color(e.color);
       const pulse = 1 + Math.sin(this.time * 5 + e.id) * 0.055;
-      if (e.kind === 'chaser' || e.kind === 'shard') this.addShape(e.x, e.y, e.r * 1.35, e.r * 1.35, Math.atan2(e.vy, e.vx) + Math.PI / 2, rgb, 1, 1, 1);
+      if (e.kind === 'chaser' || e.kind === 'shard') this.addShape(e.x, e.y, e.r * 1.35, e.r * 1.35, Math.atan2(e.vy, e.vx) - Math.PI / 2, rgb, 1, 1, 1);
       else if (e.kind === 'drifter') this.addShape(e.x, e.y, e.r * pulse, e.r * pulse, e.angle, rgb, 2, 1, 1);
       else if (e.kind === 'splitter') {
         this.addShape(e.x, e.y, e.r * pulse, e.r * pulse, e.angle, rgb, 3, 1, 1);
@@ -498,7 +501,7 @@ void main(){
       const playerColor = p.hit > 0 ? color('#ff4b68') : cyan;
       const cos = Math.cos(p.angle), sin = Math.sin(p.angle);
       const px = -sin, py = cos;
-      this.addShape(p.x, p.y, 27, 27, p.angle + Math.PI / 2, playerColor, 1, 1, alpha * 1.35);
+      this.addShape(p.x, p.y, 27, 27, p.angle - Math.PI / 2, playerColor, 1, 1, alpha * 1.35);
       this.addShape(p.x + px * 16, p.y + py * 16, 15, 15, p.angle + .65, playerColor, 2, 1, alpha * .9);
       this.addShape(p.x - px * 16, p.y - py * 16, 15, 15, p.angle - .65, playerColor, 2, 1, alpha * .9);
       this.addShape(p.x, p.y, 7, 7, 0, color('#ffffff'), 0, 1, alpha * .9);

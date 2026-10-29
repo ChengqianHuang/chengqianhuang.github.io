@@ -22,6 +22,20 @@ const norm = (x, y) => {
 };
 const distance2 = (a, b) => (a.x - b.x) ** 2 + (a.y - b.y) ** 2;
 
+// World coordinates are +X right / +Y down. Rendering and damage share one beam box.
+export function laserFrame(hazard) {
+  const cos = Math.cos(hazard.angle), sin = Math.sin(hazard.angle);
+  return { x: hazard.x + cos * hazard.length / 2, y: hazard.y + sin * hazard.length / 2,
+    halfLength: hazard.length / 2, halfWidth: hazard.width, angle: hazard.angle, cos, sin };
+}
+export function laserHitsCircle(hazard, circle) {
+  const beam = laserFrame(hazard), dx = circle.x - beam.x, dy = circle.y - beam.y;
+  const along = dx * beam.cos + dy * beam.sin, across = -dx * beam.sin + dy * beam.cos;
+  const gapX = Math.max(0, Math.abs(along) - beam.halfLength);
+  const gapY = Math.max(0, Math.abs(across) - beam.halfWidth);
+  return gapX * gapX + gapY * gapY < circle.r * circle.r;
+}
+
 export class NeonGame {
   constructor({ random = Math.random, emit = () => {}, mode = 'standard' } = {}) {
     this.random = random;
@@ -382,11 +396,7 @@ export class NeonGame {
       if (h.telegraph > 0) h.telegraph -= dt;
       else h.active -= dt;
       if (h.telegraph <= 0 && h.active > 0) {
-        const vx = p.x - h.x, vy = p.y - h.y;
-        const c = Math.cos(h.angle), s = Math.sin(h.angle);
-        const along = vx * c + vy * s;
-        const across = Math.abs(vx * s - vy * c);
-        if (along > 0 && along < h.length && across < h.width + p.r) this.damagePlayer(24);
+        if (laserHitsCircle(h, p)) this.damagePlayer(24);
       }
       if (h.active <= 0) this.hazards.splice(i, 1);
     }
