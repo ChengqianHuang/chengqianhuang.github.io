@@ -458,12 +458,12 @@ export class NeonGame {
       if (!this.bossSpawned && this.time >= 2) this.spawnBoss();
       return;
     }
-    if (!this.bossSpawned && this.time >= 75) {
+    if (!this.bossSpawned && this.time >= 60) {
       this.spawnBoss();
       return;
     }
     if (this.bossSpawned) return;
-    const wave = this.time >= 50 ? 3 : this.time >= 25 ? 2 : 1;
+    const wave = this.time >= 40 ? 3 : this.time >= 20 ? 2 : 1;
     if (wave !== this.wave) {
       this.wave = wave;
       this.emit({ type: 'wave', wave, x: WIDTH / 2, y: HEIGHT / 2 });

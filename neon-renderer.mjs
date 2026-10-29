@@ -426,12 +426,12 @@ void main(){
     if (game.state === 'playing' && this.time - this.lastTrail > 0.018) {
       this.trail.push({ x: p.x, y: p.y, angle: p.angle, birth: this.time });
       this.lastTrail = this.time;
-      if (this.trail.length > 28) this.trail.shift();
+      if (this.trail.length > 40) this.trail.shift();
     }
-    this.trail = this.trail.filter(t => this.time - t.birth < 0.48);
+    this.trail = this.trail.filter(t => this.time - t.birth < 0.65);
     for (const t of this.trail) {
-      const a = (1 - (this.time - t.birth) / 0.48) * 0.2;
-      this.addShape(t.x, t.y, 23, 23, t.angle + Math.PI / 2, cyan, 1, 0, a);
+      const a = (1 - (this.time - t.birth) / 0.65) * 0.24;
+      this.addShape(t.x, t.y, 24, 24, t.angle + Math.PI / 2, cyan, 1, 0, a);
     }
     for (const wave of this.shockwaves) {
       const t = (this.time - wave.birth) / wave.life;
@@ -456,8 +456,9 @@ void main(){
     }
     for (const b of game.enemyBullets) {
       const a = Math.atan2(b.vy, b.vx), rgb = color(b.color);
-      this.addShape(b.x - b.vx * 0.018, b.y - b.vy * 0.018, 17, 3, a, rgb, 0, 1, 1.2);
-      this.addShape(b.x, b.y, 11, 11, this.time * 3, rgb, 4, 0, 0.5);
+      this.addShape(b.x, b.y, 12, 3, a, rgb, 3, 1, .9);
+      this.addShape(b.x, b.y, 3, 12, a, rgb, 3, 1, .9);
+      this.addShape(b.x, b.y, 4, 4, 0, color('#ffffff'), 0, 1, .8);
     }
     for (const e of game.enemies) {
       const rgb = e.hit > 0 ? color('#ffffff') : color(e.color);
@@ -494,10 +495,16 @@ void main(){
     }
     if (game.state !== 'gameover') {
       const alpha = p.invulnerable > 0 && Math.floor(this.time * 24) % 2 ? .25 : 1;
-      this.addShape(p.x, p.y, 25, 25, p.angle + Math.PI / 2, p.hit > 0 ? color('#ff4b68') : cyan, 1, 1, alpha * 1.25);
-      this.addShape(p.x, p.y, 13, 13, -this.time * 2, cyan, 4, 0, alpha * .75);
-      if (p.dashCooldown <= 0) this.addShape(p.x, p.y, 33 + Math.sin(this.time * 6) * 3, 33 + Math.sin(this.time * 6) * 3, 0, cyan, 4, 0, .24);
-      if (emitTrail && Math.hypot(p.vx, p.vy) > 45) this.particle(p.x - Math.cos(p.angle) * 13, p.y - Math.sin(p.angle) * 13, -p.vx * .3, -p.vy * .3, .35, cyan, 7, 3);
+      const playerColor = p.hit > 0 ? color('#ff4b68') : cyan;
+      const cos = Math.cos(p.angle), sin = Math.sin(p.angle);
+      const px = -sin, py = cos;
+      this.addShape(p.x, p.y, 27, 27, p.angle + Math.PI / 2, playerColor, 1, 1, alpha * 1.35);
+      this.addShape(p.x + px * 16, p.y + py * 16, 15, 15, p.angle + .65, playerColor, 2, 1, alpha * .9);
+      this.addShape(p.x - px * 16, p.y - py * 16, 15, 15, p.angle - .65, playerColor, 2, 1, alpha * .9);
+      this.addShape(p.x, p.y, 7, 7, 0, color('#ffffff'), 0, 1, alpha * .9);
+      this.addShape(p.x, p.y, 15, 15, -this.time * 2, playerColor, 4, 0, alpha * .75);
+      if (p.dashCooldown <= 0) this.addShape(p.x, p.y, 36 + Math.sin(this.time * 6) * 3, 36 + Math.sin(this.time * 6) * 3, 0, playerColor, 4, 0, .24);
+      if (emitTrail && Math.hypot(p.vx, p.vy) > 45) this.particle(p.x - cos * 15, p.y - sin * 15, -p.vx * .3, -p.vy * .3, .42, playerColor, 8, 3);
     }
     if (this.pointer.active && game.state === 'playing') {
       const r = 12 + Math.sin(this.time * 5) * 2;

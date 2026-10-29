@@ -81,9 +81,9 @@ const tick = (game, seconds, input = {}) => {
 // Director waves, all three boss phases, laser creation and victory.
 {
   const g = create(); g.start(); g.nextSpawn = Infinity;
-  g.time = 25; g.step(STEP); assert.equal(g.wave, 2);
-  g.time = 50; g.step(STEP); assert.equal(g.wave, 3);
-  g.time = 75; g.step(STEP);
+  g.time = 20; g.step(STEP); assert.equal(g.wave, 2);
+  g.time = 40; g.step(STEP); assert.equal(g.wave, 3);
+  g.time = 60; g.step(STEP);
   const boss = g.enemies.find(e => e.kind === 'boss');
   assert.ok(boss, 'Boss arrives after the third sector');
   g.player.invulnerable = 999;
@@ -148,7 +148,7 @@ const tick = (game, seconds, input = {}) => {
   const g = create(); g.start();
   g.player.maxHp = g.player.hp = 1e9;
   let frames = 0;
-  while (g.state === 'playing' && frames < 135 / STEP) {
+  while (g.state === 'playing' && frames < 120 / STEP) {
     const p = g.player;
     let target = null, best = Infinity;
     for (const e of g.enemies) {
@@ -165,7 +165,7 @@ const tick = (game, seconds, input = {}) => {
   }
   assert.equal(g.state, 'victory', 'Autonomous full run must reach and defeat the boss');
   assert.ok(g.kills > 40);
-  assert.ok(g.time >= 75 && g.time < 135);
+  assert.ok(g.time >= 60 && g.time < 120);
   console.log(`Full run: ${g.time.toFixed(1)}s, ${g.kills} kills, ${g.score} score`);
 }
 
