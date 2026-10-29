@@ -28,6 +28,8 @@
 
 港湾疾驰：电脑优先的 Three.js + Jolt 四轮赛车，入口 `games/harbor-rush.html`。源码、依赖和离线资源在 `racing/`，发布构建在 `racing/dist/`。在 `racing/` 执行 `npm ci`、`npm test`、`npm run build`，提交源码时同时提交构建产物。三个赛道在 `src/track.mjs` 定义，路面、碰撞、电脑路线和小地图共用同一份曲线数据；各赛道各玩法独立保存纪录。物理检查覆盖发动机、刹车、倒车、护栏碰撞、坡道腾空、顺序检查点、每条赛道四车完整三圈对战、示范圈、重复切换和旧纪录迁移。运行时不使用 CDN，也不改变其它游戏的依赖。素材来源和操作说明见 `racing/README.md`。
 
+霓虹裂变：`node scripts/test_neon.mjs`，检查移动、冲刺、武器、连杀、分裂、脉冲、暂停、Boss 三阶段与完整模拟。入口 `games/neon-rift.html`，规则在 `neon-engine.mjs`，WebGL2 HDR 渲染、GPU 粒子和弹性网格在 `neon-renderer.mjs`，合成音频在 `neon-audio.mjs`，输入及界面在 `neon.js`。无外部运行时依赖；修改游戏规则后运行逻辑回归，修改渲染后在浏览器检查 WebGL 着色器、桌面与触屏操作。
+
 `test_gomoku.mjs` 还用真实落子规则逐步核验 16 组旋转 / 镜像的冲四线路（最长 21 手），检查反击优先级、封死的假活三、劣势下继续防守和中断搜索。改动算法时可用 `node scripts/bench_gomoku.mjs /absolute/path/to/baseline-ai.mjs 250` 对弈回归：四种固定开局交换先后手，双方使用相同每步时限，输出棋谱与搜索数据。基线模块需导出 `chooseMove`，并使用能解析的引擎导入路径；不要将基线模块部署到网站。耗时对弈结果会随设备负载变化，不能当作等级分。
 
 引力边界：电脑优先的 Three.js 轨道飞行游戏，入口 `games/periapsis.html`，源码与构建在 `periapsis/`。六条航线、鼠标 / 键盘 / 触屏转向、加速过热、穿环连击、扫掠碰撞和不计纪录的观光试飞。在 `periapsis/` 执行 `npm ci --ignore-scripts`、`npm test`、`npm run build`，源码和 `dist/` 一起提交。测试覆盖六条完整航线、不同步长、无加速通关、碰撞 / 擦身防重复、漏环、过热、失败和存档。装饰场景不改动飞行规则；游戏资源全部从本站读取，NASA 地球纹理的来源与署名保留在 README。

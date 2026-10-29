@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="440" viewBox="0 0 720 440" role="img" aria-labelledby="title desc">
+  <title id="title">霓虹裂变</title>
+  <desc id="desc">霓虹网格竞技场中，一艘青色飞船面对巨大的红色几何核心。</desc>
+  <defs>
+    <radialGradient id="bg" cx="52%" cy="43%" r="76%"><stop stop-color="#102b52"/><stop offset=".48" stop-color="#070d22"/><stop offset="1" stop-color="#02040c"/></radialGradient>
+    <linearGradient id="grid" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#286bc4" stop-opacity=".08"/><stop offset="1" stop-color="#35e5ff" stop-opacity=".48"/></linearGradient>
+    <linearGradient id="boss" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff3e77"/><stop offset="1" stop-color="#d52eff"/></linearGradient>
+    <filter id="cyanGlow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="pinkGlow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="18"/></filter>
+    <clipPath id="clip"><rect width="720" height="440" rx="0"/></clipPath>
+  </defs>
+  <g clip-path="url(#clip)">
+    <rect width="720" height="440" fill="url(#bg)"/>
+    <ellipse cx="525" cy="178" rx="160" ry="135" fill="#b5128a" opacity=".12" filter="url(#soft)"/>
+    <ellipse cx="190" cy="330" rx="150" ry="75" fill="#00ddef" opacity=".09" filter="url(#soft)"/>
+    <g fill="none" stroke="url(#grid)" stroke-width="1">
+      <path d="M-40 440 270 180M35 440 300 180M110 440 330 180M185 440 360 180M260 440 390 180M335 440 420 180M410 440 450 180M485 440 480 180M560 440 510 180M635 440 540 180M710 440 570 180M785 440 600 180"/>
+      <path d="M126 270H594M92 300H628M54 335H666M10 378H710M-40 430H760"/>
+    </g>
+    <path d="M0 378Q170 351 335 378T720 370" fill="none" stroke="#49e9ff" stroke-opacity=".3"/>
+    <g transform="translate(540 168)" fill="none" filter="url(#pinkGlow)">
+      <circle r="103" stroke="#ff3c9e" stroke-opacity=".18" stroke-width="2" stroke-dasharray="4 12"/>
+      <path d="M0-91 78-47 78 47 0 91-78 47-78-47Z" stroke="url(#boss)" stroke-width="3" transform="rotate(12)"/>
+      <path d="M0-68 59-34 59 34 0 68-59 34-59-34Z" stroke="#ff4b88" stroke-width="2" transform="rotate(-19)"/>
+      <path d="M0-50 43 25-43 25Z" stroke="#ff79d9" stroke-width="3" transform="rotate(28)"/>
+      <circle r="24" fill="#ff258d" fill-opacity=".15" stroke="#ff9ddf" stroke-width="2"/>
+      <circle r="8" fill="#fff" stroke="none"/>
+    </g>
+    <g stroke="#ff4ea6" fill="#ff4ea6" filter="url(#pinkGlow)">
+      <circle cx="417" cy="191" r="4"/><circle cx="391" cy="212" r="3"/><circle cx="447" cy="230" r="4"/><circle cx="373" cy="246" r="3"/>
+    </g>
+    <g transform="translate(214 309) rotate(-27)" filter="url(#cyanGlow)">
+      <path d="M0-34 24 25 0 15-24 25Z" fill="#2ce8ff" fill-opacity=".13" stroke="#75f7ff" stroke-width="3"/>
+      <circle r="10" fill="none" stroke="#60f5ff" stroke-width="2"/>
+      <path d="M-10 29 0 62 10 29" fill="#35dfff" fill-opacity=".28"/>
+    </g>
+    <g fill="#7df9ff" filter="url(#cyanGlow)"><circle cx="275" cy="279" r="4"/><circle cx="308" cy="260" r="4"/><circle cx="341" cy="241" r="4"/></g>
+    <g fill="none" stroke="#b96dff" filter="url(#cyanGlow)"><path d="m105 235 12 12-12 12-12-12Z"/><path d="m645 319 15 15-15 15-15-15Z"/><circle cx="108" cy="247" r="25" stroke-opacity=".25"/></g>
+    <rect x="28" y="27" width="160" height="22" rx="2" fill="#0a2639" stroke="#2e8ba5"/>
+    <text x="40" y="42" fill="#65efff" font-family="monospace" font-size="10" letter-spacing="2">RIFT LINK // 01</text>
+    <text x="35" y="103" fill="#e9fdff" font-family="monospace" font-size="48" font-weight="800" letter-spacing="-3">NEON <tspan fill="#ff4fc8">//</tspan> RIFT</text>
+    <text x="40" y="131" fill="#8db9cc" font-family="sans-serif" font-size="12" letter-spacing="7">霓 虹 裂 变</text>
+    <g font-family="monospace" font-size="9" letter-spacing="2" fill="#6591a7"><text x="39" y="410">HULL 100</text><text x="135" y="410">CHAIN ×8</text><text x="600" y="410" fill="#ff69be">CORE ONLINE</text></g>
+    <rect x="39" y="419" width="82" height="3" fill="#4ff5cb"/><rect x="135" y="419" width="82" height="3" fill="#e45cff"/>
+  </g>
+</svg>

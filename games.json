@@ -1,5 +1,13 @@
 [
   {
+    "id": "neon-rift",
+    "title": "霓虹裂变",
+    "description": "双摇杆几何射击。冲刺穿过弹幕，积攒脉冲，挑战三阶段裂隙主宰。",
+    "controls": "键鼠 / 触屏双摇杆 · WebGL2 · 可直闯 Boss",
+    "url": "/games/neon-rift.html",
+    "cover": "/game-assets/neon-rift.svg"
+  },
+  {
     "id": "periapsis",
     "title": "引力边界",
     "description": "掠过行星，穿越轨道站。六条太空航线，挑战穿环连击与高速擦身飞行。",

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="霓虹裂变：原生 WebGL2 双摇杆竞技场射击。弹性空间网格、GPU 粒子、HDR 辉光、实时合成音频与三阶段 Boss。">
+  <title>霓虹裂变 - Chengqian Huang</title>
+  <script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch{}</script>
+  <link rel="stylesheet" href="/neon.css?v=1">
+</head>
+<body>
+  <header class="neon-header">
+    <a href="/games.html" class="neon-back">← 全部游戏</a>
+    <a href="/" class="neon-site">Chengqian Huang</a>
+    <div class="neon-header-end"><span>NEON // RIFT</span><button id="theme-toggle" type="button" aria-label="切换主题">主题</button></div>
+  </header>
+  <main>
+    <section id="neon-machine" class="neon-machine" aria-label="霓虹裂变游戏">
+      <div id="neon-stage" class="neon-stage">
+        <canvas id="neon-canvas" tabindex="0" aria-label="霓虹裂变游戏画面。WASD 移动，鼠标瞄准并射击，空格冲刺，E 释放脉冲，Esc 暂停。" aria-describedby="neon-help">游戏需要支持 WebGL 2 的浏览器。</canvas>
+        <div class="neon-scanlines" aria-hidden="true"></div>
+        <div id="neon-hud" class="neon-hud" aria-label="游戏状态">
+          <div class="neon-score"><small>SCORE</small><strong id="neon-score">00000000</strong><span>BEST <b id="neon-best">00000000</b></span></div>
+          <div class="neon-multiplier"><small>CHAIN</small><strong id="neon-multiplier">×1</strong><span id="neon-combo">等待裂隙开启</span></div>
+          <div class="neon-vitals">
+            <div class="neon-meter-row"><span>HULL</span><div class="neon-meter"><i id="neon-health-bar"></i></div><b id="neon-health">100</b></div>
+            <div class="neon-meter-row"><span>DASH</span><div class="neon-meter dash"><i id="neon-dash-bar"></i></div><b id="neon-dash">READY</b></div>
+            <div class="neon-meter-row"><span>PULSE</span><div class="neon-meter pulse"><i id="neon-pulse-bar"></i></div><b id="neon-pulse">0%</b></div>
+          </div>
+          <div class="neon-clock"><small id="neon-sector">SECTOR 01</small><strong id="neon-time">00:00</strong></div>
+        </div>
+        <div id="neon-boss-hud" class="neon-boss-hud" hidden><div><span>RIFT SOVEREIGN</span><b id="neon-boss-phase">PHASE 01</b></div><div class="neon-boss-meter"><i id="neon-boss-bar"></i></div></div>
+        <div class="neon-tools">
+          <button id="neon-sound" type="button" aria-pressed="true">声音：开</button>
+          <button id="neon-fullscreen" type="button">全屏</button>
+          <button id="neon-pause-button" type="button" disabled>暂停 <kbd>Esc</kbd></button>
+        </div>
+        <div id="neon-banner" class="neon-banner" aria-live="polite"><small></small><strong></strong><span></span></div>
+        <div id="neon-overlay" class="neon-overlay">
+          <div class="neon-menu">
+            <p id="neon-kicker" class="neon-kicker">A WEBGL2 ARENA EXPERIMENT</p>
+            <h1 id="neon-title"><span>NEON</span><em>//</em>RIFT</h1>
+            <p id="neon-chinese" class="neon-chinese">霓 虹 裂 变</p>
+            <p id="neon-description" class="neon-description">撕开几何虫群，维持连杀，把整座竞技场变成武器。</p>
+            <div id="neon-mode-picker" class="neon-mode-picker" role="group" aria-label="游戏模式">
+              <button type="button" data-neon-mode="standard" aria-pressed="true"><span>01</span><strong>完整入侵</strong><small>三波虫群 · 最终 Boss</small></button>
+              <button type="button" data-neon-mode="boss" aria-pressed="false"><span>02</span><strong>Boss 速通</strong><small>直接进入三阶段核心战</small></button>
+            </div>
+            <div id="neon-results" class="neon-results" hidden><div><small>最终得分</small><strong id="neon-result-score">0</strong></div><div><small>存活时间</small><strong id="neon-result-time">0:00</strong></div><div><small>击破</small><strong id="neon-result-kills">0</strong></div></div>
+            <button id="neon-start" class="neon-primary" type="button">进入裂隙 <span>→</span></button>
+            <div class="neon-overlay-actions"><button id="neon-secondary" type="button" hidden>重新开始</button><button id="neon-menu-return" type="button" hidden>返回模式选择</button></div>
+            <p id="neon-record" class="neon-record">本地最高分等待刷新</p>
+            <div id="neon-menu-help" class="neon-menu-help"><span><kbd>WASD</kbd> 移动</span><span><kbd>鼠标</kbd> 瞄准 / 射击</span><span><kbd>Space</kbd> 冲刺</span><span><kbd>E</kbd> 满能量脉冲</span></div>
+          </div>
+        </div>
+      </div>
+      <div id="neon-touch" aria-label="触屏操作" hidden>
+        <div class="neon-touch-side"><div id="neon-move-stick" class="neon-stick" aria-label="移动摇杆"><i></i><b></b><span>MOVE</span></div></div>
+        <div class="neon-touch-actions"><button id="neon-touch-pulse" type="button">脉冲<small>E</small></button><button id="neon-touch-dash" type="button">冲刺<small>SPACE</small></button></div>
+        <div class="neon-touch-side"><div id="neon-aim-stick" class="neon-stick aim" aria-label="瞄准并射击摇杆"><i></i><b></b><span>FIRE</span></div></div>
+      </div>
+      <div class="neon-statusbar"><span><i></i> RIFT LINK STABLE</span><span id="neon-renderer-info">WEBGL2 · HDR · GPU PARTICLES</span><span>ESC 暂停 · F 全屏</span></div>
+    </section>
+    <details class="neon-details">
+      <summary>操作说明与渲染技术</summary>
+      <p id="neon-help">电脑：WASD 移动，鼠标瞄准，按住左键射击；方向键也可瞄准射击。Space 冲刺，冲刺期间无敌；E 在能量满时释放脉冲，清除敌方弹幕并伤害全场。Esc 暂停，F 全屏。手机使用双摇杆，右侧摇杆推动即射击。</p>
+      <p>连续击破会提升武器与得分倍率，受击会清空连杀。拾取紫色能量碎片充满脉冲，绿色核心恢复生命。完整入侵在三个区域后进入 Boss 战；Boss 速通可直接挑战全部三个阶段。最高纪录只保存在当前浏览器。</p>
+      <p>原生 WebGL2 · HDR 帧缓冲 · 四轮回旋 Bloom · 65,536 GPU 粒子 · 弹性网格 · 冲击波 · 色差 · Web Audio 实时合成。无外部运行时或素材依赖。</p>
+    </details>
+    <noscript><p class="neon-noscript">游戏需要 JavaScript。<a href="/games.html">返回全部游戏</a></p></noscript>
+  </main>
+  <script src="/theme.js"></script>
+  <script type="module" src="/neon.js?v=1"></script>
+</body>
+</html>
