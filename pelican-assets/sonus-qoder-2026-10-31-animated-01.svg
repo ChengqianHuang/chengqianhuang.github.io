@@ -1,0 +1,187 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="800" viewBox="0 0 1000 800" role="img" aria-labelledby="title description">
+  <title id="title">The scenic route — a pelican on a bicycle</title>
+  <desc id="description">An ivory pelican with a long golden bill and a terracotta scarf pedals a teal bicycle along the coast. Both spoked wheels turn clockwise, and its webbed feet follow the pedals. All animation stops when reduced motion is preferred.</desc>
+  <defs>
+    <pattern id="paper" width="7" height="7" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="2" r=".55" fill="#76664f" opacity=".065"/>
+      <circle cx="5" cy="6" r=".4" fill="#76664f" opacity=".05"/>
+    </pattern>
+    <pattern id="road-marks" width="160" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 12 10 H 58" stroke="#a6b3a1" stroke-width="2" stroke-linecap="round"/>
+      <path d="M 114 16 H 126" stroke="#a6b3a1" stroke-width="2" stroke-linecap="round"/>
+    </pattern>
+    <clipPath id="road-window"><rect x="174" y="681" width="674" height="24" rx="12"/></clipPath>
+    <g id="spokes" fill="none" stroke="#82948a" stroke-width="1.8">
+      <path d="M-105 0H105 M0-105V105 M-74.25-74.25L74.25 74.25 M-74.25 74.25L74.25-74.25 M-97-40.2L97 40.2 M-97 40.2L97-40.2 M-40.2-97L40.2 97 M-40.2 97L40.2-97"/>
+      <path d="M-80-79A112 112 0 0 1-38-106" stroke="#fff9eb" stroke-width="3" stroke-linecap="round"/>
+      <path d="M92 34L86 32" stroke="#d59a3f" stroke-width="8" stroke-linecap="round"/>
+    </g>
+    <g id="foot" stroke="#754d2d" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M-13-9Q-4-14 3-8L26 1Q30 6 24 7H-17Q-22 4-18 0Z" fill="#e9aa44"/>
+      <path d="M4-4L15 3M-3-3L3 4" fill="none" stroke="#b87a33" stroke-width="1.5"/>
+      <path d="M-18 10H20" stroke="#24474a" stroke-width="6" stroke-linecap="round"/>
+    </g>
+    <style>
+      .spin { animation: turn 1.8s linear infinite; }
+      .level { animation: counter-turn 1.8s linear infinite; }
+      .near-leg { animation: near-pedal 1.8s linear infinite; }
+      .far-leg { animation: far-pedal 1.8s linear infinite; }
+      .scarf-tail { animation: breeze 1.8s ease-in-out infinite; transform-origin: 502px 276px; }
+      .road { animation: pass-by 1.8s linear infinite; }
+      @keyframes turn { to { transform: rotate(360deg); } }
+      @keyframes counter-turn { to { transform: rotate(-360deg); } }
+      @keyframes breeze { 0%,100% { transform: rotate(-3deg); } 50% { transform: rotate(4deg); } }
+      @keyframes pass-by { to { transform: translateX(-160px); } }
+      @keyframes near-pedal {
+        0%,100% { d: path("M 430 354 L 538.89 415.38 L 520 544"); }
+        6.25% { d: path("M 430 354 L 529.32 429.90 L 516.96 559.31"); }
+        12.5% { d: path("M 430 354 L 518.12 442.66 L 508.28 572.28"); }
+        18.75% { d: path("M 430 354 L 508.11 451.59 L 495.31 580.96"); }
+        25% { d: path("M 430 354 L 502.35 455.94 L 480 584"); }
+        31.25% { d: path("M 430 354 L 501.76 456.35 L 464.69 580.96"); }
+        37.5% { d: path("M 430 354 L 505.24 453.82 L 451.72 572.28"); }
+        43.75% { d: path("M 430 354 L 511.49 448.79 L 443.04 559.31"); }
+        50% { d: path("M 430 354 L 519.57 441.19 L 440 544"); }
+        56.25% { d: path("M 430 354 L 528.61 430.82 L 443.04 528.69"); }
+        62.5% { d: path("M 430 354 L 537.40 417.95 L 451.72 515.72"); }
+        68.75% { d: path("M 430 354 L 544.41 404.35 L 464.69 507.04"); }
+        75% { d: path("M 430 354 L 548.58 393.56 L 480 504"); }
+        81.25% { d: path("M 430 354 L 549.97 389.10 L 495.31 507.04"); }
+        87.5% { d: path("M 430 354 L 549 392.26 L 508.28 515.72"); }
+        93.75% { d: path("M 430 354 L 545.47 401.86 L 516.96 528.69"); }
+      }
+      @keyframes far-pedal {
+        0%,100% { d: path("M 448 351 L 527.27 447.65 L 440 544"); }
+        6.25% { d: path("M 448 351 L 536.96 438.81 L 443.04 528.69"); }
+        12.5% { d: path("M 448 351 L 547.01 427.30 L 451.72 515.72"); }
+        18.75% { d: path("M 448 351 L 555.79 414.30 L 464.69 507.04"); }
+        25% { d: path("M 448 351 L 561.72 402.90 L 480 504"); }
+        31.25% { d: path("M 448 351 L 564.29 396.85 L 495.31 507.04"); }
+        37.5% { d: path("M 448 351 L 563.77 398.15 L 508.28 515.72"); }
+        43.75% { d: path("M 448 351 L 560.20 406.10 L 516.96 528.69"); }
+        50% { d: path("M 448 351 L 553.31 418.34 L 520 544"); }
+        56.25% { d: path("M 448 351 L 543.22 431.99 L 516.96 559.31"); }
+        62.5% { d: path("M 448 351 L 531.17 444.31 L 508.28 572.28"); }
+        68.75% { d: path("M 448 351 L 519.84 453.29 L 495.31 580.96"); }
+        75% { d: path("M 448 351 L 512.44 458.11 L 480 584"); }
+        81.25% { d: path("M 448 351 L 510.46 459.28 L 464.69 580.96"); }
+        87.5% { d: path("M 448 351 L 513.12 457.70 L 451.72 572.28"); }
+        93.75% { d: path("M 448 351 L 519.05 453.84 L 443.04 559.31"); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .spin, .level, .near-leg, .far-leg, .scarf-tail, .road { animation: none !important; }
+      }
+    </style>
+  </defs>
+
+  <rect width="1000" height="800" rx="24" fill="#f6f1e5"/>
+  <rect x="24" y="24" width="952" height="752" rx="12" fill="none" stroke="#d5d3bd"/>
+  <g fill="#24474a">
+    <text x="66" y="64" font-family="Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="3">FIELD NOTES / THE COASTAL COLLECTION</text>
+    <text x="62" y="126" font-family="Georgia, 'Times New Roman', serif" font-size="60" letter-spacing="-2">The scenic route.</text>
+    <text x="66" y="155" font-family="Arial, sans-serif" font-size="14" fill="#748279" letter-spacing=".4">A little less hurry. A little more coast.</text>
+  </g>
+  <g transform="translate(892 104)" fill="#3b6962" text-anchor="middle">
+    <circle r="43" fill="none" stroke="#a2b0a0"/>
+    <circle r="37" fill="none" stroke="#a2b0a0" stroke-dasharray="1 5"/>
+    <text y="-13" font-family="Arial, sans-serif" font-size="9" font-weight="700" letter-spacing="2">EST.</text>
+    <text y="10" font-family="Georgia, serif" font-size="26" font-style="italic">slow</text>
+    <path d="M-15 21Q-8 15 0 21T15 21" fill="none" stroke="#3b6962" stroke-width="1.5"/>
+  </g>
+
+  <circle cx="642" cy="333" r="177" fill="#edcd81" opacity=".55"/>
+  <path d="M115 443Q240 419 363 441T608 443T885 432V515H115Z" fill="#dde4d6"/>
+  <path d="M119 471Q250 450 371 474T621 469T885 473" fill="none" stroke="#bdcfc2" stroke-width="2"/>
+  <g fill="none" stroke="#8fa99c" stroke-width="2" stroke-linecap="round">
+    <path d="M771 353q10-11 20 0q10-11 20 0"/>
+    <path d="M821 325q7-8 14 0q7-8 14 0"/>
+    <path d="M155 487h44m27 0h12m543 17h38m15 0h13" opacity=".65"/>
+  </g>
+  <g fill="none" stroke="#b2b8a1" stroke-width="2" stroke-linecap="round">
+    <path d="M127 657q5-22-8-33m10 30q4-29 18-36m-18 39q-2-14-17-20M865 656q-5-20 8-36m-7 34q8-13 18-17"/>
+  </g>
+  <ellipse cx="510" cy="671" rx="331" ry="12" fill="#a7b49b" opacity=".18"/>
+  <path d="M148 674H858" stroke="#a3ad96" stroke-width="2" stroke-linecap="round"/>
+  <g clip-path="url(#road-window)"><rect class="road" x="174" y="681" width="834" height="24" fill="url(#road-marks)"/></g>
+
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <g id="rear-wheel" transform="translate(300 552)">
+      <circle r="116" fill="#f6f1e5" stroke="#24474a" stroke-width="13"/>
+      <circle r="106" fill="none" stroke="#c4c5ab" stroke-width="3"/>
+      <g class="spin"><use href="#spokes"/></g>
+      <circle r="10" fill="#d6d7be" stroke="#24474a" stroke-width="3"/>
+    </g>
+    <g id="front-wheel" transform="translate(710 552)">
+      <circle r="116" fill="#f6f1e5" stroke="#24474a" stroke-width="13"/>
+      <circle r="106" fill="none" stroke="#c4c5ab" stroke-width="3"/>
+      <g class="spin"><use href="#spokes"/></g>
+      <circle r="10" fill="#d6d7be" stroke="#24474a" stroke-width="3"/>
+    </g>
+
+    <path class="far-leg" d="M448 351L527.27 447.65L440 544" fill="none" stroke="#895f38" stroke-width="13"/>
+    <path class="far-leg" d="M448 351L527.27 447.65L440 544" fill="none" stroke="#ca913f" stroke-width="8"/>
+    <g transform="translate(480 544)"><g class="spin"><g transform="translate(-40 0)"><g class="level"><use href="#foot" fill="#c58b3e"/></g></g></g></g>
+
+    <path d="M180 520A125 125 0 0 1 401 473M604 488A125 125 0 0 1 830 521" fill="none" stroke="#587f70" stroke-width="7"/>
+    <path d="M180 520A125 125 0 0 1 401 473M604 488A125 125 0 0 1 830 521" fill="none" stroke="#cad1b7" stroke-width="2"/>
+    <path d="M298 531L480 516A28 28 0 0 1 483 572L298 568A19 19 0 0 1 298 531Z" fill="none" stroke="#858f7a" stroke-width="3"/>
+    <path d="M300 552L426 418L480 544L300 552M426 418H638L480 544M634 400L654 462L710 552" fill="none" stroke="#24474a" stroke-width="13"/>
+    <path d="M300 552L426 418L480 544L300 552M426 418H638L480 544M634 400L654 462L710 552" fill="none" stroke="#38897e" stroke-width="8"/>
+    <path d="M437 425H620M489 529L634 431" fill="none" stroke="#83b4a1" stroke-width="2"/>
+    <path d="M425 416L415 386" stroke="#24474a" stroke-width="8"/>
+    <path d="M385 386Q410 379 450 385Q459 388 451 396H389Q377 394 385 386Z" fill="#94583e" stroke="#24474a" stroke-width="3"/>
+    <path d="M634 400L621 359L661 344Q682 338 686 354Q690 369 674 371" fill="none" stroke="#24474a" stroke-width="8"/>
+    <path d="M636 354L661 345Q681 338 685 353" fill="none" stroke="#ac7651" stroke-width="9"/>
+    <path d="M675 374Q643 383 672 444" fill="none" stroke="#758c7e" stroke-width="2"/>
+    <circle cx="644" cy="345" r="8" fill="#e3b85c" stroke="#24474a" stroke-width="2.5"/>
+    <path d="M640 342L645 340" stroke="#fff2c6" stroke-width="2"/>
+    <circle cx="480" cy="544" r="29" fill="#d4d3b8" stroke="#24474a" stroke-width="4"/>
+    <circle cx="480" cy="544" r="21" fill="none" stroke="#8c9f8d" stroke-width="3" stroke-dasharray="2 6"/>
+    <g transform="translate(480 544)"><g class="spin"><path d="M-40 0H40" stroke="#24474a" stroke-width="7"/><path d="M-36-1H36" stroke="#bec7b0" stroke-width="2"/></g></g>
+    <circle cx="480" cy="544" r="6" fill="#24474a"/>
+    <circle cx="300" cy="552" r="5" fill="#24474a"/>
+    <circle cx="710" cy="552" r="5" fill="#24474a"/>
+
+    <path class="near-leg" d="M430 354L538.89 415.38L520 544" fill="none" stroke="#805630" stroke-width="15"/>
+    <path class="near-leg" d="M430 354L538.89 415.38L520 544" fill="none" stroke="#e7aa4d" stroke-width="10"/>
+    <g transform="translate(480 544)"><g class="spin"><g transform="translate(40 0)"><g class="level"><use href="#foot"/></g></g></g></g>
+
+    <path d="M303 287C332 272 357 264 389 270C432 275 459 291 475 286C488 282 489 254 493 229C494 191 517 171 548 174C577 176 594 194 593 218L575 234C567 244 567 274 568 296C571 339 541 365 503 366C479 394 421 400 376 380C344 367 326 344 315 326L278 314L300 307L271 291Z" fill="#fffdf2" stroke="#24474a" stroke-width="3.5"/>
+    <path d="M311 315Q340 356 387 369Q457 394 503 353Q551 348 551 296L555 243Q536 263 539 303Q538 335 501 338Q467 376 408 355Q354 334 311 315Z" fill="#e1e5d7"/>
+    <path d="M285 297L326 309M300 311L333 322" fill="none" stroke="#91a599" stroke-width="2"/>
+    <path d="M526 179Q523 163 535 162M534 178Q540 164 548 167" fill="none" stroke="#24474a" stroke-width="3"/>
+
+    <path d="M585 233L779 257Q727 278 674 300Q638 315 612 287Q599 274 585 247Z" fill="#e8b653" stroke="#24474a" stroke-width="3"/>
+    <path d="M594 244L757 259Q706 278 670 291Q633 303 609 270Z" fill="#f0cd7c"/>
+    <path d="M602 252Q618 289 649 294" fill="none" stroke="#cd963f" stroke-width="2"/>
+    <path d="M585 212Q659 215 782 249Q795 253 782 260L586 239Z" fill="#f2bc4e" stroke="#24474a" stroke-width="3"/>
+    <path d="M597 220Q674 227 762 249" fill="none" stroke="#ffe2a0" stroke-width="3"/>
+    <path d="M782 251L786 257L778 263" fill="none" stroke="#24474a" stroke-width="2.5"/>
+    <path d="M603 228L609 230" stroke="#a77935" stroke-width="2.5"/>
+    <circle cx="567" cy="207" r="10" fill="#ecce7f"/>
+    <circle cx="568" cy="207" r="5" fill="#24474a"/>
+    <circle cx="570" cy="205" r="1.6" fill="#fffdf2"/>
+    <path d="M555 190Q564 186 572 191" fill="none" stroke="#24474a" stroke-width="2.5"/>
+
+    <g class="scarf-tail">
+      <path d="M504 274C470 264 451 229 420 239L401 232L405 253C438 250 459 288 494 290Z" fill="#cc593f" stroke="#924733" stroke-width="2"/>
+      <path d="M494 284C466 285 447 269 428 279L406 275L415 293C445 286 467 307 500 294Z" fill="#de7150" stroke="#924733" stroke-width="2"/>
+      <path d="M416 239L418 251M425 241L427 254M422 280L427 289" fill="none" stroke="#f3ad79" stroke-width="3"/>
+    </g>
+    <path d="M491 267Q520 281 560 268L562 281Q526 298 492 281Z" fill="#d96647" stroke="#924733" stroke-width="2.5"/>
+    <path d="M501 272Q525 283 552 275" fill="none" stroke="#f09a6b" stroke-width="2"/>
+    <path d="M498 276Q486 269 486 281Q489 291 501 285Z" fill="#b64e38" stroke="#924733" stroke-width="2"/>
+
+    <path d="M360 299C400 283 440 299 472 319C493 331 520 349 550 352L642 344Q658 344 652 353L638 361Q576 378 531 373C484 374 464 354 441 350C405 350 378 332 360 299Z" fill="#f7f8ed" stroke="#24474a" stroke-width="3"/>
+    <path d="M371 310Q395 339 440 338Q473 342 497 355Q558 383 635 355Q575 368 530 359Q491 351 460 330Q411 301 371 310Z" fill="#d7dfd2"/>
+    <g fill="none" stroke="#91a69a" stroke-width="2">
+      <path d="M392 311Q417 331 449 330M404 308Q437 321 459 327M454 339Q494 370 529 367M474 336Q506 361 545 363M491 337Q521 355 561 359"/>
+      <path d="M617 350L639 349M618 355L638 353"/>
+    </g>
+  </g>
+
+  <rect width="1000" height="800" rx="24" fill="url(#paper)" pointer-events="none"/>
+  <path d="M66 719H934" stroke="#d0d1bb"/>
+  <text x="66" y="749" fill="#24474a" font-family="Arial, sans-serif" font-size="12" font-weight="700" letter-spacing="2.7">PELICAN VÉLO CLUB</text>
+  <text x="934" y="749" text-anchor="end" fill="#778477" font-family="Arial, sans-serif" font-size="11" letter-spacing="1.7">COAST ALONG / Nº 001</text>
+</svg>

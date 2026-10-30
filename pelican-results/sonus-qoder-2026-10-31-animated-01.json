@@ -1,0 +1,62 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "sonus-qoder-2026-10-31-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "Unknown",
+    "name": "Sonus",
+    "id": null,
+    "identitySource": "user-reported"
+  },
+  "harness": {
+    "name": "Qoder",
+    "version": null,
+    "mode": "agent",
+    "context": "fresh",
+    "tools": [
+      "functions.Bash",
+      "functions.Read",
+      "functions.Write",
+      "functions.Edit",
+      "functions.TaskCreate",
+      "functions.TaskUpdate",
+      "functions.mcp_list",
+      "functions.mcp_get",
+      "functions.mcp_call",
+      "mcp__browser-use__navigate_page",
+      "mcp__browser-use__evaluate_script",
+      "mcp__browser-use__take_screenshot",
+      "mcp__browser-use__list_console_messages"
+    ]
+  },
+  "run": {
+    "generatedAt": "2026-10-31T07:37:24+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 1,
+    "totalAttempts": 1,
+    "selection": "first",
+    "parameters": {},
+    "postProcessing": "none",
+    "notes": "固定提示词是本次对话的首个创作请求，生成前无既有对话；环境注入了用户的基准测试及博客参考记忆，并读取了动画 SVG 验证工具链记忆。未读取其他模型画作。通过 Bash/Python 计算腿部关节关键帧，以 Write 一次写出原始 SVG；仅生成一次，未修改或重新格式化该 SVG。随后使用本地 HTTP 服务、Qoder 浏览器及独立无头 Chrome/CDP 检查渲染、轮子旋转、踩踏、踏板对齐和 prefers-reduced-motion 动态切换；所有 13 个动画在减少动态效果模式下停止，取消该偏好后恢复。Edit 仅用于修正临时验证脚本中的动画数量断言，不涉及画作。工具列表涵盖生成与验证阶段；未调用图像生成工具。生成时间取原始 SVG 文件的写入时间。动画原图逐字节复制，SHA-256 与会话原文件一致；暂停图仅通过自动移除整个 CSS style 元素派生，静态基础几何和原始动画文件均保持不变。Sonus 名称由用户在生成后的提交请求中提供，未独立核实；提供商、具体模型 ID、Qoder 版本和生成参数未知。"
+  },
+  "artifact": {
+    "path": "pelican-assets/sonus-qoder-2026-10-31-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 1000,
+    "height": 800,
+    "sha256": "b221650ae4c9636ea04137db21a5c69553a000c72be3cb86bd6972022e76bd46"
+  },
+  "source": null,
+  "animation": {
+    "mechanism": "css",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/sonus-qoder-2026-10-31-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 1000,
+    "height": 800,
+    "sha256": "7065041f57857bac77c186d4876f3b7441b7414e19121f77be2c3e96cbfbe13f"
+  }
+}
