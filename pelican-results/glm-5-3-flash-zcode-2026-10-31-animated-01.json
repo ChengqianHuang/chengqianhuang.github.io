@@ -1,0 +1,54 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "glm-5-3-flash-zcode-2026-10-31-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "Z.ai",
+    "name": "GLM-5.3-Flash",
+    "id": null,
+    "identitySource": "system-reported"
+  },
+  "harness": {
+    "name": "ZCode",
+    "version": null,
+    "mode": "agent",
+    "context": "fresh",
+    "tools": [
+      "Skill",
+      "Write",
+      "Bash",
+      "mcp__node_repl__js",
+      "TaskStop"
+    ]
+  },
+  "run": {
+    "generatedAt": "2026-10-31T07:47:14+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 1,
+    "totalAttempts": 1,
+    "selection": "first",
+    "parameters": {},
+    "postProcessing": "none",
+    "notes": "固定提示词是本次对话的首条消息，生成前无既有对话，未查看任何其他模型画作或参考图；博客与画廊仅在生成后的提交阶段读取。环境注入的是一个无关代码仓库的协作规范，未提供基准测试相关记忆。绘制未使用图像生成工具：先加载 visualize 技能确认输出约定，随后手写 SVG 源码并以 Write 一次写入文件；蹬踏关键帧由几何计算得出（髋点固定，脚踏点沿曲柄圆每 30° 采样 12 帧，二次贝塞尔控制点按两骨长度逼近膝盖弯曲），两腿相位相差 180°。仅生成一次，未修改或重新格式化该 SVG；提交文件为原始文件逐字节复制，SHA-256 与会话原文件一致。生成后通过本地 HTTP 服务与 ZCode 内置浏览器渲染检查：整页截图确认构图，相隔约 1.1 秒的两帧截图确认轮辐转动与双腿相位交替，再向页面注入与媒体查询等价的样式强制 reduced-motion 规则，验证全部动画停止且静态踩踏姿势与未旋转轮辐显示正常。动画机制为 SMIL（animateTransform 旋转轮辐与曲柄、腿部路径 d 关键帧、脚踏平移）加 CSS keyframes（身体小幅起伏），prefers-reduced-motion 下通过 display 切换到内置静态姿势。poster 由原始 SVG 自动派生：删除全部 SMIL 动画元素，并将 CSS 样式块替换为仅强制显示静态变体的两条 display 规则，静态几何未改动；原始文件保持原样。模型身份由 ZCode 系统提示报告为 account:zai-start-plan/GLM-5.3-Flash，用户在提交请求中亦称其为 GLM-5.3Flash；提供商 Z.ai 由该标识派生，计划路由前缀非规范模型 ID，故 id 留空。ZCode 版本与生成参数（温度、推理档位）未知。生成时间取原始 SVG 文件的写入时间。"
+  },
+  "artifact": {
+    "path": "pelican-assets/glm-5-3-flash-zcode-2026-10-31-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 800,
+    "height": 600,
+    "sha256": "db3b60131908f8fb5b3160d7bc086b044382691dd588afeeee7b85983430292d"
+  },
+  "source": null,
+  "animation": {
+    "mechanism": "css-smil",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/glm-5-3-flash-zcode-2026-10-31-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 800,
+    "height": 600,
+    "sha256": "edd359ca708df888a91238180b7de6b33b4794a0d3aa3472a62c2482494c1a6e"
+  }
+}
