@@ -1,5 +1,13 @@
 [
   {
+    "id": "chronostasis",
+    "title": "时滞行动",
+    "description": "你静止时全世界静止，子弹悬在半空；移动的瞬间时间才流动。十个关卡，一击即死。",
+    "controls": "键鼠 / 触屏双摇杆 · 空枪可投掷缴械 · 一击即死",
+    "url": "/games/chronostasis.html",
+    "cover": "/game-assets/chronostasis.svg"
+  },
+  {
     "id": "windisle",
     "title": "风屿",
     "description": "风之屿上的卡通渲染动作对战。三段连击、冲刺无敌、风刃与大招，闯过一波波魔物与三阶段 Boss。",

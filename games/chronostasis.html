@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="时滞行动：你静止时全世界静止，子弹悬停在半空；移动的瞬间时间才流动。十个关卡，一击即死，把每颗子弹的轨迹站着看完再躲。">
+  <title>时滞行动 - Chengqian Huang</title>
+  <script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch{}</script>
+  <link rel="stylesheet" href="/chronostasis.css?v=1">
+</head>
+<body>
+  <header class="ch-header">
+    <a href="/games.html" class="ch-back">← 全部游戏</a>
+    <a href="/" class="ch-site">Chengqian Huang</a>
+    <div class="ch-header-end"><span>CHRONO // STASIS</span><button id="theme-toggle" type="button" aria-label="切换主题">主题</button></div>
+  </header>
+  <main>
+    <section id="ch-machine" class="ch-machine" aria-label="时滞行动游戏">
+      <div id="ch-stage" class="ch-stage">
+        <canvas id="ch-canvas" tabindex="0" aria-label="时滞行动游戏画面。WASD 移动，鼠标瞄准并射击，Q 投掷武器，Esc 暂停。静止时全世界静止。" aria-describedby="ch-help">游戏需要支持 Canvas 的浏览器。</canvas>
+        <div id="ch-hud" class="ch-hud" aria-label="游戏状态">
+          <div><small>LEVEL</small><strong id="ch-hud-level">--</strong></div>
+          <div><small>敌人</small><strong id="ch-hud-enemy">--</strong></div>
+          <div><small>武器</small><strong id="ch-hud-weapon">--</strong></div>
+          <div class="ch-clock"><small>TIME</small><strong id="ch-hud-time">0:00.0</strong></div>
+        </div>
+        <div id="ch-time-state" class="ch-time-state" aria-live="polite">■ 时间冻结</div>
+        <div class="ch-tools">
+          <button id="ch-sound" type="button" aria-pressed="true">声音：开</button>
+          <button id="ch-fullscreen" type="button">全屏</button>
+          <button id="ch-pause-button" type="button">暂停 <kbd>Esc</kbd></button>
+        </div>
+        <div id="ch-banner" class="ch-banner" aria-live="polite"><small></small><strong></strong><span></span></div>
+        <div id="ch-overlay" class="ch-overlay">
+          <div id="ch-menu" class="ch-menu">
+            <p class="ch-kicker">TIME ONLY MOVES WHEN YOU MOVE</p>
+            <h1 class="ch-title">时滞行动</h1>
+            <p class="ch-sub">CHRONOSTASIS</p>
+            <p class="ch-desc">你静止时，<b>全世界静止</b>——子弹悬在半空，枪手停在扣扳机的前一刻。你迈出一步，时间才开始流动。十道关卡，一击即死，把每颗弹道站着看完，再决定往哪走。</p>
+            <div id="ch-levels" class="ch-levels" role="group" aria-label="选择关卡"></div>
+            <button id="ch-start" class="ch-primary" type="button">进入行动 <span>→</span></button>
+            <div class="ch-menu-help">
+              <span><kbd>WASD</kbd> 移动</span>
+              <span><kbd>鼠标</kbd> 瞄准 / 射击</span>
+              <span><kbd>Q</kbd> 投掷武器</span>
+              <span><kbd>R</kbd> 重来</span>
+              <span>手机：双摇杆 + 投掷键</span>
+            </div>
+            <p class="ch-note">通关进度与每关最佳用时只保存在当前浏览器。</p>
+          </div>
+          <div id="ch-death" class="ch-menu" hidden>
+            <p class="ch-kicker">TIME STOPS FOR YOU ALONE</p>
+            <h1 class="ch-title ch-death-title">被击中</h1>
+            <p id="ch-death-cause" class="ch-desc">时间只为你一个人停止。</p>
+            <button id="ch-death-retry" class="ch-primary red" type="button">再来一次 <span>⏎ R</span></button>
+            <div class="ch-overlay-actions"><button id="ch-death-menu" type="button">返回选关</button></div>
+          </div>
+          <div id="ch-clear" class="ch-menu" hidden>
+            <p class="ch-kicker">SECTOR CLEAR</p>
+            <h1 id="ch-clear-title" class="ch-title ch-clear-title">关卡清空</h1>
+            <div id="ch-clear-stats" class="ch-results"></div>
+            <button id="ch-clear-next" class="ch-primary" type="button">下一关 <span>⏎</span></button>
+            <div class="ch-overlay-actions"><button id="ch-clear-menu" type="button">返回选关</button></div>
+          </div>
+          <div id="ch-complete" class="ch-menu" hidden>
+            <p class="ch-kicker">ALL TEN SECTORS CLEAR</p>
+            <h1 class="ch-title ch-clear-title">行动完成</h1>
+            <p id="ch-complete-line" class="ch-desc">十关全部清空。</p>
+            <button id="ch-complete-restart" class="ch-primary" type="button">从头再打一轮</button>
+            <div class="ch-overlay-actions"><button id="ch-complete-menu" type="button">返回选关</button></div>
+          </div>
+          <div id="ch-pause" class="ch-menu" hidden>
+            <p class="ch-kicker">PAUSED</p>
+            <h1 class="ch-title">暂停</h1>
+            <p class="ch-desc">世界已经冻结——这次是因为你按了 Esc。</p>
+            <button id="ch-pause-resume" class="ch-primary" type="button">继续 <span>⏎ Esc</span></button>
+            <div class="ch-overlay-actions"><button id="ch-pause-menu" type="button">返回选关</button></div>
+          </div>
+        </div>
+      </div>
+      <div id="ch-touch" aria-label="触屏操作" hidden>
+        <div class="ch-touch-side"><div id="ch-stick-move" class="ch-stick" aria-label="移动摇杆"><i></i><b></b><span>MOVE</span></div></div>
+        <div class="ch-touch-actions"><button id="ch-touch-throw" type="button">投掷<small>Q</small></button></div>
+        <div class="ch-touch-side"><div id="ch-stick-aim" class="ch-stick aim" aria-label="瞄准并射击摇杆"><i></i><b></b><span>FIRE</span></div></div>
+      </div>
+      <div class="ch-statusbar"><span><i></i> CHRONOSTASIS PROTOCOL</span><span>时间法则：世界流速 = 你的移动速度</span><span>ESC 暂停 · F 全屏</span></div>
+    </section>
+    <details class="ch-details">
+      <summary>操作说明与规则细节</summary>
+      <p id="ch-help">电脑：WASD / 方向键移动，鼠标瞄准，左键或空格射击；手枪和霰弹是半自动，点放比按住快。Q 或右键把手中武器（含空枪）扔出去——击中敌人会缴械并眩晕它，掉落的枪可以捡。Esc 暂停，F 全屏，R 死后重来，⏎ 进下一关。手机用双摇杆：左摇杆移动，右摇杆推动即瞄准开火，另有投掷键。</p>
+      <p>时间法则：世界的流速等于你的移动速度。你站定时，敌人的子弹、瞄准、反应计时全部冻结，你自己射出的子弹也会悬停在枪口——射击之后必须移动，子弹才会飞。一击即死：你被任何子弹或冲刺贴身命中即阵亡，本关重开。敌方子弹可以误伤其他敌人，投掷物在空中同样遵守时间法则。</p>
+      <p>十关逐步引入：基础静止与射击、掩体视线、空手捡枪、冲锋者、霰弹枪、投掷缴械、交叉火力、火力压制、环形枪阵与最终关。打空的枪不会消失，随时可以扔出去换一把。进度与每关最佳用时保存在浏览器本地。纯 Canvas 2D 渲染 + Web Audio 合成音效，无外部运行时依赖；遵循减少动态效果偏好。</p>
+    </details>
+    <noscript><p class="ch-noscript">游戏需要 JavaScript。<a href="/games.html">返回全部游戏</a></p></noscript>
+  </main>
+  <script src="/theme.js"></script>
+  <script type="module" src="/chronostasis.js?v=1"></script>
+</body>
+</html>

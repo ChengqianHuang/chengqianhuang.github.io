@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 440" width="720" height="440" role="img" aria-label="时滞行动：你静止时全世界静止">
+  <defs>
+    <style>
+      .fg{fill:#17181c}
+      .enemy{fill:#cf3527}
+      .accent{stroke:#33698f;fill:none}
+      .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+      .sans{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+    </style>
+  </defs>
+
+  <!-- 场地 -->
+  <rect width="720" height="440" fill="#eceae4"/>
+  <g fill="#d8d3c8">
+    <circle cx="72" cy="72" r="1.6"/><circle cx="136" cy="72" r="1.6"/><circle cx="200" cy="72" r="1.6"/><circle cx="264" cy="72" r="1.6"/><circle cx="328" cy="72" r="1.6"/><circle cx="392" cy="72" r="1.6"/><circle cx="456" cy="72" r="1.6"/><circle cx="520" cy="72" r="1.6"/><circle cx="584" cy="72" r="1.6"/><circle cx="648" cy="72" r="1.6"/>
+    <circle cx="72" cy="152" r="1.6"/><circle cx="136" cy="152" r="1.6"/><circle cx="200" cy="152" r="1.6"/><circle cx="264" cy="152" r="1.6"/><circle cx="328" cy="152" r="1.6"/><circle cx="392" cy="152" r="1.6"/><circle cx="456" cy="152" r="1.6"/><circle cx="520" cy="152" r="1.6"/><circle cx="584" cy="152" r="1.6"/><circle cx="648" cy="152" r="1.6"/>
+    <circle cx="72" cy="232" r="1.6"/><circle cx="136" cy="232" r="1.6"/><circle cx="200" cy="232" r="1.6"/><circle cx="264" cy="232" r="1.6"/><circle cx="328" cy="232" r="1.6"/><circle cx="392" cy="232" r="1.6"/><circle cx="456" cy="232" r="1.6"/><circle cx="520" cy="232" r="1.6"/><circle cx="584" cy="232" r="1.6"/><circle cx="648" cy="232" r="1.6"/>
+    <circle cx="72" cy="312" r="1.6"/><circle cx="136" cy="312" r="1.6"/><circle cx="200" cy="312" r="1.6"/><circle cx="264" cy="312" r="1.6"/><circle cx="328" cy="312" r="1.6"/><circle cx="392" cy="312" r="1.6"/><circle cx="456" cy="312" r="1.6"/><circle cx="520" cy="312" r="1.6"/><circle cx="584" cy="312" r="1.6"/><circle cx="648" cy="312" r="1.6"/>
+    <circle cx="72" cy="392" r="1.6"/><circle cx="136" cy="392" r="1.6"/><circle cx="200" cy="392" r="1.6"/><circle cx="264" cy="392" r="1.6"/><circle cx="328" cy="392" r="1.6"/><circle cx="456" cy="392" r="1.6"/><circle cx="520" cy="392" r="1.6"/><circle cx="584" cy="392" r="1.6"/><circle cx="648" cy="392" r="1.6"/>
+  </g>
+  <rect x="8" y="8" width="704" height="424" fill="none" stroke="#b3ab9c" stroke-width="3"/>
+
+  <!-- 掩体 -->
+  <g>
+    <rect x="300" y="336" width="120" height="22" fill="#d5cfc4" stroke="#b3ab9c" stroke-width="2"/>
+    <rect x="300" y="336" width="120" height="4" fill="#ffffff" opacity=".5"/>
+    <rect x="452" y="120" width="22" height="104" fill="#d5cfc4" stroke="#b3ab9c" stroke-width="2"/>
+    <rect x="452" y="120" width="22" height="4" fill="#ffffff" opacity=".5"/>
+  </g>
+
+  <!-- 瞄准虚线 -->
+  <line x1="196" y1="252" x2="560" y2="212" stroke="#33698f" stroke-width="2" stroke-dasharray="5 11" opacity=".45"/>
+
+  <!-- 悬停的子弹 -->
+  <g>
+    <g transform="rotate(-6 300 240)">
+      <line x1="270" y1="243" x2="296" y2="240" stroke="#17181c" stroke-width="5" opacity=".3" stroke-linecap="round"/>
+      <circle cx="300" cy="240" r="6.5" fill="#17181c"/>
+      <circle cx="300" cy="240" r="12" fill="none" stroke="#17181c" stroke-width="1.6" opacity=".4"/>
+    </g>
+    <g transform="rotate(-6 420 226)">
+      <line x1="392" y1="229" x2="416" y2="226" stroke="#17181c" stroke-width="5" opacity=".3" stroke-linecap="round"/>
+      <circle cx="420" cy="226" r="6.5" fill="#17181c"/>
+      <circle cx="420" cy="226" r="12" fill="none" stroke="#17181c" stroke-width="1.6" opacity=".4"/>
+    </g>
+    <g transform="rotate(24 520 300)">
+      <line x1="498" y1="309" x2="516" y2="302" stroke="#cf3527" stroke-width="5" opacity=".35" stroke-linecap="round"/>
+      <circle cx="520" cy="300" r="5.5" fill="#cf3527"/>
+      <circle cx="520" cy="300" r="11" fill="none" stroke="#cf3527" stroke-width="1.6" opacity=".45"/>
+    </g>
+    <g transform="rotate(-30 560 340)">
+      <line x1="540" y1="352" x2="556" y2="344" stroke="#cf3527" stroke-width="5" opacity=".35" stroke-linecap="round"/>
+      <circle cx="560" cy="340" r="5.5" fill="#cf3527"/>
+      <circle cx="560" cy="340" r="11" fill="none" stroke="#cf3527" stroke-width="1.6" opacity=".45"/>
+    </g>
+  </g>
+
+  <!-- 枪手（冻结在扣扳机前一刻） -->
+  <g transform="translate(596 200) rotate(-8)">
+    <path d="M15 0 L1 -12 L-14 -7 L-14 7 L1 12 Z" fill="#cf3527"/>
+    <rect x="5" y="-2" width="15" height="3.4" fill="#eceae4"/>
+  </g>
+  <g transform="translate(648 320) rotate(46)">
+    <path d="M17 0 L-11 -10 L-5 0 L-11 10 Z" fill="#cf3527"/>
+  </g>
+
+  <!-- 玩家：时间环 + 朝向 -->
+  <g transform="translate(170 240)">
+    <path d="M 0 -24 A 24 24 0 1 1 -16.97 -16.97" fill="none" stroke="#33698f" stroke-width="3.4" stroke-linecap="round"/>
+    <circle r="24" fill="none" stroke="#33698f" stroke-width="1.4" opacity=".25"/>
+    <circle r="14" fill="#17181c"/>
+    <path d="M23 0 L8 -8.5 L8 8.5 Z" fill="#17181c"/>
+    <rect x="12" y="-2.6" width="15" height="5.2" fill="#17181c"/>
+  </g>
+
+  <!-- 空枪掉落 -->
+  <g transform="translate(430 366) rotate(-24)" opacity=".65">
+    <rect x="-8" y="-3.4" width="12" height="6.8" fill="#17181c"/>
+    <rect x="4" y="-2.2" width="13" height="3.6" fill="#17181c"/>
+    <rect x="-10" y="2.4" width="4.4" height="8" fill="#17181c"/>
+  </g>
+
+  <!-- 标题 -->
+  <text x="60" y="96" class="sans" font-size="58" font-weight="800" letter-spacing="14" fill="#17181c">时滞行动</text>
+  <text x="62" y="126" class="mono" font-size="13" letter-spacing="10.5" fill="#77716a">CHRONOSTASIS</text>
+  <text x="62" y="164" class="sans" font-size="14" fill="#4c463f">你静止，时间就静止——把每颗弹道站着看完，再决定往哪走。</text>
+  <text x="660" y="416" class="mono" font-size="10" letter-spacing="3" fill="#77716a" text-anchor="end">TIME MOVES WHEN YOU MOVE</text>
+</svg>
