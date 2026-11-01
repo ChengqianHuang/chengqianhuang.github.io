@@ -1,5 +1,13 @@
 [
   {
+    "id": "brass-pinball",
+    "title": "黄铜弹珠台",
+    "description": "双挡板接住钢珠，击落铜靶打开高架轨道，启动三球齐发。",
+    "controls": "A D / 方向键 / 触屏 · 3D 机械弹珠",
+    "url": "/games/brass-pinball.html",
+    "cover": "/game-assets/brass-pinball.jpg"
+  },
+  {
     "id": "neon-rift",
     "title": "霓虹裂变",
     "description": "双摇杆几何射击。冲刺穿过弹幕，积攒脉冲，挑战三阶段裂隙主宰。",
