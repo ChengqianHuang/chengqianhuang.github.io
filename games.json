@@ -1,5 +1,13 @@
 [
   {
+    "id": "windisle",
+    "title": "风屿",
+    "description": "风之屿上的卡通渲染动作对战。三段连击、冲刺无敌、风刃与大招，闯过一波波魔物与三阶段 Boss。",
+    "controls": "WASD / 虚拟摇杆 · 普攻 J · 冲刺 空格 · 风刃 K · 大招 L",
+    "url": "/games/windisle.html",
+    "cover": "/game-assets/windisle.jpg"
+  },
+  {
     "id": "brass-pinball",
     "title": "黄铜弹珠台",
     "description": "双挡板接住钢珠，击落铜靶打开高架轨道，启动三球齐发。",
