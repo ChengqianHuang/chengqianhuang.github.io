@@ -329,15 +329,18 @@ function boot() {
     updateCamera(dtReal, simTime);
     composer.render();
   }
-  // 自动化测试泵（?pump=1）：rAF 在被遮挡的窗格中会被节流，用定时器驱动同一帧函数。
-  // ?slow=N 将泵间隔放慢 N 倍（dt 仍被钳制），用于抓拍特效瞬间。
+  // 主循环驱动：rAF 优先；看门狗定时器兜底。
+  // 某些嵌入式浏览器（如应用内预览）rAF 完全停摆而定时器照常，看门狗在
+  // rAF 停滞超过一帧半时接管驱动；正常浏览器中它始终是零开销的空转检查。
+  // ?slow=N 仅供自动化抓拍：将看门狗间隔放慢 N 倍（模拟 dt 仍被钳制）。
   const pumpParams = new URLSearchParams(location.search);
-  if (pumpParams.has('pump')) {
-    const slow = Math.max(1, Number(pumpParams.get('slow')) || 1);
-    setInterval(() => frame(performance.now()), 16 * slow);
-  } else {
-    requestAnimationFrame(frame);
-  }
+  const watchdogMs = 16 * Math.max(1, Number(pumpParams.get('slow')) || 1);
+  let lastLoopAt = performance.now();
+  const loopFrame = (now) => { lastLoopAt = performance.now(); frame(now); };
+  requestAnimationFrame(loopFrame);
+  setInterval(() => {
+    if (performance.now() - lastLoopAt > watchdogMs + 24) loopFrame(performance.now());
+  }, watchdogMs);
 
   // 调试句柄（供自动化测试读取内部状态）
   window.__windisle = {
