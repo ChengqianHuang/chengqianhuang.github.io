@@ -1,6 +1,7 @@
 import * as T from 'three';
+import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
-import {BUMPERS,GEARS,TARGETS,WALLS,PIVOTS,FLIPPER_LENGTH,FLIPPER_RADIUS,RADIUS,rampPoint} from './physics.mjs';
+import {BUMPERS,GEARS,SHOOTER_GATE,TARGETS,WALLS,PIVOTS,FLIPPER_LENGTH,FLIPPER_RADIUS,RADIUS,rampPoint} from './physics.mjs';
 const metal=(color,roughness=.29)=>new T.MeshStandardMaterial({color,metalness:.82,roughness});
 export class TableView {
   constructor(canvas){
@@ -17,17 +18,17 @@ export class TableView {
     const sun=new T.DirectionalLight(0xffe7bd,2.6);sun.position.set(-8,19,-6);sun.castShadow=true;
     sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-12,right:12,top:14,bottom:-14,near:.5,far:50});sun.shadow.bias=-.0006;sun.shadow.normalBias=.025;
     this.scene.add(sun);const fill=new T.DirectionalLight(0xc7e6ec,1.5);fill.position.set(9,9,9);this.scene.add(fill);
-    this.brass=metal('#bb8a44');this.chrome=metal('#c7d0cc',.16);this.darkMetal=metal('#273b35',.4);
+    this.brass=metal('#bb8a44');this.chrome=metal('#c7d0cc',.16);this.ballMaterial=metal('#ffffff',.075);this.ballMaterial.emissive=new T.Color('#bbd1d0');this.ballMaterial.emissiveIntensity=.07;this.darkMetal=metal('#273b35',.4);
     this.rubber=new T.MeshStandardMaterial({color:'#b65532',roughness:.66});
     this.cream=new T.MeshStandardMaterial({color:'#f4dfaf',roughness:.35});
     this.wood=new T.MeshStandardMaterial({map:this.woodTexture(),roughness:.4,metalness:.07});
     this.root=new T.Group();this.scene.add(this.root);
     const floor=this.box(150,.3,150,new T.MeshStandardMaterial({color:'#ded9cb',roughness:1}),0,-1.5,0,this.scene);floor.receiveShadow=true;this.floor=floor;
-    this.box(10.7,.85,18.8,this.wood,0,-.52,0);
-    const board=new T.MeshStandardMaterial({map:this.boardTexture(),roughness:.48,metalness:.12});
+    this.roundBox(10.7,.85,18.8,this.wood,0,-.52,0);
+    const board=new T.MeshStandardMaterial({map:this.boardTexture(),roughness:.62,metalness:.04});
     this.box(9.95,.14,17.95,board,0,-.07,0);
-    for(const x of [-5.2,5.2]){this.box(.4,.66,18.65,this.wood,x,.17,0);this.box(.11,.05,18.55,this.brass,x-.1*Math.sign(x),.52,0);}
-    for(const z of [-9.2,9.2]){this.box(10.7,.65,.4,this.wood,0,.17,z);this.box(10.4,.06,.09,this.brass,0,.53,z);}
+    for(const x of [-5.2,5.2]){this.roundBox(.4,.66,18.65,this.wood,x,.17,0);this.box(.11,.05,18.55,this.brass,x-.1*Math.sign(x),.52,0);}
+    for(const z of [-9.2,9.2]){this.roundBox(10.7,.65,.4,this.wood,0,.17,z);this.box(10.4,.06,.09,this.brass,0,.53,z);}
     for(const x of [-5.2,5.2])for(const y of [-8.5,-3,3,8.5])this.screw(x,.53,y);
     for(const w of WALLS){
       this.tube([[w.ax-5,.31,w.ay-9],[w.bx-5,.31,w.by-9]],w.r,this.chrome);
@@ -48,9 +49,12 @@ export class TableView {
       this.torus(p.r-.18,.055,this.chrome,0,.56,0,g);
       const mat=new T.MeshStandardMaterial({color:'#f3e1aa',emissive:'#ffad43',emissiveIntensity:.16,roughness:.3});
       const cap=this.cylinder(p.r-.21,.07,mat,0,.55,0,g);
-      this.label(String((i+1)*100),0,0,.6,.6,g,.595);
+      this.label('150',0,0,.66,.58,g,.595);
       return {g,cap};
     });
+    this.shutter=new T.Group();this.shutter.position.set(SHOOTER_GATE.ax-5,.32,SHOOTER_GATE.ay-9);this.root.add(this.shutter);
+    this.tube([[0,0,0],[SHOOTER_GATE.bx-SHOOTER_GATE.ax,0,SHOOTER_GATE.by-SHOOTER_GATE.ay]],SHOOTER_GATE.r,this.brass,this.shutter);
+    this.cylinder(.11,.14,this.chrome,0,0,0,this.shutter);
     this.targets=TARGETS.map((p,i)=>{
       this.box(.38,.07,.95,this.darkMetal,p.x-5,.07,p.y-9);
       const m=this.box(.26,.58,.68,this.brass,p.x-5,.34,p.y-9);
@@ -84,8 +88,9 @@ export class TableView {
     }
     this.gate=new T.Group();this.gate.position.set(7.22-5,.25,11.05-9);this.root.add(this.gate);
     this.box(.86,.22,.24,this.brass,.43,0,0,this.gate);this.screw(0,.15,0,this.gate);
+    this.rampGuide=[[7.1,12.2],[6.75,13],[6.35,13.8]].map(([x,y])=>this.lamp(x-5,y-9,.1));
     this.rampLamp=this.lamp(7.65-5,11.8-9,.16);
-    this.label('MULTIBALL',2.65,3.35,1.8,.3);
+    this.label('MULTIBALL',2.65,2.65,1.8,.34);
     this.label('BRASS  &  GRAVITY',-.15,3.0,3.3,.42);
     this.label('MECHANICAL  PINBALL',-.15,3.55,2.6,.24);
     this.label('EST.  2026',-.15,4.0,1.3,.22);
@@ -99,9 +104,56 @@ export class TableView {
     this.lamps=[];for(let i=0;i<5;i++)this.lamps.push(this.lamp(-1.1+i*.46,4.65,.08));
     // Thin edge glass strips suggest a cover without obscuring the steel ball with glare.
     const glass=new T.MeshPhysicalMaterial({color:'#d3ede3',transparent:true,opacity:.1,metalness:.05,roughness:.1,depthWrite:false});
-    this.box(.55,.025,17.4,glass,-4.65,2.1,0);this.box(.55,.025,17.4,glass,4.65,2.1,0);
-    this.ballMeshes=new Map();this.pulses=[];this.lastEvent=null;this.effects=new T.Group();this.root.add(this.effects);
+    this.box(.035,.8,16.8,glass,-4.65,.5,0);this.box(.035,.8,16.8,glass,4.65,.5,0);
+    this.ballMeshes=new Map();this.trails=new Map();this.pulses=[];this.lastEvent=null;this.lastTime=0;this.effects=new T.Group();this.root.add(this.effects);this.scoreTextures=new Map();
+    this.ringGeometry=new T.RingGeometry(.6,.64,48);
+    this.contactGeometry=new T.CircleGeometry(.25,24);this.contactMaterial=new T.MeshBasicMaterial({color:'#0d231c',transparent:true,opacity:.3,depthWrite:false});
     this.resize();
+  }
+  roundBox(w,h,d,mat,x,y,z){const m=new T.Mesh(new RoundedBoxGeometry(w,h,d,3,.09),mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;this.root.add(m);return m;}
+  burst(e){
+    if(!['bumper','target','ramp','sling'].includes(e.type))return;
+    const material=new T.MeshBasicMaterial({color:e.type==='sling'?'#d6d7bd':'#e6b75b',transparent:true,opacity:.5,side:T.DoubleSide,depthWrite:false});
+    const ring=new T.Mesh(this.ringGeometry,material);ring.rotation.x=-Math.PI/2;ring.position.set(e.x-5,.04,e.y-9);this.effects.add(ring);
+    let text=null;
+    if(e.type!=='sling'){
+      const value='+'+e.value;
+      if(!this.scoreTextures.has(value)){
+        const c=document.createElement('canvas');c.width=256;c.height=96;const ctx=c.getContext('2d');ctx.font='bold 52px monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineWidth=7;ctx.strokeStyle='#143329';ctx.strokeText(value,128,48);ctx.fillStyle='#fff0c3';ctx.fillText(value,128,48);const t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;this.scoreTextures.set(value,t);
+      }
+      text=new T.Sprite(new T.SpriteMaterial({map:this.scoreTextures.get(value),transparent:true,depthTest:false,depthWrite:false}));text.scale.set(1.35,.51,1);text.position.set(e.x-5,.95,e.y-9);this.effects.add(text);
+    }
+    this.pulses.push({ring,text,time:e.time});
+    if(this.pulses.length>12)this.dropPulse(this.pulses.shift());
+  }
+  dropPulse(p){this.effects.remove(p.ring);p.ring.material.dispose();if(p.text){this.effects.remove(p.text);p.text.material.dispose();}}
+  updateBallMeshes(g,reduced){
+    const balls=g.status==='ready'?[{id:'preview',x:9.2,y:16.1,z:0,lane:true}]:g.balls;
+    const ids=new Set(balls.map(b=>b.id));
+    for(const [id,m] of this.ballMeshes)if(!ids.has(id)){
+      this.root.remove(m);this.ballMeshes.delete(id);m.geometry.dispose();
+      const t=this.trails.get(id);this.root.remove(t.line,t.shadow);t.line.geometry.dispose();t.line.material.dispose();this.trails.delete(id);
+    }
+    for(const b of balls){
+      let m=this.ballMeshes.get(b.id),track=this.trails.get(b.id);
+      if(!m){
+        m=new T.Mesh(new T.SphereGeometry(RADIUS,32,24),this.ballMaterial);m.castShadow=true;this.root.add(m);this.ballMeshes.set(b.id,m);
+        const geometry=new T.BufferGeometry();geometry.setAttribute('position',new T.BufferAttribute(new Float32Array(36),3));geometry.setAttribute('color',new T.BufferAttribute(new Float32Array(36),3));
+        const line=new T.Line(geometry,new T.LineBasicMaterial({color:'#f2dab0',vertexColors:true,transparent:true,opacity:.65,depthWrite:false}));line.frustumCulled=false;this.root.add(line);
+        const shadow=new T.Mesh(this.contactGeometry,this.contactMaterial);shadow.rotation.x=-Math.PI/2;this.root.add(shadow);
+        track={line,shadow,samples:[]};this.trails.set(b.id,track);
+      }
+      const p=new T.Vector3(b.x-5,RADIUS+b.z+.025,b.y-9);m.position.copy(p);
+      track.shadow.position.set(p.x,.017,p.z);track.shadow.visible=b.z<.1;
+      if(reduced||b.lane){track.samples=[];track.line.visible=false;continue;}
+      if(!g.paused&&(!track.samples.length||track.samples.at(-1).t!==g.time)){
+        if(track.samples.length&&p.distanceTo(track.samples.at(-1).p)>1.3)track.samples=[];
+        track.samples.push({p,t:g.time});track.samples=track.samples.filter(s=>g.time-s.t<.09).slice(-12);
+      }
+      const {position,color}=track.line.geometry.attributes;
+      track.samples.forEach((s,i)=>{position.setXYZ(i,s.p.x,s.p.y,s.p.z);const brightness=(i+1)/track.samples.length;color.setXYZ(i,brightness,brightness,brightness);});
+      position.needsUpdate=true;color.needsUpdate=true;track.line.geometry.setDrawRange(0,track.samples.length);track.line.visible=track.samples.length>1;
+    }
   }
   box(w,h,d,mat,x,y,z,parent=this.root){const m=new T.Mesh(new T.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;}
   cylinder(r,h,mat,x,y,z,parent=this.root){const m=new T.Mesh(new T.CylinderGeometry(r,r,h,32),mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;}
@@ -165,13 +217,25 @@ export class TableView {
   render(g,dt,reduced=false){
     for(let i=0;i<2;i++)this.flippers[i].rotation.y=-g.flippers[i].angle;
     for(let i=0;i<3;i++){this.targets[i].m.position.y=g.targets[i]?-.23:.34;this.targets[i].led.material.emissiveIntensity=g.targets[i]?1.1:0;}
-    this.gate.rotation.z=g.armed?Math.PI/2:0;this.rampLamp.material.emissiveIntensity=g.armed?1.3+.3*Math.sin(g.time*5):0;
+    this.gate.rotation.z=reduced?(g.armed?Math.PI/2:0):T.MathUtils.damp(this.gate.rotation.z,g.armed?Math.PI/2:0,12,g.paused?0:dt);this.rampLamp.material.emissiveIntensity=g.armed?1.3+.3*Math.sin(g.time*5):0;
     this.gears.forEach((gear,i)=>gear.rotation.y=g.gear*(i%2?-1:1));
     this.plunger.position.z=7.55+g.charge*.45;
-    const balls=g.status==='ready'?[{id:'preview',x:9.2,y:16.1,z:0}]:g.balls;
-    const ids=new Set(balls.map(b=>b.id));
-    for(const [id,m] of this.ballMeshes)if(!ids.has(id)){this.root.remove(m);this.ballMeshes.delete(id);m.geometry.dispose();}
-    for(const b of balls){let m=this.ballMeshes.get(b.id);if(!m){m=new T.Mesh(new T.SphereGeometry(RADIUS,32,24),this.chrome);m.castShadow=true;this.root.add(m);this.ballMeshes.set(b.id,m);}m.position.set(b.x-5,RADIUS+b.z+.025,b.y-9);}
+    if(g.time<this.lastTime){for(const p of this.pulses)this.dropPulse(p);this.pulses=[];this.lastEvent=null;for(const t of this.trails.values())t.samples=[];}
+    this.lastTime=g.time;
+    const fresh=this.lastEvent?g.events.slice(g.events.indexOf(this.lastEvent)+1):g.events;
+    if(!reduced)for(const e of fresh)this.burst(e);
+    this.lastEvent=g.events.at(-1)||null;
+    for(const p of [...this.pulses]){
+      const age=g.time-p.time;
+      if(age>.65||reduced){this.dropPulse(p);this.pulses.splice(this.pulses.indexOf(p),1);continue;}
+      p.ring.scale.setScalar(1+age*1.4);p.ring.material.opacity=Math.max(0,.45-age*1.3);
+      if(p.text){p.text.position.y=.95+age*.8;p.text.material.opacity=Math.min(1,(.65-age)*3);}
+    }
+    const nextGate=(g.balls.some(b=>b.x>8.7&&b.y>2.2&&b.y<3.8&&b.vy<0))?-1.25:0;
+    this.shutter.rotation.z=reduced?nextGate:T.MathUtils.damp(this.shutter.rotation.z,nextGate,18,g.paused?0:dt);
+    this.spring.scale.z=1-g.charge*.5;this.spring.position.z=g.charge*4.0;
+    this.rampGuide.forEach((lamp,i)=>lamp.material.emissiveIntensity=g.armed?(reduced?1:((g.time*3+i)%3<1?1.8:.25)):0);
+    this.updateBallMeshes(g,reduced);
     for(let i=0;i<5;i++)this.lamps[i].material.emissiveIntensity=g.combo>i&&g.time-g.lastBumper<2?1.1:0;
     for(const {g:group,cap} of this.bumperMeshes){const p=BUMPERS[this.bumperMeshes.findIndex(b=>b.g===group)];const e=[...g.events].reverse().find(e=>e.type==='bumper'&&e.x===p.x);const intensity=e?Math.max(0,1-(g.time-e.time)*5):0;cap.material.emissiveIntensity=.12+intensity*1.5;cap.position.y=.55-(reduced?0:intensity*.08);}
     this.renderer.render(this.scene,this.camera);

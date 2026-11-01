@@ -1,6 +1,8 @@
 // Table units are shared by physics and the 3D scene. y runs downhill.
 export const STEP = 1 / 240;
 export const RADIUS = .19;
+export const MAX_SPEED = 32;
+export const SHOOTER_GATE = {ax:8.85,ay:3.0,bx:9.55,by:2.75,r:.06};
 export const BUMPERS = [{x:3.05,y:4.6,r:.57},{x:6.25,y:4.9,r:.57},{x:4.65,y:6.9,r:.62}];
 export const GEARS = [{x:4.65,y:9.65,r:.49,h:.4,teeth:14},{x:5.48,y:9.9,r:.34,h:.18,teeth:11},{x:3.95,y:10.15,r:.3,h:.16,teeth:10},{x:1.2,y:1.4,r:.45,h:.18,teeth:14}];
 export const TARGETS = [{x:1.25,y:7.1},{x:1.25,y:8.3},{x:1.25,y:9.5}];
@@ -34,23 +36,23 @@ export function flipperSegment(f,i) {
 }
 export function createGame() {
   return {status:'ready',paused:false,time:0,score:0,ballNumber:1,balls:[],nextId:0,
-    flippers:PIVOTS.map(p=>({angle:p.rest,omega:0})),targets:[false,false,false],
+    flippers:PIVOTS.map(p=>({angle:p.rest,omega:0,held:false})),targets:[false,false,false],
     hits:0,ramps:0,multiballs:0,multiball:false,armed:false,saveUntil:0,tilt:0,nudges:[],
     events:[],notice:'按住空格蓄力，松开发射',noticeUntil:999,gear:0,lastBumper:-9,combo:0,
     charge:0,charging:false,lastNudge:false,accumulator:0};
 }
 function event(g,type,x=4.9,y=9,value=0){g.events.push({type,x,y,value,time:g.time});if(g.events.length>80)g.events.shift();}
 function say(g,text,seconds=3){g.notice=text;g.noticeUntil=g.time+seconds;}
-function ball(g,x,y,vx=0,vy=0){return {id:g.nextId++,x,y,vx,vy,r:RADIUS,z:0,ramp:null,cooldowns:{},lane:false};}
+function ball(g,x,y,vx=0,vy=0){return {id:g.nextId++,x,y,vx,vy,r:RADIUS,z:0,ramp:null,cooldowns:{},lane:false,entered:true,launched:false};}
 export function startGame(g) {
   Object.assign(g,createGame());g.status='playing';serve(g);
 }
-function serve(g){const b=ball(g,9.2,16.1);b.lane=true;g.balls.push(b);g.charge=0;}
+function serve(g){const b=ball(g,9.2,16.1);b.lane=true;b.entered=false;g.balls.push(b);g.charge=0;}
 function addScore(g,n){g.score+=Math.round(n);}
 export function launch(g,power=.8){
   if(g.status!=='playing'||g.paused)return false;
   const b=g.balls.find(b=>b.lane);if(!b)return false;
-  b.lane=false;b.vy=-(22+clamp(power,0,1)*9);g.saveUntil=g.time+10;
+  b.lane=false;b.launched=true;b.vy=-(14+clamp(power,0,1)*17);
   g.charge=0;g.charging=false;event(g,'launch',b.x,b.y);say(g,'击落左侧三枚铜靶，点亮右侧轨道',5);return true;
 }
 function contact(b,s,restitution=.78,kick=0,surface={x:0,y:0}){
@@ -75,21 +77,24 @@ function updateBall(g,b,dt){
     return;
   }
   b.vy+=10.7*dt;b.vx*=Math.exp(-.025*dt);b.vy*=Math.exp(-.025*dt);
-  const speed=Math.hypot(b.vx,b.vy);if(speed>36){b.vx*=36/speed;b.vy*=36/speed;}
+  const speed=Math.hypot(b.vx,b.vy);if(speed>MAX_SPEED){b.vx*=MAX_SPEED/speed;b.vy*=MAX_SPEED/speed;}
   b.x+=b.vx*dt;b.y+=b.vy*dt;
-  for(const wall of WALLS){const h=contact(b,wall,wall.sling?.85:.75,wall.sling?5:0);
-    if(h&&h.speed>1&&hitReady(b,`w${WALLS.indexOf(wall)}`,g.time)){
+  if(!b.entered&&b.launched&&b.x<8.55&&b.y<4){b.entered=true;if(g.tilt===0){g.saveUntil=Math.max(g.saveUntil,g.time+10);event(g,'protection');}}
+  // A one-way flap admits an upward serve but closes behind it.
+  if(b.vy>0&&b.y<3.6&&b.x>8.5){const h=contact(b,SHOOTER_GATE,.72);if(h&&hitReady(b,'shutter',g.time))event(g,'rail',h.x,h.y,h.speed);}
+  for(const [i,wall] of WALLS.entries()){const key=`w${i}`,kick=wall.sling&&(b.cooldowns[key]??-1)<=g.time?4:0;const h=contact(b,wall,wall.sling?.8:.75,kick);
+    if(h&&h.speed>1&&hitReady(b,key,g.time)){
       event(g,wall.sling?'sling':'rail',h.x,h.y,h.speed);if(wall.sling)addScore(g,50);
     }}
   for(let i=0;i<g.flippers.length;i++){
     const f=g.flippers[i],s=flipperSegment(f,i);
     // Moving rigid surface velocity = omega cross radius. It supplies the shot energy.
     const sx=-f.omega*(b.y-s.ay),sy=f.omega*(b.x-s.ax);
-    const h=contact(b,s,.62,0,{x:sx,y:sy});
+    const h=contact(b,s,f.held&&Math.abs(f.omega)<.01?.12:.56,0,{x:sx,y:sy});
     if(h&&h.speed>1&&hitReady(b,`f${i}`,g.time,.09))event(g,'flipper',b.x,b.y,h.speed);
   }
   for(let i=0;i<BUMPERS.length;i++){
-    const p=BUMPERS[i],h=circle(b,p.x,p.y,p.r,.9,5.5);
+    const p=BUMPERS[i],h=circle(b,p.x,p.y,p.r,.9,4.8);
     if(h&&hitReady(b,`b${i}`,g.time)){
       g.combo=g.time-g.lastBumper<2?Math.min(5,g.combo+1):1;g.lastBumper=g.time;
       const score=150*g.combo;g.hits++;g.gear+=.3;addScore(g,score);event(g,'bumper',p.x,p.y,score);
@@ -103,7 +108,7 @@ function updateBall(g,b,dt){
       if(g.targets.every(Boolean)){g.armed=true;addScore(g,1000);say(g,'轨道已开启 · 打入右侧入口，启动三球！',5);event(g,'armed');}
     }
   }
-  for(let i=0;i<GEARS.length;i++){const p=GEARS[i],h=circle(b,p.x,p.y,p.r,.8,2.5);
+  for(let i=0;i<GEARS.length;i++){const p=GEARS[i],h=circle(b,p.x,p.y,p.r,.8,.8);
     if(h&&hitReady(b,`gear${i}`,g.time)){g.gear+=h.speed*.12;addScore(g,100);event(g,'gear',p.x,p.y,100);}}
   // Raised rail entry is accessible only from below, avoiding phantom captures through its sides.
   if(g.armed&&b.vy< -3&&b.y<11.65&&b.y>10.9&&Math.abs(b.x-7.65)<.45){
@@ -117,18 +122,19 @@ function updateBall(g,b,dt){
   }else if(!g.armed){const h=contact(b,{ax:7.22,ay:11.05,bx:8.08,by:11.05,r:.12},.8);
     if(h&&hitReady(b,'gate',g.time))event(g,'rail',b.x,b.y,3);}
   // A weak launch rolls back into the shooter lane and can be retried, without losing a ball.
-  if(b.x>8.98&&b.y>16.1&&b.vy>0){b.lane=true;b.y=16.1;b.vx=b.vy=0;say(g,'再蓄一点力，松开发射',3);}
+  if(!b.entered&&b.x>8.98&&b.y>16.1&&b.vy>0){b.lane=true;b.y=16.1;b.vx=b.vy=0;say(g,'再蓄一点力，松开发射',3);}
 }
 function fixedStep(g,input,dt){
   g.time+=dt;g.tilt=Math.max(0,g.tilt-dt);
   for(let i=0;i<2;i++){
     const f=g.flippers[i],p=PIVOTS[i],pressed=(i===0?input.left:input.right)&&g.tilt===0;
-    const target=pressed?p.up:p.rest,delta=clamp(target-f.angle,-(pressed?15:9)*dt,(pressed?15:9)*dt);
+    if(!!pressed!==f.held){f.held=!!pressed;event(g,'coil',p.x,p.y,pressed?1:-1);}
+    const target=pressed?p.up:p.rest,delta=clamp(target-f.angle,-(pressed?13:9)*dt,(pressed?13:9)*dt);
     f.omega=delta/dt;f.angle+=delta;
   }
   if(input.launch&&g.balls.some(b=>b.lane)){g.charging=true;g.charge=Math.min(1,g.charge+dt*.9);}
   else if(g.charging)launch(g,g.charge);
-  if(input.nudge&&!g.lastNudge){
+  if(input.nudge&&!g.lastNudge&&g.balls.some(b=>!b.lane&&b.ramp===null)){
     g.nudges=g.nudges.filter(t=>g.time-t<6);g.nudges.push(g.time);
     if(g.nudges.length>=3){g.tilt=3;g.saveUntil=0;say(g,'晃台过度 · 挡板停机 3 秒',3);event(g,'tilt');}
     else{for(const b of g.balls)if(!b.lane&&b.ramp===null){b.vy-=3.5;b.vx+=(b.x<4.9?1.5:-1.5);}event(g,'nudge');say(g,'轻推一下 · 连续晃台会停机',2);}
@@ -143,7 +149,7 @@ function fixedStep(g,input,dt){
       const v=(b.vx-a.vx)*nx+(b.vy-a.vy)*ny;if(v<0){a.vx+=.92*v*nx;a.vy+=.92*v*ny;b.vx-=.92*v*nx;b.vy-=.92*v*ny;}}
   }
   // Cap after moving-surface and ball-pair impulses as well as before integration.
-  for(const b of g.balls){const speed=Math.hypot(b.vx,b.vy);if(speed>36){b.vx*=36/speed;b.vy*=36/speed;}}
+  for(const b of g.balls){const speed=Math.hypot(b.vx,b.vy);if(speed>MAX_SPEED){b.vx*=MAX_SPEED/speed;b.vy*=MAX_SPEED/speed;}}
   const drained=g.balls.filter(b=>b.y>17.6&&!b.lane&&b.ramp===null);
   for(const b of drained){g.balls.splice(g.balls.indexOf(b),1);event(g,'drain');
     if(g.time<g.saveUntil){g.balls.push(ball(g,5,2.3,-3,3));say(g,'救球保护 · 继续！',2);event(g,'save');}}
@@ -159,4 +165,13 @@ export function advance(g,input={},seconds=STEP){
   while(g.accumulator+1e-10>=STEP&&g.status==='playing'){
     g.accumulator-=STEP;fixedStep(g,input,STEP);
   }
+}
+
+export function tableStatus(g){
+  const targets=g.targets.filter(Boolean).length;
+  const stress=g.nudges.filter(t=>g.time-t<6).length;
+  return {targets,stress:Math.min(3,stress),tilted:g.tilt>0,ready:g.armed,
+    combo:g.time-g.lastBumper<2?g.combo:0,
+    objective:g.armed?'左挡板打向右侧轨道':`右挡板打向左侧铜靶 · ${targets}/3`,
+    nudge:g.tilt>0?`停机 ${Math.ceil(g.tilt)} 秒`:stress>=2?'再推一次会停机':stress===1?'让桌面缓一缓':'可以轻推救球'};
 }

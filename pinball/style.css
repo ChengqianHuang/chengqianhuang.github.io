@@ -8,3 +8,20 @@
 
 main:fullscreen{height:100dvh;max-width:none;background:var(--bg)}
 @media(max-width:380px) and (orientation:portrait){main{grid-template-rows:164px minmax(0,1fr)}h1{font-size:24px}}
+
+/* Playing feedback stays beside the controls and never covers the flipper tips. */
+.nudge-status{position:absolute;bottom:78px;left:50%;transform:translateX(-50%);display:flex;gap:9px;align-items:center;white-space:nowrap;font-size:10px;color:#536357;pointer-events:none}
+.nudge-status[data-warning=true]{color:#a34d29}.nudge-status>span:first-child{letter-spacing:3px}
+[data-theme=dark] .nudge-status{color:#bcc9b5}[data-theme=dark] .nudge-status[data-warning=true]{color:#f0b77f}
+.notice-wrap{bottom:105px}.table-wrap[data-lane=true] .notice-wrap{bottom:91px}
+.charge-track{height:5px;width:150px;position:relative;background:#c4c7b6}.charge-track:after{content:'';position:absolute;height:5px;width:1px;background:#566b4a;left:30%;top:0}.charge-track[data-ready=true] i{background:#49815b}
+.combo{margin-top:14px;display:flex;align-items:center;gap:12px;color:var(--muted);font-size:11px;position:relative;padding-bottom:10px}.combo b{font:18px monospace;color:var(--accent)}.combo>i{height:2px;background:var(--line);position:absolute;bottom:0;left:0;right:0}.combo em{height:100%;display:block;background:var(--accent);width:0}
+.mission[data-ready=true] .mission-row:last-of-type{color:var(--accent)}.mission #mission-hint{display:block;font-size:11px;line-height:1.8}
+.modal{overflow:auto;align-items:safe center}.modal-card{margin:auto}.modal-help{border-top:1px solid var(--line);margin-top:18px;padding-top:2px}.modal-help p{font-size:11px!important;line-height:1.7;margin:11px 0}.table-controls button.pressed{background:#d2b783;border-color:#9d7947;color:#263d30;box-shadow:inset 0 2px 5px #49391e22}
+@media(max-width:800px){.nudge-status{bottom:66px;font-size:9px}.notice-wrap{bottom:88px}.table-wrap[data-lane=true] .notice-wrap{bottom:78px}header div{gap:6px}header button{padding:5px 8px}.modal-card{padding:20px}.modal-help p{font-size:10px!important}}
+@media(min-width:801px) and (max-height:760px){.sidebar{gap:12px}.sidebar h1{font-size:44px}.combo{margin-top:8px}.mission #mission-hint{margin-top:5px}.instructions small{font-size:9px}}
+@media(max-height:540px) and (orientation:landscape){.nudge-status{bottom:65px}.notice-wrap{bottom:86px}.table-wrap[data-lane=true] .notice-wrap{bottom:65px}.modal-card{padding:18px}.modal-help p{margin:7px 0}}
+
+@media(min-width:801px){.sidebar{gap:12px;padding-top:22px}.sidebar h1{font-size:44px}.sidebar .eyebrow{margin-bottom:10px}.sidebar .subtitle{margin-top:12px}.scoreboard{padding:12px 0}.scoreboard strong{font-size:36px}.mission .section-label{margin-bottom:8px}.mission-row{margin:7px 0}.mission #mission-hint{margin-top:7px}.combo{margin-top:8px}.instructions{gap:6px}.instructions small{display:none}.table-controls button{padding:11px 16px}.table-controls kbd{font:10px monospace;vertical-align:middle;opacity:.7}.table-controls .launch{gap:14px}}
+@media(min-width:801px) and (max-height:760px){.instructions{display:none}}
+@media(max-width:800px){.table-controls kbd{display:none}}

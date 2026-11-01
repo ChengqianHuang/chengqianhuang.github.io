@@ -1,0 +1,18 @@
+<!doctype html><meta charset="UTF-8"><title>Pinball render regression</title><style>body{margin:0;font:14px monospace;background:#ece8dd}pre{padding:12px;margin:0}canvas{display:block;width:900px;height:600px}</style><pre id="result">Checking…</pre><canvas id="qa"></canvas>
+<script type="importmap">{"imports":{"three":"/pinball/node_modules/three/build/three.module.js","three/addons/":"/pinball/node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+import {TableView} from '/pinball/src/art.mjs';
+import {createGame,startGame,advance,launch,TARGETS,STEP} from '/pinball/src/physics.mjs';
+const check=(value,msg)=>{if(!value)throw Error(msg)},out=document.getElementById('result');
+try {
+ const view=new TableView(document.getElementById('qa')),g=createGame();startGame(g);launch(g,.6);
+ for(let i=0;i<90;i++){advance(g,{},1/60);const before=JSON.stringify(g);view.render(g,1/60,false);check(JSON.stringify(g)===before,'render mutated simulation');}
+ for(const p of TARGETS){Object.assign(g.balls[0],{x:p.x+.34,y:p.y,vx:-10,vy:0,lane:false,ramp:null});for(let j=0;j<12;j++)advance(g,{},STEP);}
+ check(g.armed,'targets did not unlock');Object.assign(g.balls[0],{x:7.65,y:11.6,vx:0,vy:-10});for(let j=0;j<20;j++)advance(g,{},STEP);
+ check(g.balls.length===3,'multiball missing');view.render(g,1/60,false);check(view.ballMeshes.size===3,'missing ball meshes');
+ g.paused=true;const snapshot=JSON.stringify(g);for(let i=0;i<15;i++)view.render(g,1/60,false);check(JSON.stringify(g)===snapshot,'paused state mutated');
+ view.render(g,1/60,true);check(view.pulses.length===0,'reduced motion left effects alive');check([...view.trails.values()].every(t=>!t.line.visible),'reduced motion left trails alive');
+ startGame(g);view.render(g,1/60,false);check(view.ballMeshes.size===1&&view.trails.size===1,'restart leaked balls/trails');check(view.pulses.length===0,'restart leaked effects');
+ out.textContent='PASS · 90 read-only render frames · three-ball rendering · pause · reduced motion · restart cleanup';
+} catch(e){out.textContent='FAIL: '+e.message;console.error(e);}
+</script>

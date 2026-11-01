@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {createGame,startGame,advance,launch,STEP,BUMPERS,TARGETS,PIVOTS,flipperSegment,rampPoint,RADIUS} from '../pinball/src/physics.mjs';
+import {createGame,startGame,advance,launch,STEP,MAX_SPEED,SHOOTER_GATE,tableStatus,BUMPERS,TARGETS,PIVOTS,flipperSegment,rampPoint,RADIUS} from '../pinball/src/physics.mjs';
 const fresh=()=>{const g=createGame();startGame(g);return g;};
 const run=(g,seconds,input={})=>{for(let i=0;i<Math.round(seconds/STEP);i++)advance(g,input,STEP);};
 const place=(g,values)=>Object.assign(g.balls[0],{lane:false,ramp:null,x:5,y:12,vx:0,vy:0,...values});
@@ -7,8 +7,32 @@ const place=(g,values)=>Object.assign(g.balls[0],{lane:false,ramp:null,x:5,y:12,
 {
  const g=createGame();advance(g,{launch:true},1);assert.equal(g.time,0);
  startGame(g);run(g,.5,{launch:true});assert(g.charge>.4);assert(g.balls[0].lane);
- advance(g,{},STEP);assert(!g.balls[0].lane);assert(g.balls[0].vy< -25);assert.equal(g.charge,0);
+ advance(g,{},STEP);assert(!g.balls[0].lane);assert(g.balls[0].vy< -20);assert.equal(g.charge,0);
  run(g,2);assert(g.balls[0].x<8.85,'launch must enter the playfield');
+}
+// Weak serves return safely; protection starts only on entry, and retry cannot extend it from the playfield.
+{
+ const g=fresh();launch(g,.1);run(g,5);assert(g.balls[0].lane);assert.equal(g.ballNumber,1);assert.equal(g.saveUntil,0);
+ launch(g,.6);run(g,2);assert(g.balls[0].entered);assert(g.saveUntil>10);assert(!g.balls[0].lane);
+ const until=g.saveUntil;run(g,2);assert.equal(g.saveUntil,until);
+}
+// The shooter flap is one-way: a returning ball is redirected onto the table.
+{
+ const g=fresh();place(g,{x:9.2,y:2.3,vx:0,vy:10});run(g,.1);assert(g.balls[0].vx< -2);assert(g.balls[0].vy<0);
+ const serve=fresh();place(serve,{x:9.2,y:3.4,vy:-10});run(serve,.06);assert(serve.balls[0].y<3);assert(serve.balls[0].vy<0);
+}
+// Holding a raised flipper absorbs a falling ball; it does not repeatedly fire a coil or pump energy.
+{
+ const g=fresh();run(g,.125,{left:true});place(g,{x:3.7,y:14.2,vy:5});run(g,1,{left:true});
+ assert(g.balls[0].x<3.6);assert(Math.hypot(g.balls[0].vx,g.balls[0].vy)<2);
+ assert.equal(g.events.filter(e=>e.type==='coil'&&e.value===1).length,1);
+ advance(g,{},STEP);assert.equal(g.events.filter(e=>e.type==='coil'&&e.value===-1).length,1);
+}
+// Warning indicators expire with simulation time and only read state.
+{
+ const g=fresh();launch(g);for(let i=0;i<2;i++){advance(g,{nudge:true},STEP);advance(g,{},STEP);}
+ const before=JSON.stringify(g);const info=tableStatus(g);assert.equal(info.stress,2);assert.match(info.nudge,/停机/);assert.equal(JSON.stringify(g),before);
+ run(g,6.1);assert.equal(tableStatus(g).stress,0);
 }
 // Both moving flippers supply upward energy, and mirrored shots behave symmetrically.
 {
@@ -41,6 +65,11 @@ const place=(g,values)=>Object.assign(g.balls[0],{lane:false,ramp:null,x:5,y:12,
  const snap=JSON.stringify(g);advance(g,{launch:true},.1);assert.equal(JSON.stringify(g),snap);
  startGame(g);assert.equal(g.score,0);assert.equal(g.ballNumber,1);assert.equal(g.balls.length,1);assert.equal(g.status,'playing');
 }
+// An already-entered ball falling past the shooter rail must drain, not become a free re-serve.
+{
+ const g=fresh();place(g,{x:9.2,y:17.4,vy:8,entered:true});run(g,.1);assert.equal(g.ballNumber,2);
+ const waiting=fresh();for(let i=0;i<3;i++){advance(waiting,{nudge:true},STEP);advance(waiting,{},STEP);}assert.equal(waiting.tilt,0);assert.equal(waiting.nudges.length,0);
+}
 // Pausing freezes physics, timers, charge, and pending effects.
 {
  const g=fresh();launch(g,.8);run(g,1);g.paused=true;const state=JSON.stringify(g);run(g,5,{left:true,launch:true,nudge:true});assert.equal(JSON.stringify(g),state);g.paused=false;run(g,.1);assert(g.time>1);
@@ -64,7 +93,7 @@ for(let seed=1;seed<=6;seed++){
    advance(g,input,STEP);steps++;
    assert(g.balls.length<=3);for(const b of g.balls){assert([b.x,b.y,b.vx,b.vy].every(Number.isFinite));minY=Math.min(minY,b.y);maxSpeed=Math.max(maxSpeed,Math.hypot(b.vx,b.vy));assert(b.x>0&&b.x<10,'ball escaped side rails');}
  }
- assert(minY<2,'serve never reached top of table');assert(g.score>0);assert(maxSpeed<=36.00001);
+ assert(minY<2,'serve never reached top of table');assert(g.score>0);assert(maxSpeed<=MAX_SPEED+.00001);
  console.log(`seed ${seed}: ${g.time.toFixed(1)}s, ${g.score} points, ${g.hits} bumpers, ${g.ramps} ramps, ${g.status}`);
 }
 // Hands-off runs must drain rather than remaining trapped on a static collision indefinitely.

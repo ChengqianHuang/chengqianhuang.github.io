@@ -5,7 +5,7 @@
     "description": "双挡板接住钢珠，击落铜靶打开高架轨道，启动三球齐发。",
     "controls": "A D / 方向键 / 触屏 · 3D 机械弹珠",
     "url": "/games/brass-pinball.html",
-    "cover": "/game-assets/brass-pinball.jpg"
+    "cover": "/game-assets/brass-pinball.jpg?v=2"
   },
   {
     "id": "neon-rift",

@@ -1,19 +1,20 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="一张黄铜与木头做的机械弹珠台。双挡板接球，击落铜靶，打开高架轨道，启动三球模式。"><title>黄铜弹珠台 - Chengqian Huang</title>
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch{}</script>
-<link rel="stylesheet" href="/pinball/style.css"></head>
-<body><header><a href="/games.html">← 全部游戏</a><a class="site" href="/">Chengqian Huang</a><div><button id="sound" aria-pressed="true" title="切换音效">声音 开</button><button id="theme-toggle" aria-label="切换主题">主题</button></div></header>
+<link rel="stylesheet" href="/pinball/style.css?v=2"></head>
+<body><header><a href="/games.html">← 全部游戏</a><a class="site" href="/">Chengqian Huang</a><div><button id="help">怎么玩</button><button id="sound" aria-pressed="true" title="切换音效">声音 开</button><button id="theme-toggle" aria-label="切换主题">主题</button></div></header>
 <main id="game"><aside class="sidebar"><div><p class="eyebrow"><span></span> THE WORKSHOP / 01</p><h1>Brass <i>&</i><br> Gravity<span>.</span></h1><p class="subtitle">黄铜弹珠台</p></div>
 <div class="scoreboard"><div class="score-label">本局得分 <span id="ball-label">3 BALLS</span></div><strong id="score">000,000</strong><div class="best">个人最佳 <span id="best">0</span></div></div>
-<div class="mission"><span class="section-label">桌上的小机关</span><div class="mission-row"><b id="target-progress">○ ○ ○</b><span>击落左侧三枚铜靶</span></div><div class="mission-row"><b id="ramp-progress">↗</b><span>打入右侧高架轨道</span></div><p>点亮机关，启动三球齐发。<br>连续撞击弹簧鼓，最高 5 倍连击。</p></div>
+<div class="mission"><span class="section-label">桌上的小机关</span><div class="mission-row"><b id="target-progress">○ ○ ○</b><span>击落左侧三枚铜靶</span></div><div class="mission-row"><b id="ramp-progress">↗</b><span>打入右侧高架轨道</span></div><p id="mission-hint">右挡板打左侧铜靶，左挡板打右侧轨道。</p><div class="combo"><span>弹簧鼓连击</span><b id="combo-label">—</b><i><em id="combo-fill"></em></i></div></div>
 <div class="actions"><button id="start" class="primary">开一局 <span>↗</span></button><button id="pause" hidden>暂停 <kbd>Esc</kbd></button></div>
 <div class="instructions"><div><span><kbd>←</kbd> <kbd>→</kbd> / <kbd>A</kbd> <kbd>D</kbd></span><span>左右挡板</span></div><div><span><kbd>Space</kbd> 按住 → 松开</span><span>蓄力发射</span></div><div><span><kbd>W</kbd> / <kbd>↑</kbd></span><span>轻推桌面</span></div><small>每局三颗球 · 连续晃台会停机<br>纪录保存在当前浏览器</small></div>
 <div class="sidebar-foot"><span>BUILT BY CODEX</span><button id="fullscreen">全屏 ↗</button></div></aside>
 <section class="table-wrap" aria-label="弹珠台"><canvas id="table" tabindex="0" aria-label="3D 机械弹珠台。A D 或左右方向键控制挡板，空格蓄力发射，Esc 暂停。"></canvas>
 <div class="table-top"><span class="table-tag">BRASS SERIES <b>№ 001</b></span><span id="state-label">每局三颗球 · 挡板接球</span></div>
-<div class="notice-wrap"><p id="notice" role="status" aria-live="polite">准备好就开一局。</p><div class="charge-track" aria-hidden="true"><i id="charge-fill"></i></div></div>
-<div class="table-controls"><button id="left" data-input="left" aria-label="左挡板">‹ <span>左挡板</span></button><button id="launch" data-input="launch" class="launch" aria-label="按住蓄力，松开发射"><span id="launch-label">按住 · 发射</span><i>↑</i></button><button id="right" data-input="right" aria-label="右挡板"><span>右挡板</span> ›</button></div>
-<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-title"><div class="modal-card"><p class="eyebrow" id="modal-tag">INTERMISSION</p><h2 id="modal-title">歇一会儿</h2><p id="modal-text">钢珠和计时都已暂停。</p><button class="primary" id="resume">继续玩 →</button><button id="restart">重新开一局</button></div></div>
+<div class="notice-wrap"><p id="notice" role="status" aria-live="polite">准备好就开一局。</p><div class="charge-track" id="charge-track" aria-hidden="true" hidden><i id="charge-fill"></i></div></div>
+<div class="nudge-status" id="nudge-status" hidden><span id="nudge-dots" aria-hidden="true">○ ○ ○</span><span id="nudge-label">可以轻推救球</span></div>
+<div class="table-controls"><button id="left" data-input="left" aria-label="左挡板">‹ <span>左挡板</span> <kbd>A</kbd></button><button id="launch" data-input="launch" class="launch" aria-label="按住蓄力，松开发射"><span id="launch-label">按住 · 发射</span><kbd id="center-key">Space</kbd></button><button id="right" data-input="right" aria-label="右挡板"><span>右挡板</span> <kbd>D</kbd> ›</button></div>
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-title"><div class="modal-card"><p class="eyebrow" id="modal-tag">INTERMISSION</p><h2 id="modal-title">歇一会儿</h2><p id="modal-text">钢珠和计时都已暂停。</p><button class="primary" id="resume">继续玩 →</button><button id="restart">重新开一局</button><div class="modal-help" id="modal-help" hidden><p><b>1. 接球</b>　A / D 或左右键控制挡板。按住可以缓住球，松开再击打。</p><p><b>2. 开机关</b>　用右挡板打左侧三枚铜靶，再用左挡板打亮起的右侧轨道，启动三球。</p><p><b>3. 救球</b>　W / ↑ 或中间按钮轻推桌面。六秒内推三次，挡板会停机三秒。</p></div></div></div>
 <div id="loading" class="loading" role="status">正在装好弹簧与轨道…</div>
 </section></main><noscript>需要启用 JavaScript 才能玩弹珠台。<a href="/games.html">返回游戏列表</a></noscript>
-<script src="/theme.js"></script><script type="module" src="/pinball/dist/pinball.js"></script></body></html>
+<script src="/theme.js"></script><script type="module" src="/pinball/dist/pinball.js?v=2"></script></body></html>
