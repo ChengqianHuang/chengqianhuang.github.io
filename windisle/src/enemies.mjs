@@ -194,16 +194,20 @@ export class EnemyRigs {
   constructor(scene) {
     this.scene = scene;
     this.map = new Map();
+    this.dead = [];
   }
 
   sync(state, dt, time, reduced) {
-    // 移除已消失的
-    for (const [id, rig] of this.map) {
-      if (!state.enemies.find((e) => e.id === id)) {
-        this.scene.remove(rig.built.group);
-        rig.built.group.traverse((o) => { if (o.geometry && !o.geometry.__shared) o.geometry.dispose?.(); });
-        this.map.delete(id);
-      }
+    const alive=new Set(state.enemies.map(e=>e.id));
+    for(const[id,rig]of this.map)if(!alive.has(id)){
+      this.dead.push({rig,t:0,start:rig.built.group.position.clone(),face:rig.built.group.rotation.y});this.map.delete(id);
+    }
+    for(let i=this.dead.length-1;i>=0;i--){
+      const d=this.dead[i];d.t+=dt;const k=d.t/(reduced?.16:.38),g=d.rig.built.group;
+      if(k>=1||this.dead.length>24){this.dispose(g);this.dead.splice(i,1);continue;}
+      const size=1-k*k;g.scale.set(size,Math.max(.03,size*(1-k*.65)),size);
+      if(!reduced){g.rotation.z=k*1.1;g.position.y=d.start.y+Math.sin(k*Math.PI)*.18;g.position.x=d.start.x+Math.sin(d.face)*k*.35;g.position.z=d.start.z+Math.cos(d.face)*k*.35;}
+      for(const m of d.rig.built.mats)m.emissive.setRGB(.25*(1-k),.12*(1-k),0);
     }
     for (const e of state.enemies) {
       let rig = this.map.get(e.id);
@@ -217,6 +221,13 @@ export class EnemyRigs {
       this.updateRig(rig, e, dt, time, reduced);
     }
   }
+
+  dispose(group){
+    this.scene.remove(group);const geometries=new Set(),materials=new Set();
+    group.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)for(const m of [].concat(o.material))materials.add(m);});
+    geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());
+  }
+  reset(){for(const r of this.map.values())this.dispose(r.built.group);for(const d of this.dead)this.dispose(d.rig.built.group);this.map.clear();this.dead.length=0;}
 
   updateRig(rig, e, dt, time, reduced) {
     const { group, body, mats } = rig.built;
@@ -296,6 +307,11 @@ export class EnemyRigs {
       group.position.y = 0;
     }
 
+    // Visual recoil follows the existing physical knockback, without moving hitboxes.
+    if(flash>0&&e.type!=='boss'){
+      sx*=1+flash*.12;sy*=1-flash*.19;sz*=1+flash*.08;
+      if(!reduced){tiltX-=Math.cos(e.face-Math.atan2(e.kbx||0,e.kbz||0))*flash*.22;tiltZ+=Math.sin(e.face-Math.atan2(e.kbx||0,e.kbz||0))*flash*.2;}
+    }
     group.scale.set(scale * sx, scale * sy, scale * sz);
     if (e.type !== 'boss') {
       group.rotation.x = tiltX;

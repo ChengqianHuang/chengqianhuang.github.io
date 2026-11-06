@@ -90,9 +90,9 @@ export class AudioFX {
     this.tone({ freq: 620 + stage * 110, dur: 0.09, type: 'triangle', vol: 0.1, slide: -260 });
   }
   heavy() { this.noise({ dur: 0.24, vol: 0.24, freq: 900, slideTo: 200, q: 0.8 }); this.tone({ freq: 130, dur: 0.3, type: 'sine', vol: 0.3, slide: -60 }); }
-  hit(blocked) {
+  hit(blocked,heavy=false) {
     if (blocked) { this.tone({ freq: 1150, dur: 0.06, type: 'square', vol: 0.08 }); this.noise({ dur: 0.05, vol: 0.1, freq: 3200 }); }
-    else { this.noise({ dur: 0.06, vol: 0.14, freq: 1800, q: 0.8 }); this.tone({ freq: 220, dur: 0.08, type: 'triangle', vol: 0.16, slide: -80 }); }
+    else {this.noise({dur:heavy?.13:.055,vol:heavy?.22:.13,freq:heavy?950:2100,q:.8});this.tone({freq:heavy?125:240,dur:heavy?.18:.07,type:'triangle',vol:heavy?.23:.13,slide:heavy?-65:-90});}
   }
   kill(boss) {
     if (boss) { this.tone({ freq: 90, dur: 0.7, type: 'sine', vol: 0.4, slide: -40 }); this.noise({ dur: 0.5, vol: 0.25, freq: 500, slideTo: 80 }); }

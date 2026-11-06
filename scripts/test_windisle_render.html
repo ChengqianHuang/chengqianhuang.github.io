@@ -1,0 +1,28 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>Wind Isle rendering regression</title><style>body{background:#14252a;color:#f5ead3;font:16px system-ui;margin:25px}canvas{width:512px;max-width:100%}pre{white-space:pre-wrap}</style><h1>风屿渲染回归 · 本地开发检查</h1><p>八方向真实 GPU 预警边界、分级命中、倒地回收与只读渲染。</p><pre id="result">RUNNING</pre><script type="importmap">{"imports":{"three":"/windisle/node_modules/three/build/three.module.js"}}</script><script type="module">
+import * as T from 'three';
+import {FX} from '../windisle/src/fx.mjs';
+import {EnemyRigs} from '../windisle/src/enemies.mjs';
+import {createState} from '../windisle/src/engine.mjs';
+const out=document.querySelector('#result'),logs=[];
+function check(test,msg){if(!test)throw Error(msg);logs.push('PASS '+msg);}
+try{
+ const renderer=new T.WebGLRenderer({antialias:false});renderer.setSize(512,512);document.body.append(renderer.domElement);
+ const scene=new T.Scene(),camera=new T.OrthographicCamera(-16,16,16,-16,.1,80);camera.position.set(0,30,0);camera.up.set(0,0,-1);camera.lookAt(0,0,0);camera.updateMatrixWorld();
+ const layer=document.createElement('div'),fx=new FX(scene,camera,layer,{reducedMotion:true}),target=new T.WebGLRenderTarget(512,512);
+ const state={telegraphs:[],projectiles:[],enemies:[]},pixel=new Uint8Array(4);
+ const lit=(x,z)=>{const v=new T.Vector3(x,.05,z).project(camera);renderer.readRenderTargetPixels(target,Math.floor((v.x*.5+.5)*512),Math.floor((v.y*.5+.5)*512),1,1,pixel);return pixel[0]+pixel[1]+pixel[2]>12;};
+ for(let i=0;i<8;i++){
+  const a=i*Math.PI/4,tg={kind:'line',x:0,z:0,dirX:Math.sin(a),dirZ:Math.cos(a),len:10,halfWidth:1,t:.4,dur:1};state.telegraphs=[tg];fx.update(0,state);
+  renderer.setRenderTarget(target);renderer.render(scene,camera);
+  for(const [along,side,want]of [[-.2,0,true],[9.7,0,true],[5,.7,true],[-.9,0,false],[10.4,0,false],[5,1.4,false]])check(lit(tg.dirX*along+tg.dirZ*side,tg.dirZ*along-tg.dirX*side)===want,`direction ${i}: ${along},${side} = ${want}`);
+ }
+ for(const kind of ['slam','lob']){state.telegraphs=[{kind,x:0,z:0,radius:3,t:.5,dur:1}];fx.update(0,state);renderer.render(scene,camera);check(lit(2.7,0)&&!lit(3.4,0),kind+' circle boundary');}
+ fx.drain([{type:'hit',x:0,z:0,dmg:50,attack:'heavy'},{type:'kill',x:0,z:0,enemyType:'boss'}]);check(fx.hitstop===0&&fx.shake===0&&fx.flashSprite.material.opacity===0,'reduced motion suppresses shake, hitstop and flash');
+ fx.reduced=false;fx.reset();fx.drain([{type:'hit',x:0,z:0,dmg:12,stage:1}]);const light=fx.hitstop;fx.reset();fx.drain([{type:'hit',x:0,z:0,dmg:22,stage:3}]);const third=fx.hitstop;fx.reset();fx.drain([{type:'hit',x:0,z:0,dmg:40,attack:'heavy'}]);check(light<third&&third<fx.hitstop,'light / finisher / heavy feedback differs');
+ fx.reset();check(fx.decals.size===0&&fx.blades.size===0&&fx.bullets.size===0&&fx.dmgPool.every(d=>d.life===0)&&fx.hitstop===0,'restart clears transient effects');
+ const rigs=new EnemyRigs(scene),s=createState(1);s.enemies=[{id:1,type:'rusher',x:1,z:1,face:0,flash:.15,kbx:2,kbz:0,animT:0,phase:'recover'}];const before=JSON.stringify(s);rigs.sync(s,.1,1,false);check(JSON.stringify(s)===before,'rendering does not modify the engine');
+ s.enemies=[];rigs.sync(s,.016,1,false);check(rigs.dead.length===1&&rigs.map.size===0,'defeated enemy stays briefly for collapse');for(let i=0;i<30;i++)rigs.sync(s,1/60,1+i/60,false);check(rigs.dead.length===0,'collapse removes its geometry and materials');
+ const baseline=scene.children.length;for(let i=0;i<30;i++){state.telegraphs=[{kind:'line',x:0,z:0,dirX:1,dirZ:0,len:10,halfWidth:1,t:0,dur:1}];fx.update(.01,state);fx.reset();}check(scene.children.length===baseline,'restarts do not accumulate scene objects');
+ renderer.setRenderTarget(null);renderer.render(scene,camera);target.dispose();rigs.reset();out.textContent=`${logs.length} CHECKS PASSED\n`+logs.join('\n');
+}catch(e){out.textContent='FAIL '+e.stack;console.error(e);}
+</script></html>

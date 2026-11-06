@@ -1,0 +1,27 @@
+import assert from 'node:assert/strict';
+import {TRACKS} from '../racing/src/track.mjs';
+import {eligibleGhostRun,createRecorder,recordFrame,finishRecording,validGhost,readGhosts,sampleGhost,sectorDifferences} from '../racing/src/ghost.mjs';
+const track=TRACKS[0],pose=t=>({x:t*2,y:1,z:0,q:{x:0,y:0,z:0,w:t>12?-1:1},wheels:[{steer:.12,rotation:t*2}]});
+const r=createRecorder(track,pose(0));
+for(let i=1;i<=1500;i++)recordFrame(r,i/60,pose(i/60),Math.floor(i/60+1e-6));
+const g=finishRecording(r,{finished:true,passed:25},25,pose(25));
+assert(validGhost(g,track));assert(g.samples.length<260,'recording is sampled at 10 Hz');
+const saved=JSON.stringify({harbor:g});assert.deepEqual(readGhosts(saved,TRACKS),{harbor:g});
+assert.deepEqual(readGhosts('{broken',TRACKS),{});
+for(const damaged of [null,{}, {...g,samples:[null,null]}, {...g,samples:[[0],null]}, {...g,samples:[{},{}]}, {...g,gates:g.gates.map(()=>null)}, {...g,time:601}, {...g,route:'old-route'}, {...g,samples:g.samples.toReversed()}, {...g,samples:g.samples.map(p=>p.map((n,i)=>i===7?0:n))}])assert.doesNotThrow(()=>assert.equal(validGhost(damaged,track),false));
+assert(!validGhost(g,TRACKS[1]),'a different route cannot reuse this ghost');
+assert(!validGhost(g,{...track,LENGTH:track.LENGTH+1}),'track edits invalidate stale recordings');
+for(const time of [0,.055,12,12.05,24.97,25]){const p=sampleGhost(g,time);assert(Math.abs(p.x-time*2)<.005);assert(Math.abs(Math.hypot(...Object.values(p.q))-1)<1e-6,'quaternion sign crossings stay normalized');}
+assert.equal(sampleGhost(g,-1),null);assert.equal(sampleGhost(g,26),null);
+assert.deepEqual(sampleGhost(g,10),sampleGhost(g,10),'a paused simulation clock leaves the ghost stationary');
+const gates=g.gates.map((t,i)=>i?t+(i>=13?1:0):null);
+assert.deepEqual(sectorDifferences(g,gates).map(s=>s.delta),[0,1,0,0],'sector differences compare each segment rather than cumulative elapsed time');
+assert.equal(sectorDifferences(g,gates.slice(0,10)).length,1,'unfinished sectors stay hidden');
+assert(eligibleGhostRun({mode:'trial'}));
+for(const flags of [{mode:'race'},{mode:'trial',demoRun:true},{mode:'trial',penalty:3}])assert(!eligibleGhostRun(flags));
+const invalid=createRecorder(track,pose(0));invalid.invalid=true;assert.equal(finishRecording(invalid,{finished:true,passed:25},25,pose(25)),null,'recovery permanently invalidates a lap');
+const teleport=createRecorder(track,pose(0));recordFrame(teleport,.1,{...pose(.1),x:1000},1);assert(teleport.invalid);
+const tooLong=createRecorder(track,pose(0));recordFrame(tooLong,601,pose(601),1);assert(tooLong.invalid&&tooLong.invalidReason==='limit');
+const backward=createRecorder(track,pose(0));recordFrame(backward,1,pose(1),1);recordFrame(backward,.5,pose(.5),1);assert(backward.invalid);
+assert.equal(finishRecording(createRecorder(track,pose(0)),{finished:false,passed:24},25,pose(25)),null);
+console.log('Ghost checks passed: corrupt storage, interpolation, route isolation, eligibility, recovery and sector timing.');

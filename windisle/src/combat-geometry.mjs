@@ -1,0 +1,2 @@
+export function telegraphShape(tg){return tg.kind==='line'?{kind:'line',width:tg.halfWidth*2,length:tg.len+.5,center:tg.len/2-.25,angle:Math.atan2(tg.dirX,tg.dirZ)}:{kind:'circle',radius:tg.radius};}
+export function telegraphContains(tg,p){const dx=p.x-tg.x,dz=p.z-tg.z;if(tg.kind!=='line')return dx*dx+dz*dz<tg.radius*tg.radius;const along=dx*tg.dirX+dz*tg.dirZ;return along>-.5&&along<tg.len&&Math.abs(dx*tg.dirZ-dz*tg.dirX)<tg.halfWidth;}

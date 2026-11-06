@@ -5,8 +5,8 @@ import * as THREE from 'three';
 export const PALETTE = {
   ink: 0x17272b,          // 描边墨色
   sun: 0xfff1d6,
-  grassA: 0x74c15e,
-  grassB: 0x9ed86f,
+  grassA: 0x7fa770,
+  grassB: 0xa6b67b,
   grassDeco: 0x549e4a,
   cliff: 0x8b9d7a,
   cliffDark: 0x6c8064,
@@ -15,16 +15,16 @@ export const PALETTE = {
   leafB: 0x7cc565,
   water: 0x4fc3c9,
   rock: 0x93a08b,
-  jacket: 0x2e6b5c,       // 玩家玉青外衣
-  jacketLight: 0x3f8a75,
+  jacket: 0x284c66,       // 玩家深蓝外衣，与草地分离
+  jacketLight: 0x447a9c,
   skin: 0xffd9b4,
   hair: 0x27404a,
   scarf: 0xff5a3c,        // 朱红飘带
   steel: 0xe8f3f6,
-  rusher: 0xb3743f,
-  thrower: 0x8f9a52,
-  charger: 0x9a5f43,
-  brute: 0x6d7a72,
+  rusher: 0xba583c,
+  thrower: 0x8560a4,
+  charger: 0x8b3643,
+  brute: 0x536d89,
   bossCore: 0x1f4e52,
   bossRing: 0xd9a441,
   petal: 0xffd9e2,

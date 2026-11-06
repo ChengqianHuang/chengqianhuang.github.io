@@ -2,9 +2,9 @@ name: Validate racing game
 on:
   push:
     branches: [main]
-    paths: ['racing/**', 'games/harbor-rush.html', 'scripts/test_racing.mjs', '.github/workflows/validate-racing.yml']
+    paths: ['racing/**', 'games/harbor-rush.html', 'scripts/test_racing.mjs', 'scripts/test_racing_ghost.mjs', '.github/workflows/validate-racing.yml']
   pull_request:
-    paths: ['racing/**', 'games/harbor-rush.html', 'scripts/test_racing.mjs', '.github/workflows/validate-racing.yml']
+    paths: ['racing/**', 'games/harbor-rush.html', 'scripts/test_racing.mjs', 'scripts/test_racing_ghost.mjs', '.github/workflows/validate-racing.yml']
 permissions:
   contents: read
 jobs:

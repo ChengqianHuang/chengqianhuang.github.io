@@ -1,5 +1,6 @@
 // 风屿规则引擎回归测试。node scripts/test_windisle.mjs
 import assert from 'node:assert/strict';
+import {telegraphShape,telegraphContains} from '../windisle/src/combat-geometry.mjs';
 import { readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -81,6 +82,29 @@ function hashState(state) {
   ];
   return parts.join('|');
 }
+
+ok('八方向预警显示边界与真实命中区域一致',()=>{
+  for(let i=0;i<8;i++){
+    const a=i*Math.PI/4,tg={kind:'line',x:2,z:-3,dirX:Math.sin(a),dirZ:Math.cos(a),len:10,halfWidth:.9};
+    const shape=telegraphShape(tg);assert.equal(shape.center-shape.length/2,-.5);assert.equal(shape.center+shape.length/2,10);
+    for(const [along,side,hit]of [[-.51,0,false],[-.49,0,true],[9.99,.89,true],[10.01,0,false],[5,.91,false]]){
+      const p={x:tg.x+tg.dirX*along+tg.dirZ*side,z:tg.z+tg.dirZ*along-tg.dirX*side};
+      assert.equal(telegraphContains(tg,p),hit);
+      const state=createState(10);startWave(state,1);state.enemies=[];state.spawnQueue=[];Object.assign(state.player,p);state.telegraphs=[{...tg,t:0,dur:DT,damage:7}];
+      update(state,DT,{},mulberry32(1));assert.equal(state.player.hp<TUNING.player.hp,hit,'engine uses the same boundary');
+    }
+  }
+  for(const kind of ['slam','lob']){const tg={kind,x:0,z:0,radius:3};assert.equal(telegraphShape(tg).radius,3);assert(telegraphContains(tg,{x:2.99,z:0}));assert(!telegraphContains(tg,{x:3.01,z:0}));}
+});
+ok('出怪与击杀保留事件名称，命中包含攻击分级',()=>{
+  const state=createState(6),rng=mulberry32(6);startWave(state,1);let spawned=false;
+  for(let f=0;f<120;f++){update(state,DT,{},rng);spawned ||=state.events.some(e=>e.type==='spawnPoof'&&e.enemyType);state.events=[];}
+  assert(spawned,'enemy metadata must not overwrite spawnPoof');
+  state.enemies=[{id:99,type:'rusher',x:0,z:1.5,face:0,state:'act',phase:'recover',t:999,flash:0,kbx:0,kbz:0,touchCd:99,animT:0,hp:1,maxHp:1,cd:99}];state.player.energy=100;
+  update(state,DT,{burstPressed:true},rng);
+  assert(state.events.some(e=>e.type==='kill'&&e.enemyType==='rusher'));
+  assert(state.events.some(e=>e.type==='hit'&&e.enemyId===99&&e.attack==='burst'));
+});
 
 // ---------------------------------------------------------------- 连击
 ok('连击三段依次造成递增伤害并循环', () => {

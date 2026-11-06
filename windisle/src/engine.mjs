@@ -1,3 +1,4 @@
+import {telegraphContains} from './combat-geometry.mjs';
 // 风屿 - 纯规则引擎。无 DOM、无渲染依赖，给定种子完全可复现，供测试直接导入。
 // 调用方（main.mjs / 测试）以固定步长调用 update()，渲染层只读取状态与事件。
 
@@ -149,7 +150,7 @@ function spawnEnemy(state, type, rng) {
     enemy.cd = 2.2;
   }
   state.enemies.push(enemy);
-  emit(state, 'spawnPoof', { x: enemy.x, z: enemy.z, type });
+  emit(state, 'spawnPoof', { x: enemy.x, z: enemy.z, enemyType:type });
 }
 
 // ---------------------------------------------------------------- 天赋
@@ -218,7 +219,7 @@ function damageEnemy(state, e, amount, knock, dirX, dirZ, opts = {}) {
   const kb = knock * (e.type === 'brute' ? TUNING.brute.kbMult : 1) * state.player.stats.knockMult;
   if (!e.still) { e.kbx += dirX * kb; e.kbz += dirZ * kb; }
   gainEnergy(state, TUNING.player.energyPerHit);
-  emit(state, 'hit', { x: e.x, z: e.z, dmg: Math.round(dmg), blocked: bruteshield, boss: e.type === 'boss' });
+  emit(state, 'hit', { x: e.x, z: e.z, dmg: Math.round(dmg), blocked: bruteshield, boss:e.type==='boss',enemyId:e.id,attack:opts.attack||(opts.combo?'combo':'blade'),stage:opts.combo?state.player.comboStage:0 });
   if (e.hp <= 0) killEnemy(state, e);
 }
 
@@ -236,7 +237,7 @@ function killEnemy(state, e) {
     state.projectiles = state.projectiles.filter((pr) => pr.kind !== 'ebullet');
     state.telegraphs = state.telegraphs.filter((tg) => tg.owner !== e.id);
   }
-  emit(state, 'kill', { x: e.x, z: e.z, type: e.type });
+  emit(state, 'kill', { x:e.x,z:e.z,enemyType:e.type });
 }
 
 function gainEnergy(state, amount) {
@@ -255,7 +256,7 @@ function doHeavy(state) {
     const d2 = dist2(cx, cz, e.x, e.z);
     if (d2 < TUNING.player.heavyRadius * TUNING.player.heavyRadius) {
       const dx = e.x - p.x, dz = e.z - p.z, len = Math.hypot(dx, dz) || 1;
-      damageEnemy(state, e, dmg, 9, dx / len, dz / len, { ignoreBlock: true });
+      damageEnemy(state, e, dmg, 9, dx / len, dz / len, { ignoreBlock:true,attack:'heavy' });
     }
   }
   emit(state, 'heavy', { x: cx, z: cz, face: p.face });
@@ -282,7 +283,7 @@ function doBurst(state) {
     const d2 = dist2(p.x, p.z, e.x, e.z);
     if (d2 < TUNING.player.burstRadius * TUNING.player.burstRadius) {
       const dx = e.x - p.x, dz = e.z - p.z, len = Math.hypot(dx, dz) || 1;
-      damageEnemy(state, e, TUNING.player.burstDamage, 11, dx / len, dz / len, { ignoreBlock: true });
+      damageEnemy(state, e, TUNING.player.burstDamage, 11, dx / len, dz / len, {ignoreBlock:true,attack:'burst'});
     }
   }
   emit(state, 'burst', { x: p.x, z: p.z });
@@ -328,24 +329,21 @@ function updateTelegraphs(state, dt) {
       tg.resolved = true;
       const p = state.player;
       if (tg.kind === 'line') {
-        // 胶囊判定：从起点沿方向 len，半宽
-        const px = p.x - tg.x, pz = p.z - tg.z;
-        const along = px * tg.dirX + pz * tg.dirZ;
-        const perp = Math.abs(px * tg.dirZ - pz * tg.dirX);
-        if (along > -0.5 && along < tg.len && perp < tg.halfWidth) hurtPlayer(state, tg.damage, tg.x, tg.z);
+        // 有向矩形：从起点后 0.5 到前方 len，半宽与显示共用。
+        if(telegraphContains(tg,p)) hurtPlayer(state, tg.damage, tg.x, tg.z);
         if (tg.owner !== undefined) {
           const e = state.enemies.find((en) => en.id === tg.owner);
           if (e) { e.phase = 'charge'; e.t = tg.kind === 'line' ? (e.type === 'charger' ? TUNING.charger.chargeTime : 0.5) : 0; e.chargeX = tg.dirX; e.chargeZ = tg.dirZ; }
         }
       } else if (tg.kind === 'slam') {
-        if (dist2(p.x, p.z, tg.x, tg.z) < tg.radius * tg.radius) hurtPlayer(state, tg.damage, tg.x, tg.z);
+        if(telegraphContains(tg,p)) hurtPlayer(state, tg.damage, tg.x, tg.z);
         if (tg.owner !== undefined) {
           const e = state.enemies.find((en) => en.id === tg.owner);
           if (e && e.type === 'boss') { e.phase = 'stun'; e.t = TUNING.boss.stunAfterSlam; emit(state, 'bossStun', { x: e.x, z: e.z }); }
           else if (e) { e.phase = 'recover'; e.t = TUNING.brute.recover; }
         }
       } else if (tg.kind === 'lob') {
-        if (dist2(p.x, p.z, tg.x, tg.z) < tg.radius * tg.radius) hurtPlayer(state, tg.damage, tg.x, tg.z);
+        if(telegraphContains(tg,p)) hurtPlayer(state, tg.damage, tg.x, tg.z);
         emit(state, 'lobDone', { x: tg.x, z: tg.z });
       }
       emit(state, 'telegraphDone', { kind: tg.kind, x: tg.x, z: tg.z });

@@ -4,13 +4,15 @@ import {createWorld} from './world.mjs';
 import {createCar} from './car.mjs';
 import {createTireSmoke} from './effects.mjs';
 import {TRACKS,getTrack,formatTime,deltaU} from './track.mjs';
+import {GHOST_KEY,eligibleGhostRun,createRecorder,recordFrame,finishRecording,readGhosts,sampleGhost,sectorDifferences} from './ghost.mjs';
 import {RECORD_KEY,readRecords,saveBest} from './records.mjs';
 
 const $=id=>document.getElementById(id),canvas=$('race-canvas'),stage=$('race-stage');
 const keys=new Set(),colors=[0xe9a62e,0x3e8f91,0xc54d36,0xe4ddc3];
 let physics,world,renderer,scene,camera,models=[],states=[],phase='loading',previousPhase='race',mode='race',clock=0,countdown=3,accumulator=0,lastFrame=0,camMode=0,sound,muted=false,penalty=0,noticeTime=0,quality='high',frames=0,frameTime=0,aiStuck=[0,0,0,0],demo=false,demoRun=false,smoke;
 const cameraTarget=new T.Vector3(),cameraPosition=new T.Vector3(),forward=new T.Vector3(),reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
-let track=TRACKS[0],bests=readRecords();
+let track=TRACKS[0],bests=readRecords(),ghosts={},recorder=null,ghostRun=null,ghostModel=null,ghostEnabled=true,lastSplit=null;
+try{ghosts=readGhosts(localStorage.getItem(GHOST_KEY),TRACKS);}catch{}
 try{bests=readRecords(localStorage.getItem(RECORD_KEY),localStorage.getItem('harbor-rush-records-v1'));track=getTrack(localStorage.getItem('harbor-rush-track'));}catch{}
 const requestedTrack=new URL(location.href).searchParams.get('track');if(requestedTrack)track=getTrack(requestedTrack);
 
@@ -20,7 +22,7 @@ function loading(message){$('loading-label').textContent=message;}
 function overlay(id){for(const name of ['loading','menu','pause','results','failure'])$(name).hidden=name!==id;}
 function focusButton(id){requestAnimationFrame(()=>$(id).focus({preventScroll:true}));}
 function clearInput(){keys.clear();document.querySelectorAll('[data-drive]').forEach(b=>b.classList.remove('pressed'));}
-function updateBest(){const b=bests[track.id][mode];$('record').textContent=b?`本赛道最佳 ${formatTime(b)}`:'本赛道暂无纪录，跑完一场试试';}
+function updateBest(){$('ghost-option').hidden=$('mode').value!=='trial';$('ghost-record').textContent=ghosts[track.id]?`幽灵基准 ${formatTime(ghosts[track.id].time)}`:'完成有效计时圈后，自动留下你的幽灵车';const b=bests[track.id][mode];$('record').textContent=b?`本赛道最佳 ${formatTime(b)}`:'本赛道暂无纪录，跑完一场试试';}
 function resize(){if(!renderer)return;const w=stage.clientWidth,h=stage.clientHeight;renderer.setPixelRatio(Math.min(devicePixelRatio,quality==='high'?1.5:1));renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
 function setQuality(value){quality=value;renderer.shadowMap.enabled=value==='high';world.sun.castShadow=value==='high';resize();}
 
@@ -39,6 +41,7 @@ function start(isDemo=false){
   physics.cars.forEach((car,i)=>{physics.reset(car,track.grid(i));states[i]=track.createProgress(track.grid(i));models[i].root.visible=mode==='race'||i===0;});
   // In time trial the other cars are parked outside the course, with no invisible obstacles.
   if(mode==='trial')physics.cars.slice(1).forEach((car,i)=>physics.reset(car,{x:track.ground[0]/2-15-i*5,z:track.ground[1]/2-12,yaw:0}));
+  recorder=null;lastSplit=null;ghostRun=mode==='trial'&&!demoRun&&ghostEnabled?ghosts[track.id]:null;if(ghostModel)ghostModel.root.visible=false;
   physics.resetProps();phase='countdown';overlay(null);$('hud').hidden=false;$('race-tools').hidden=false;$('touch-controls').hidden=false;
   $('countdown').hidden=false;$('countdown').textContent='3';$('race-position').hidden=mode!=='race';
   cameraPosition.copy(new T.Vector3(physics.cars[0].x-8,4,physics.cars[0].z+2));
@@ -47,13 +50,18 @@ function start(isDemo=false){
 function pause(){if(!['race','countdown'].includes(phase))return;previousPhase=phase;phase='paused';clearInput();overlay('pause');$('countdown').hidden=true;focusButton('resume');}
 function resume(){if(phase!=='paused')return;phase=previousPhase;overlay(null);$('countdown').hidden=phase!=='countdown';lastFrame=performance.now();accumulator=0;canvas.focus({preventScroll:true});}
 function menu(focus='start'){mode=$('mode').value;phase='menu';clearInput();overlay('menu');$('hud').hidden=true;$('race-tools').hidden=true;$('touch-controls').hidden=true;$('countdown').hidden=true;updateBest();focusButton(typeof focus==='string'?focus:'start');}
-function recover(index=0){const state=states[index],p=track.recoverPoint(state);physics.reset(physics.cars[index],p);state.last=p.u;aiStuck[index]=0;if(index===0){penalty+=3;notice('车辆已回到赛道 · 用时 +3 秒',3);}}
+function recover(index=0){if(index===0&&recorder){recorder.invalid=true;recorder.invalidReason='recovery';}const state=states[index],p=track.recoverPoint(state);physics.reset(physics.cars[index],p);state.last=p.u;aiStuck[index]=0;if(index===0){penalty+=3;notice('车辆已回到赛道 · 用时 +3 秒',3);}}
 function finish(){
   const total=clock+penalty,ranking=rank(),last=bests[track.id][mode];phase='finished';overlay('results');$('countdown').hidden=true;
   $('result-title').textContent=demo?'示范结束':mode==='race'?`第 ${ranking} 名冲线`:'计时完成';$('result-time').textContent=formatTime(total);$('result-course').textContent=`${track.name} · ${mode==='race'?'三圈竞速':'单圈计时'}`;
   const laps=states[0].lapTimes;$('result-laps').textContent=laps.map((t,i)=>`第 ${i+1} 圈 ${formatTime(t)}`).join('　/　');
   const record=!last||total<last;$('result-note').textContent=demoRun?'示范与接管体验圈不计入纪录。':(record?'刷新本机纪录':'本机纪录 '+formatTime(last))+(penalty?` · 回正罚时 ${penalty} 秒`:'');
   if(!demoRun&&saveBest(bests,track.id,mode,total)){try{localStorage.setItem(RECORD_KEY,JSON.stringify(bests));}catch{}}
+  const splits=ghostRun&&recorder&&!recorder.invalid?sectorDifferences(ghostRun,recorder.gates):[];
+  $('result-splits').textContent=splits.map(s=>`第 ${s.sector} 段 ${s.delta>=0?'+':''}${s.delta.toFixed(2)} 秒`).join(' / ');
+  const recorded=eligibleGhostRun({mode,demoRun,penalty})?finishRecording(recorder,states[0],clock,physics.cars[0]):null;
+  if(recorded&&(!ghosts[track.id]||recorded.time<ghosts[track.id].time)){ghosts[track.id]=recorded;try{localStorage.setItem(GHOST_KEY,JSON.stringify(ghosts));$('result-note').textContent+=' · 已保存最佳幽灵圈';}catch{$('result-note').textContent+=' · 幽灵圈仅保留至关闭页面（存储不可用）';}}
+  if(ghostModel)ghostModel.root.visible=false;
   focusButton('again');
 }
 function rank(){const score=i=>states[i].passed+Math.max(-.99,Math.min(.99,deltaU(track.nearest(physics.cars[i].x,physics.cars[i].z).u,((states[i].next-1+24)%24)/24)*24));return 1+states.slice(1).filter((s,i)=>s.finished||score(i+1)>score(0)).length;}
@@ -63,13 +71,14 @@ function simulate(dt){
     const before=Math.ceil(countdown);countdown-=dt;physics.step(dt,physics.cars.map(()=>({brake:1,handbrake:1})));
     if(Math.ceil(countdown)!==before)sound?.ping(countdown<=0?880:500);
     const label=String(Math.max(1,Math.ceil(countdown)));if($('countdown').textContent!==label)$('countdown').textContent=label;
-    if(countdown<=0){phase='race';$('countdown').textContent='GO';notice('出发！',1);}
+    if(countdown<=0){if(eligibleGhostRun({mode,demoRun,penalty}))recorder=createRecorder(track,physics.cars[0]);phase='race';$('countdown').textContent='GO';notice('出发！',1);}
   }else if(phase==='race'){
     clock+=dt;const inputs=[demo?track.aiInput(physics.cars[0],1):playerInput(),...physics.cars.slice(1).map((c,i)=>mode==='race'?track.aiInput(c,i):{brake:1})];
     physics.step(dt,inputs);
     physics.cars.forEach((car,i)=>{
       if(i&&mode==='trial')return;
       const event=track.updateProgress(states[i],car,clock,mode==='race'?3:1);
+      if(i===0&&recorder){const before=recorder.gates.filter(t=>t!=null).length;recordFrame(recorder,clock,car,states[0].passed,event==='finish');if(ghostRun&&recorder.gates.filter(t=>t!=null).length>before){const splits=sectorDifferences(ghostRun,recorder.gates);if(splits.length)lastSplit=splits.at(-1);}}
       if(i===0&&event==='finish')finish();
       else if(i===0&&event==='lap'&&states[0].lap>1){notice(`第 ${states[0].lap-1} 圈 ${formatTime(states[0].lapTimes.at(-1))}`,3);sound?.ping(800);}
       if(i>0){aiStuck[i]=car.velocity<2?aiStuck[i]+dt:0;if(aiStuck[i]>4||car.y< -4||car.upright<.2)recover(i);}
@@ -97,9 +106,14 @@ function minimap(){
   const ctx=mapCtx;ctx.clearRect(0,0,220,140);ctx.lineJoin='round';ctx.lineCap='round';
   const point=p=>track.project(p);ctx.beginPath();track.samples.forEach((p,i)=>{const [x,y]=point(p);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.closePath();ctx.strokeStyle='#e5e3cb30';ctx.lineWidth=10;ctx.stroke();ctx.strokeStyle='#e5e3cb90';ctx.lineWidth=2;ctx.stroke();
   const gate=point(track.sample(states[0].next/24));ctx.beginPath();ctx.arc(...gate,5,0,Math.PI*2);ctx.strokeStyle='#efc26a';ctx.lineWidth=2;ctx.stroke();
+  if(ghostModel?.root.visible){const[x,y]=point(ghostModel.root.position);ctx.beginPath();ctx.arc(x,y,4.5,0,Math.PI*2);ctx.strokeStyle='#85e0df';ctx.lineWidth=2;ctx.stroke();}
   physics.cars.forEach((c,i)=>{if(mode==='trial'&&i)return;const [x,y]=point(c);ctx.fillStyle=['#ffd17c','#67cfcb','#f98267','#e3e1ce'][i];ctx.beginPath();ctx.arc(x,y,i===0?4.5:3.2,0,Math.PI*2);ctx.fill();if(i===0){ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();}});
 }
 function hud(dt){
+  $('ghost-hud').hidden=mode!=='trial'||demoRun||!['race','countdown','paused'].includes(phase);
+  $('ghost-label').textContent=recorder?.invalid?(recorder.invalidReason==='recovery'?'本圈使用了回正，不保存幽灵':recorder.invalidReason==='limit'?'本圈超出录制时限，不保存幽灵':'轨迹记录中断，不保存幽灵'):!ghostEnabled?'幽灵车已关闭':!ghostRun?'首个有效圈将成为幽灵基准':lastSplit?`第 ${lastSplit.sector} 段 ${lastSplit.delta<=0?'领先':'落后'} ${Math.abs(lastSplit.delta).toFixed(2)} 秒`:`幽灵基准 ${formatTime(ghostRun.time)}`;
+  $('ghost-hud').dataset.ahead=String(lastSplit?.delta<0);
+
   const car=physics.cars[0],state=states[0];$('speed').textContent=String(Math.round(Math.abs(car.speed)*3.6));
   const gear=car.controller.GetTransmission().GetCurrentGear();$('gear').textContent=gear<0?'R':gear===0?'N':gear;
   $('time').textContent=formatTime(clock+penalty);$('lap').textContent=`${Math.max(1,Math.min(mode==='race'?3:1,state.lap))} / ${mode==='race'?3:1}`;$('position').textContent=`${rank()} / 4`;
@@ -127,6 +141,7 @@ function frame(now){
   if(phase==='loading'){lastFrame=now;requestAnimationFrame(frame);return;}
   const dt=Math.min(.10,(now-lastFrame)/1000||1/60);lastFrame=now;
   if(['race','countdown'].includes(phase)){accumulator+=dt;let steps=0;while(accumulator>=1/60&&steps<6){simulate(1/60);accumulator-=1/60;steps++;}}
+  if(ghostModel){const pose=ghostRun&&ghostEnabled&&['race','paused'].includes(phase)?sampleGhost(ghostRun,clock):null;ghostModel.root.visible=!!pose;if(pose)ghostModel.update(pose);}
   const time=now/1000;physics.cars.forEach((car,i)=>models[i].update(car));
   world.update(time,physics.cars[0],states[0].next);world.gate.visible=['race','countdown'].includes(phase);
   updateCamera(dt,time);hud(dt);skids(physics.cars[0]);smoke(phase==='race'?dt:0,physics.cars[0],phase==='race');renderer.render(scene,camera);
@@ -147,11 +162,12 @@ async function changeTrack(id,initial=false){
   try{
     // Detach shared cars before freeing the old circuit, including its shadow maps,
     // procedurally generated textures, smoke buffers and skid marks.
-    models.forEach(m=>m.root.removeFromParent());world?.dispose();
+    models.forEach(m=>m.root.removeFromParent());if(ghostModel)ghostModel.root.removeFromParent();world?.dispose();
     track=getTrack(id);physics.setTrack(track);scene=new T.Scene();
     states=physics.cars.map((_,i)=>track.createProgress(track.grid(i)));
     world=await createWorld(scene,renderer,physics,loading,track);
     models.forEach(m=>{m.root.visible=true;scene.add(m.root);});
+    if(!ghostModel){ghostModel=createCar(0x72e6e5,'PB');ghostModel.root.traverse(o=>{if(o.isMesh){const materials=Array.isArray(o.material)?o.material:[o.material];const next=materials.map(m=>{const mat=m.clone();mat.transparent=true;mat.opacity=.28;mat.depthWrite=false;mat.color?.set(0x7de8e5);return mat;});o.material=Array.isArray(o.material)?next:next[0];o.castShadow=false;o.receiveShadow=false;}});}scene.add(ghostModel.root);ghostModel.root.visible=false;
     for(let f=0;f<90;f++)physics.step(1/60,physics.cars.map(()=>({brake:1})));
     skids=makeSkids();smoke=createTireSmoke(scene);clock=0;penalty=0;accumulator=0;
     trackLabels();setQuality(quality);menu(initial?'start':'track-select');
@@ -170,6 +186,7 @@ async function init(){try{
   await changeTrack(track.id,true);lastFrame=performance.now();requestAnimationFrame(frame);
 }catch(error){console.error(error);phase='failed';overlay('failure');$('failure-detail').textContent='画面未能加载。请刷新重试，或使用开启硬件加速的新版浏览器。';}}
 
+$('ghost-enabled').addEventListener('change',e=>{ghostEnabled=e.target.checked;});
 $('track-select').addEventListener('change',e=>changeTrack(e.target.value));
 $('start').addEventListener('click',start);$('again').addEventListener('click',start);$('resume').addEventListener('click',resume);$('pause-button').addEventListener('click',pause);
 $('demo').addEventListener('click',()=>start(true));
@@ -196,5 +213,5 @@ document.querySelectorAll('[data-drive]').forEach(button=>{
 });
 canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();pause();phase='failed';clearInput();sound?.update(physics.cars[0],false);overlay('failure');$('failure-detail').textContent='显卡连接中断，请刷新游戏。';});
 // Keep the keyboard inside modal controls while racing is paused.
-stage.addEventListener('keydown',e=>{if(e.key!=='Tab')return;const panel=stage.querySelector('.overlay.modal:not([hidden])');if(!panel)return;const list=[...panel.querySelectorAll('button,select,a[href]')],first=list[0],last=list.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
+stage.addEventListener('keydown',e=>{if(e.key!=='Tab')return;const panel=stage.querySelector('.overlay.modal:not([hidden])');if(!panel)return;const list=[...panel.querySelectorAll('button,select,input,a[href]')],first=list[0],last=list.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
 init();

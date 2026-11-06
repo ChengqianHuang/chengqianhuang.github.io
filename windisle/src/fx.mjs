@@ -1,6 +1,7 @@
 // 风屿 - 特效系统：预警区贴花、刀光、粒子、花瓣、伤害数字、镜头震动。
 // 每帧同步引擎状态中的预警与弹幕；事件只消费不回写。
 import * as THREE from 'three';
+import { telegraphShape } from './combat-geometry.mjs';
 import { toonMaterial, radialTexture, addOutline, PALETTE } from './art.mjs';
 
 const TAU = Math.PI * 2;
@@ -73,8 +74,6 @@ export class FX {
     // ---- 弹幕
     this.blades = new Map();
     this.bullets = new Map();
-    this.bladeProto = this.makeBladeMesh();
-    this.bulletProto = this.makeBulletMesh();
     // ---- 伤害数字 DOM 池
     this.dmgPool = [];
     for (let i = 0; i < 22; i++) {
@@ -117,9 +116,21 @@ export class FX {
         case 'slash': this.spawnArc(ev); break;
         case 'heavy': this.spawnRing(ev.x, ev.z, 4.6, 0xfff0c0, 0.32); this.addShake(0.32); this.flash(ev.x, ev.z, 0.5); break;
         case 'burst': this.spawnRing(ev.x, ev.z, 7, 0xbaffe4, 0.5); this.addShake(0.5); this.flash(ev.x, ev.z, 1); this.petalBurst(ev.x, ev.z, 26); break;
-        case 'hit': this.spawnSparks(ev.x, 1.0, ev.z, ev.boss ? 8 : 5, ev.blocked ? 0xcfe0da : 0xffe9a8); if (!ev.blocked) this.addShake(ev.boss ? 0.12 : 0.07); this.spawnDmg(ev.dmg, ev.x, 1.5, ev.z, ev.blocked ? 'blocked' : ev.dmg >= 22 ? 'crit' : ''); this.hitstop = Math.max(this.hitstop, ev.blocked ? 0.02 : 0.045); break;
-        case 'kill': this.spawnRing(ev.x, ev.z, ev.type === 'boss' ? 9 : 2.4, ev.type === 'boss' ? 0xffd080 : 0xd2ffe8, ev.type === 'boss' ? 0.6 : 0.35); this.spawnSparks(ev.x, 1, ev.z, ev.type === 'boss' ? 30 : 9, 0xaef2d8); this.spawnDust(ev.x, ev.z, 3); this.addShake(ev.type === 'boss' ? 0.6 : 0.14); this.hitstop = Math.max(this.hitstop, ev.type === 'boss' ? 0.16 : 0.07); break;
-        case 'playerHurt': this.addShake(0.38); this.spawnDmg(' hurt', ev.x, 2, ev.z, 'player'); break;
+        case 'hit': {
+          const heavy=ev.attack==='heavy'||ev.attack==='burst', finisher=ev.stage===3;
+          this.spawnSparks(ev.x, 1, ev.z, ev.blocked?3:heavy?12:finisher?9:4, ev.blocked?0xb8d4dc:heavy?0xffc25c:0xffefd0);
+          if(!ev.blocked){this.addShake(heavy?.2:finisher?.13:.045);if(heavy||finisher)this.spawnRing(ev.x,ev.z,heavy?2.2:1.4,0xe3b063,.18);}
+          this.spawnDmg(ev.dmg,ev.x,1.5,ev.z,ev.blocked?'blocked':heavy||finisher?'crit':'');
+          if(!this.reduced)this.hitstop=Math.max(this.hitstop,ev.blocked?.012:heavy?.075:finisher?.055:.025);
+          break;
+        }
+        case 'kill': {
+          const boss=ev.enemyType==='boss';
+          this.spawnRing(ev.x,ev.z,boss?9:1.8,boss?0xffd080:0xf2d5a8,boss?.6:.25);
+          this.spawnSparks(ev.x,1,ev.z,boss?26:7,0xffd08c);this.spawnDust(ev.x,ev.z,boss?5:2);
+          this.addShake(boss?.5:.1);if(!this.reduced)this.hitstop=Math.max(this.hitstop,boss?.12:.045);break;
+        }
+        case 'playerHurt': this.addShake(0.38); this.spawnDmg('受伤', ev.x, 2, ev.z, 'player'); break;
         case 'dash': if (!this.reduced) this.spawnDust(ev.x, ev.z, 5); break;
         case 'blade': break;
         case 'bossPhase': this.spawnRing(ev.x, ev.z, 10, 0xffb090, 0.7); this.addShake(0.5); this.flash(ev.x, ev.z, 1); break;
@@ -147,6 +158,7 @@ export class FX {
     arc.material.color.setHex(big ? 0x9a5b28 : 0x1d6b58);
     arc.material.opacity = 0.85;
     // 弧心朝向面朝方向：thetaStart 相应偏移
+    if(!arc.userData.swapped){arc.geometry.dispose();arc.userData.swapped=true;}
     arc.geometry = big ? this.arcGeoBig ?? (this.arcGeoBig = new THREE.RingGeometry(0.55, 2.6, 26, 1, -Math.PI / 2 - 1.15, 2.3))
       : this.arcGeo ?? (this.arcGeo = new THREE.RingGeometry(0.5, 2.2, 26, 1, -Math.PI / 2 - 1.0, 2.0));
   }
@@ -196,6 +208,7 @@ export class FX {
   }
 
   flash(x, z, strength) {
+    if(this.reduced)return;
     this.flashT = 0;
     this.flashSprite.position.set(x, 1.4, z);
     this.flashSprite.material.opacity = 0.5 * strength;
@@ -339,70 +352,60 @@ export class FX {
     }
   }
 
+  // Keep the full danger boundary fixed; only the inner timer changes.
   syncDecals(state, dt) {
-    const seen = new Set();
-    for (const tg of state.telegraphs) {
-      seen.add(tg);
-      let d = this.decals.get(tg);
-      if (!d) {
-        const group = new THREE.Group();
-        const fillMat = new THREE.MeshBasicMaterial({ color: 0xff5c38, transparent: true, opacity: 0.2, depthWrite: false, side: THREE.DoubleSide });
-        const edgeMat = new THREE.MeshBasicMaterial({ color: 0xffb090, transparent: true, opacity: 0.85, depthWrite: false, side: THREE.DoubleSide });
-        let fill, edge;
-        if (tg.kind === 'line') {
-          fill = new THREE.Mesh(new THREE.PlaneGeometry(tg.halfWidth * 2, tg.len), fillMat);
-          fill.rotation.x = -Math.PI / 2;
-          fill.position.y = 0.04;
-          edge = new THREE.Mesh(new THREE.PlaneGeometry(tg.halfWidth * 2, 0.5), edgeMat);
-          edge.rotation.x = -Math.PI / 2;
-          edge.position.y = 0.05;
-        } else {
-          fill = new THREE.Mesh(new THREE.CircleGeometry(tg.radius, 28), fillMat);
-          fill.rotation.x = -Math.PI / 2;
-          fill.position.y = 0.04;
-          edge = new THREE.Mesh(new THREE.RingGeometry(tg.radius - 0.14, tg.radius, 28), edgeMat);
-          edge.rotation.x = -Math.PI / 2;
-          edge.position.y = 0.05;
+    const seen=new Set();
+    for(const tg of state.telegraphs){
+      seen.add(tg);let d=this.decals.get(tg);const shape=telegraphShape(tg);
+      if(!d){
+        const group=new THREE.Group();
+        const material=(color,opacity)=>new THREE.MeshBasicMaterial({color,opacity,transparent:true,depthWrite:false,depthTest:false,side:THREE.DoubleSide});
+        const make=(geo,mat,y)=>{const m=new THREE.Mesh(geo,mat);m.rotation.x=-Math.PI/2;m.position.y=y;m.renderOrder=4;group.add(m);return m;};
+        let fill,edge,timer;
+        if(shape.kind==='line'){
+          fill=make(new THREE.PlaneGeometry(shape.width,shape.length),material(0xa12d21,.24),.045);
+          // Edge is a rectangular frame with its outer extent exactly on the damage bounds.
+          const frame=new THREE.Shape();const w=shape.width/2,l=shape.length/2;
+          frame.moveTo(-w,-l);frame.lineTo(w,-l);frame.lineTo(w,l);frame.lineTo(-w,l);frame.closePath();
+          const hole=new THREE.Path();hole.moveTo(-w+.08,-l+.08);hole.lineTo(-w+.08,l-.08);hole.lineTo(w-.08,l-.08);hole.lineTo(w-.08,-l+.08);hole.closePath();frame.holes.push(hole);
+          edge=make(new THREE.ShapeGeometry(frame),material(0xffd09a,.95),.055);
+          fill.position.z=edge.position.z=shape.center;
+          timer=make(new THREE.PlaneGeometry(shape.width,.12),material(0xffe9be,.95),.06);
+        }else{
+          fill=make(new THREE.CircleGeometry(shape.radius,48),material(0xa12d21,.24),.045);
+          edge=make(new THREE.RingGeometry(Math.max(0,shape.radius-.09),shape.radius,48),material(0xffd09a,.95),.055);
+          timer=make(new THREE.RingGeometry(.94,1,48),material(0xffe9be,.85),.06);
         }
-        group.add(fill); group.add(edge);
-        if (tg.kind === 'lob') {
-          const bomb = new THREE.Mesh(new THREE.SphereGeometry(0.18, 8, 6), new THREE.MeshBasicMaterial({ color: 0x8a6a3a }));
-          group.add(bomb);
-          d = { group, fill, edge, bomb };
-        } else d = { group, fill, edge };
-        this.scene.add(group);
-        this.decals.set(tg, d);
+        let bomb=null;if(tg.kind==='lob'){bomb=new THREE.Mesh(new THREE.SphereGeometry(.18,8,6),material(0x71362c,1));group.add(bomb);}
+        d={group,fill,edge,timer,bomb};this.scene.add(group);this.decals.set(tg,d);
       }
-      const k = Math.min(1, tg.t / tg.dur);
-      d.group.visible = true;
-      if (tg.kind === 'line') {
-        d.group.position.set(tg.x, 0, tg.z);
-        d.group.rotation.y = Math.atan2(tg.dirX, tg.dirZ);
-        d.fill.scale.y = k;
-        d.fill.position.z = -(tg.len / 2) * (1 - k);
-        d.edge.position.z = tg.len / 2 - k * tg.len;
-        d.edge.material.opacity = 0.6 + Math.sin(this.time * 18) * 0.3;
-      } else {
-        d.group.position.set(tg.x, 0, tg.z);
-        d.fill.material.opacity = 0.16 + k * 0.3;
-        d.edge.scale.setScalar(1 + Math.sin(this.time * 14) * 0.04);
-        if (d.bomb && tg.kind === 'lob') {
-          // 弹道抛物线
-          const src = tg.owner !== undefined ? (state.enemies.find((e) => e.id === tg.owner) || { x: tg.x, z: tg.z + 8 }) : { x: tg.x, z: tg.z + 8 };
-          const bx = src.x + (tg.x - src.x) * k, bz = src.z + (tg.z - src.z) * k;
-          const by = 1.2 + Math.sin(k * Math.PI) * 2.6;
-          d.bomb.position.set(bx, by, bz);
-          if (k >= 1) d.bomb.position.y = -99;
-        }
+      const k=Math.max(0,Math.min(1,tg.t/tg.dur));
+      d.group.position.set(tg.x,0,tg.z);d.group.rotation.y=shape.angle||0;
+      d.fill.material.opacity=.2+k*.18;
+      if(shape.kind==='line')d.timer.position.z=-.5+shape.length*k;
+      else d.timer.scale.setScalar(Math.max(.02,shape.radius*k));
+      if(d.bomb){
+        const src=state.enemies.find(e=>e.id===tg.owner)||{x:tg.x,z:tg.z+8};
+        d.bomb.position.set((src.x-tg.x)*(1-k),1.2+Math.sin(k*Math.PI)*2.6,(src.z-tg.z)*(1-k));
       }
     }
-    // 清理消失的贴花
-    for (const [tg, d] of this.decals) {
-      if (!seen.has(tg)) {
-        this.scene.remove(d.group);
-        this.decals.delete(tg);
-      }
-    }
+    for(const [tg,d]of this.decals)if(!seen.has(tg)){this.disposeObject(d.group);this.decals.delete(tg);}
+  }
+
+  disposeObject(group){
+    this.scene.remove(group);const geometries=new Set(),materials=new Set();
+    group.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)for(const m of [].concat(o.material))materials.add(m);});
+    geometries.forEach(g=>g.dispose());materials.forEach(m=>{m.map?.dispose();m.dispose();});
+  }
+
+  reset(){
+    for(const d of this.decals.values())this.disposeObject(d.group);this.decals.clear();
+    for(const pool of [this.blades,this.bullets]){for(const m of pool.values())this.disposeObject(m);pool.clear();}
+    for(const pool of [this.arcs,this.rings,this.dusts])for(const m of pool.items){m.visible=false;m.userData.active=false;}
+    for(const s of this.sparkData)s.life=0;
+    for(const d of this.dmgPool){d.life=0;d.el.style.display='none';}
+    this.shake=this.hitstop=0;this.flashSprite.material.opacity=0;
+    if(this.petalData)for(const p of this.petalData)this.spawnAmbientPetal(p,true);
   }
 
   syncProjectiles(state) {
@@ -422,8 +425,8 @@ export class FX {
         m.position.set(pr.x, 0.55, pr.z);
       }
     }
-    for (const [pr, m] of this.blades) if (!seenBlade.has(pr)) { this.scene.remove(m); this.blades.delete(pr); }
-    for (const [pr, m] of this.bullets) if (!seenBullet.has(pr)) { this.scene.remove(m); this.bullets.delete(pr); }
+    for (const [pr, m] of this.blades) if (!seenBlade.has(pr)) { this.disposeObject(m); this.blades.delete(pr); }
+    for (const [pr, m] of this.bullets) if (!seenBullet.has(pr)) { this.disposeObject(m); this.bullets.delete(pr); }
   }
 
   updateDamageNumbers(dt) {

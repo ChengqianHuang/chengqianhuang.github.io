@@ -152,7 +152,7 @@ function boot() {
   ui.on.start = () => startRun();
   ui.on.restart = () => startRun();
   ui.on.resume = () => togglePause();
-  ui.on.menu = () => { clearInput();mode = 'menu'; state = createState(1); rng = mulberry32(1); ui.showMenu(); };
+  ui.on.menu = () => { clearInput();fx.reset();enemyRigs.reset();mode = 'menu'; state = createState(1); rng = mulberry32(1); ui.showMenu(); };
   ui.on.pause = () => togglePause();
   ui.on.sound = () => { audio.ensure(); audio.setEnabled(!audio.enabled); ui.setSound(audio.enabled); };
   ui.on.fullscreen = () => {
@@ -165,7 +165,7 @@ function boot() {
   ui.showMenu();
 
   function startRun() {
-    clearInput();acc=0;canvas.focus({preventScroll:true});
+    clearInput();fx.reset();enemyRigs.reset();acc=0;canvas.focus({preventScroll:true});
     audio.ensure(); audio.resume(); audio.start();
     state = createState((Math.random() * 1e9) | 0);
     rng = mulberry32(state.seed ^ 0xA5F152);
@@ -201,8 +201,8 @@ function boot() {
       switch (ev.type) {
         case 'slash': audio.slash(ev.stage); break;
         case 'heavy': audio.heavy(); break;
-        case 'hit': audio.hit(ev.blocked); break;
-        case 'kill': audio.kill(ev.type === 'boss'); break;
+        case 'hit': audio.hit(ev.blocked,ev.attack==='heavy'||ev.stage===3); break;
+        case 'kill': audio.kill(ev.enemyType==='boss'); break;
         case 'dash': audio.dash(); break;
         case 'blade': audio.blade(); break;
         case 'burst': audio.burst(); break;
@@ -237,7 +237,9 @@ function boot() {
     const p = state.player;
     const lookAhead = 0.12;
     camTarget.set(p.x + p.vx * lookAhead, 0, p.z + p.vz * lookAhead);
-    const desired = camTarget.clone().add(new THREE.Vector3(0, 10, 12));
+    const boss=state.enemies.some(e=>e.type==='boss');
+    const distance=boss?new THREE.Vector3(0,11.7,14):new THREE.Vector3(0,8.8,10.4);
+    const desired=camTarget.clone().add(distance);
     camPos.lerp(desired, 1 - Math.exp(-4.2 * dt));
     fx.getShakeOffset(shakeOff);
     camera.position.copy(camPos).add(shakeOff);
@@ -289,9 +291,10 @@ function boot() {
     const dtReal = Math.max(0,Math.min(0.05, (now - last) / 1000));
     lastDt = dtReal;
     last = now;
-    simTime += dtReal;
+    const visualDt=state.phase==='paused'?0:dtReal;
+    simTime += visualDt;
     trackPerf(dtReal);
-    world.update(dtReal);
+    world.update(visualDt);
 
     if (mode === 'run') {
       // 组装输入（边沿只在第一个模拟步生效）
@@ -305,7 +308,7 @@ function boot() {
       input.heavyDown = heavyHeld;
 
       // 命中停顿：冻结模拟但保持渲染
-      if (fx.hitstop <= 0) {
+      if (fx.hitstop <= 0 && state.phase==='playing') {
         acc += dtReal;
         let steps = 0;
         while (acc >= STEP && steps < 4) {
@@ -326,16 +329,15 @@ function boot() {
             acc = 0;
             break;
           }
-          if (state.phase !== 'playing') { acc = 0; break; }
+          if (state.phase !== 'playing'||fx.hitstop>0) { acc = 0; break; }
         }
-      } else {
-        fx.hitstop -= dtReal;
       }
       if (acc > STEP * 4) acc = 0;
 
-      playerRig.update(state, dtReal, simTime, reducedMotion.matches);
-      enemyRigs.sync(state, dtReal, simTime, reducedMotion.matches);
-      fx.update(dtReal, state);
+      if(state.phase!=='paused'){
+        if(fx.hitstop<=0){playerRig.update(state,visualDt,simTime,reducedMotion.matches);enemyRigs.sync(state,visualDt,simTime,reducedMotion.matches);}
+        fx.update(visualDt,state);
+      }
       ui.updateHUD(state);
     } else {
       // 菜单：主角在场地中央待机
@@ -343,7 +345,7 @@ function boot() {
       fx.update(dtReal, null);
     }
 
-    updateCamera(dtReal, simTime);
+    if(state.phase!=='paused')updateCamera(dtReal,simTime);
     composer.render();
   }
   // 主循环驱动：rAF 优先；看门狗定时器兜底。

@@ -276,6 +276,9 @@ export function createPlayerRig(scene) {
   let wasHeavy = false;
   let heavyReleaseT = 1;
 
+  const locator=new THREE.Mesh(new THREE.RingGeometry(.54,.6,40),new THREE.MeshBasicMaterial({color:0xffe5a1,transparent:true,opacity:.8,depthWrite:false,side:THREE.DoubleSide}));
+  locator.rotation.x=-Math.PI/2;locator.position.y=.045;root.add(locator);
+
   function update(state, dt, time, reduced) {
     const p = state.player;
     root.position.set(p.x, 0, p.z);

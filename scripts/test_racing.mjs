@@ -1,4 +1,7 @@
 import assert from 'node:assert/strict';
+import './test_racing_ghost.mjs';
+import {writeFileSync} from 'node:fs';
+import {createRecorder,recordFrame,finishRecording,validGhost,readGhosts,sampleGhost} from '../racing/src/ghost.mjs';
 import {createPhysics} from '../racing/src/physics.mjs';
 import {TRACKS,getTrack,sample,grid,formatTime} from '../racing/src/track.mjs';
 import {readRecords,saveBest} from '../racing/src/records.mjs';
@@ -59,7 +62,7 @@ assert.deepEqual(readRecords('{"coast":{"trial":-2,"race":"50"},"oldtown":{"tria
 // Four real Jolt vehicles race concurrently. The player surrogate uses the same
 // controller as demo mode; opponents follow their own lanes and collide normally.
 for(let i=1;i<4;i++)physics.addCar(grid(i));
-const reports=[];
+const reports=[],ghostFixtures={};
 for(const track of TRACKS){
   physics.setTrack(track);
   const bodyCount=physics.system.GetNumBodies();
@@ -82,16 +85,23 @@ for(const track of TRACKS){
   // A solo demonstration has to finish without any automatic recovery help.
   physics.reset(car,track.grid());
   physics.cars.slice(1).forEach((c,i)=>physics.reset(c,{x:track.ground[0]/2-15-i*5,z:track.ground[1]/2-12,yaw:0}));
-  advance(1.5,{brake:1});const solo=track.createProgress(track.grid());
+  advance(1.5,{brake:1});const solo=track.createProgress(track.grid()),recording=createRecorder(track,car);
   for(let f=0;f<60*90&&!solo.finished;f++){
-    physics.step(dt,[track.aiInput(car,1)]);track.updateProgress(solo,car,f/60,1);
+    physics.step(dt,[track.aiInput(car,1)]);track.updateProgress(solo,car,(f+1)/60,1);recordFrame(recording,(f+1)/60,car,solo.passed,solo.finished);
   }
   assert(solo.finished,`${track.id}: demo completes a full lap without recovery`);
+  const ghost=finishRecording(recording,solo,solo.total,car);
+  assert(validGhost(ghost,track),`${track.id}: real physics produces a valid full-lap recording`);
+  ghostFixtures[track.id]=ghost;
+  assert(Math.hypot(sampleGhost(ghost,ghost.time).x-car.x,sampleGhost(ghost,ghost.time).z-car.z)<.01);
+  assert.equal(physics.system.GetNumBodies(),bodyCount,'recording and replay never create collision bodies');
+  assert.deepEqual(readGhosts(JSON.stringify(ghostFixtures),TRACKS),ghostFixtures,'all routes survive a storage round trip');
   reports.push({track:track.id,metres:Math.round(track.LENGTH),threeLapTimes:racers.map(s=>+s.total.toFixed(2)),recoveries,demoTime:+solo.total.toFixed(2)});
 }
 for(const track of [...TRACKS,...TRACKS]){
   physics.setTrack(track);advance(.2,{brake:1});
   assert.equal(physics.system.GetNumBodies(),1+track.barriers.length+(track.ramp?1:0)+track.props.length+4,'repeated switching does not accumulate collision bodies');
 }
+const fixtureIndex=process.argv.indexOf('--ghost-fixture');if(fixtureIndex>=0)writeFileSync(process.argv[fixtureIndex+1],JSON.stringify(ghostFixtures));
 console.log(JSON.stringify({engineAccelerationKmh:Math.round(speed*3.6),rampPeakMetres:+maxHeight.toFixed(2),circuits:reports},null,2));
 console.log('Racing checks passed: vehicle physics, three circuits, complete four-car races, solo demos, course switching and record migration.');

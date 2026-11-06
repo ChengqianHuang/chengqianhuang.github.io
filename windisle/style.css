@@ -162,4 +162,12 @@ main, #game-stage { display: block; height: 100%; }
 }
 /* Keep navigation usable above menus; leave the combat pause control clear of header tools. */
 .isle-header{z-index:55}
-#pause-button{top:156px}
+#pause-button{top:188px}
+
+/* Combat information stays legible against the sunlit meadow. */
+.vitals,.wave-hud{padding:12px 14px;background:rgba(12,34,34,.82);border:1px solid rgba(242,231,200,.25);border-radius:12px;backdrop-filter:blur(8px);box-sizing:border-box}
+.vitals{width:min(310px,46vw)}.wave-hud small{opacity:.9}
+#boss-bar{top:72px;padding:8px 14px;background:rgba(28,23,21,.85);border-radius:10px;box-sizing:border-box;width:min(400px,38vw)}
+.dmg-num{text-shadow:0 2px 2px #182e27,1px 0 #182e27,-1px 0 #182e27,0 -1px #182e27}
+@media(max-width:720px){.vitals{padding:9px 10px;width:49vw}.wave-hud{padding:8px 10px}#boss-bar{top:156px;width:min(290px,78vw)}#pause-button{top:164px;right:12px}}
+@media(max-height:560px) and (orientation:landscape){.vitals{top:54px;width:220px}.wave-hud{top:54px}#pause-button{top:172px}#boss-bar{top:58px;width:30vw}.overlay.menu{overflow:auto;justify-content:flex-start;padding-top:68px}.menu-copy h1{font-size:44px}.menu-copy .intro{margin:8px 0}.isle-caption,.menu-footer{display:none}}

@@ -48,3 +48,9 @@ npm run build   # esbuild 打包到 dist/windisle.js，与源码一起提交
 - `?pump=1&slow=N`：帧间隔放慢 N 倍（模拟 dt 仍被钳制），用于抓拍特效瞬间；封面 `game-assets/windisle.jpg` 即以此方式从实际渲染截取（720×440 静帧）。
 
 Three.js（MIT）经 esbuild 打包进 `dist/`，许可随附于 `dist/LICENSE.txt`。
+
+### 战斗表现维护
+
+战斗镜头根据普通波次 / Boss 波次调整距离，深蓝主角、暖色敌人和脚下定位环帮助区分角色；草丛降低高度和密度，HUD 使用深色底板。预警的完整外框始终等于真实伤害范围，内部亮线 / 圆环只表示倒计时。几何规则共用 `combat-geometry.mjs`。
+
+轻击、第三段与重击分别使用不同命中停顿、冲击火花和音高，击杀短暂倒地后回收模型。减少动态效果关闭停顿、镜头震动和闪光。暂停冻结视觉，重开 / 返回菜单清理临时图形与资源；表现层不修改引擎的敌人、碰撞或伤害。`npm test` 包含事件名与八方向边界回归；本地 HTTP 打开 `/scripts/test_windisle_render.html` 检查实际 GPU 边界、反馈分级、倒地回收和只读渲染。测试页依赖本地安装的 Three.js，不是游戏入口。

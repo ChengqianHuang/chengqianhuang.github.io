@@ -179,7 +179,7 @@ export function createWorld(scene, { reducedMotion = false } = {}) {
   }
 
   // ---- 草（实例化 + 顶点风摆）
-  const grassCount = reducedMotion ? 500 : 1500;
+  const grassCount = reducedMotion ? 400 : 1000;
   const grassGeo = grassBladeGeometry();
   const grassMat = new THREE.MeshToonMaterial({ color: 0xffffff, gradientMap: null, side: THREE.DoubleSide });
   // 简单渐变映射复用：直接给草用普通 toon
@@ -208,7 +208,7 @@ export function createWorld(scene, { reducedMotion = false } = {}) {
     dummy.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
     dummy.rotation.y = rng() * Math.PI;
     const s = 0.7 + rng() * 0.8;
-    dummy.scale.set(s, s * (0.8 + rng() * 0.7), s);
+    dummy.scale.set(s, s * (0.4 + rng() * 0.35), s);
     dummy.updateMatrix();
     grass.setMatrixAt(i, dummy.matrix);
     tmpC.lerpColors(cA, cB, rng());
