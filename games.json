@@ -5,7 +5,8 @@
     "description": "你静止时全世界静止，子弹悬在半空；移动的瞬间时间才流动。十个关卡，一击即死。",
     "controls": "键鼠 / 触屏双摇杆 · 空枪可投掷缴械 · 一击即死",
     "url": "/games/chronostasis.html",
-    "cover": "/game-assets/chronostasis.svg"
+    "cover": "/game-assets/chronostasis.svg",
+    "category": "action"
   },
   {
     "id": "windisle",
@@ -13,7 +14,8 @@
     "description": "风之屿上的卡通渲染动作对战。三段连击、冲刺无敌、风刃与大招，闯过一波波魔物与三阶段 Boss。",
     "controls": "WASD / 虚拟摇杆 · 普攻 J · 冲刺 空格 · 风刃 K · 大招 L",
     "url": "/games/windisle.html",
-    "cover": "/game-assets/windisle.jpg"
+    "cover": "/game-assets/windisle.jpg",
+    "category": "action"
   },
   {
     "id": "brass-pinball",
@@ -21,7 +23,8 @@
     "description": "双挡板接住钢珠，击落铜靶打开高架轨道，启动三球齐发。",
     "controls": "A D / 方向键 / 触屏 · 3D 机械弹珠",
     "url": "/games/brass-pinball.html",
-    "cover": "/game-assets/brass-pinball.jpg?v=2"
+    "cover": "/game-assets/brass-pinball.jpg?v=2",
+    "category": "physics"
   },
   {
     "id": "neon-rift",
@@ -29,7 +32,8 @@
     "description": "双摇杆几何射击。冲刺穿过弹幕，积攒脉冲，挑战三阶段裂隙主宰。",
     "controls": "键鼠 / 触屏双摇杆 · WebGL2 · 可直闯 Boss",
     "url": "/games/neon-rift.html",
-    "cover": "/game-assets/neon-rift.svg"
+    "cover": "/game-assets/neon-rift.svg",
+    "category": "action"
   },
   {
     "id": "periapsis",
@@ -37,7 +41,8 @@
     "description": "掠过行星，穿越轨道站。六条太空航线，挑战穿环连击与高速擦身飞行。",
     "controls": "鼠标 / WASD · 3D 飞行 · 电脑体验优先",
     "url": "/games/periapsis.html",
-    "cover": "/game-assets/periapsis.jpg"
+    "cover": "/game-assets/periapsis.jpg",
+    "category": "driving"
   },
   {
     "id": "demolition",
@@ -45,7 +50,9 @@
     "description": "瞄准支撑，带出连锁坍塌。六个拆楼合同与自由模式，还能慢动作回看这一炮。",
     "controls": "鼠标 / 触屏 · 3D 物理拆除 · 电脑体验优先",
     "url": "/games/demolition.html",
-    "cover": "/game-assets/demolition.jpg"
+    "cover": "/game-assets/demolition.jpg",
+    "category": "physics",
+    "featured": 1
   },
   {
     "id": "harbor-rush",
@@ -53,7 +60,9 @@
     "description": "港区、海堤、旧城三条赛道。和电脑抢位，或独自挑战最快单圈。",
     "controls": "WASD / 方向键 · 3D 赛车 · 电脑体验优先",
     "url": "/games/harbor-rush.html",
-    "cover": "/game-assets/harbor-rush.jpg"
+    "cover": "/game-assets/harbor-rush.jpg",
+    "category": "driving",
+    "featured": 2
   },
   {
     "id": "gomoku",
@@ -61,7 +70,8 @@
     "description": "和电脑下一局。三个难度，可选先后手，支持悔棋复盘。",
     "controls": "鼠标 / 触屏 / 键盘 · 单人对弈",
     "url": "/games/gomoku.html",
-    "cover": "/game-assets/gomoku.svg"
+    "cover": "/game-assets/gomoku.svg",
+    "category": "board"
   },
   {
     "id": "bomber",
@@ -69,7 +79,8 @@
     "description": "炸墙捡道具，连锁引爆。和电脑或朋友同场对战，先赢两局。",
     "controls": "键盘 / 触屏 · 支持本地双人",
     "url": "/games/bomber.html",
-    "cover": "/game-assets/bomber.svg"
+    "cover": "/game-assets/bomber.svg",
+    "category": "board"
   },
   {
     "id": "pixel-assault",
@@ -77,7 +88,8 @@
     "description": "跑跳连射，打开武器补给箱，穿过战线击破关底装甲车。",
     "controls": "键盘 / 触屏 · 手雷与武器补给",
     "url": "/games/pixel-assault.html",
-    "cover": "/game-assets/pixel-assault.jpg"
+    "cover": "/game-assets/pixel-assault.jpg",
+    "category": "action"
   },
   {
     "id": "2048",
@@ -85,7 +97,8 @@
     "description": "滑动数字，相同的碰在一起就合并。试着合出 2048。",
     "controls": "方向键 / 滑动 · 可撤回一步",
     "url": "/games/2048.html",
-    "cover": "/game-assets/2048.svg"
+    "cover": "/game-assets/2048.svg",
+    "category": "board"
   },
   {
     "id": "breakout",
@@ -93,6 +106,7 @@
     "description": "八种场景与机关：绕钢墙、拆护盾、抢闸门，最后挑战三阶段核心。",
     "controls": "鼠标 / A D / 方向键 / 触屏 · 支持全屏",
     "url": "/games/breakout.html",
-    "cover": "/game-assets/breakout.png?v=4"
+    "cover": "/game-assets/breakout.png?v=4",
+    "category": "physics"
   }
 ]

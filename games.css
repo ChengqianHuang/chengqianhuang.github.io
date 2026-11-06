@@ -62,3 +62,7 @@
 @media (prefers-reduced-motion: reduce) {
   .game-card:hover { transform: none; }
 }
+.game-cover{position:relative}.game-cover img{aspect-ratio:720/440;object-fit:cover}.game-badge{position:absolute;left:14px;top:14px;padding:4px 10px;background:var(--bg);color:var(--fg);border:1px solid var(--border);border-radius:20px;font-size:11px;box-shadow:0 2px 8px #0001}
+.game-group-nav{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 30px}.game-group-nav a,.recent-games nav a{color:var(--fg);text-decoration:none;border:1px solid var(--border);padding:9px 15px;border-radius:24px;font-size:13px}.game-group-nav a:hover,.recent-games nav a:hover{border-color:var(--accent);color:var(--accent)}
+.game-group{margin-bottom:48px;scroll-margin-top:90px}.game-group h2{font-size:22px;margin:0 0 20px;display:flex;align-items:center;gap:14px}.game-group h2 span{font-size:12px;color:var(--fg-muted);font-weight:400}.recent-games{padding:20px 0 26px;margin-bottom:26px;border-bottom:1px solid var(--border)}.recent-games>div{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.recent-games h2{font-size:15px;margin:0}.recent-games button{color:var(--fg-muted);font:inherit;font-size:12px;background:transparent;border:0;padding:6px;cursor:pointer}.recent-games nav{display:flex;gap:10px;flex-wrap:wrap}.recent-games[hidden]{display:none}
+@media(max-width:600px){.game-group-nav{gap:8px}.game-group-nav a,.recent-games nav a{font-size:12px;padding:9px 12px}.game-group{margin-bottom:32px}}

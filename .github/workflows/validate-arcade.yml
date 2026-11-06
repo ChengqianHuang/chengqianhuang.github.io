@@ -1,0 +1,37 @@
+name: Validate arcade collection
+on:
+  push:
+    branches: [main]
+    paths: ['game*', 'games/**', 'index.html', 'windisle/**', 'chronostasis*', 'gomoku*', 'bomber*', 'assault*', 'scripts/test_arcade.mjs', 'scripts/test_2048.mjs', 'scripts/test_gomoku.mjs', 'scripts/test_bomber.mjs', 'scripts/test_assault.mjs', 'scripts/test_windisle.mjs', 'scripts/test_chronostasis.mjs', '.github/workflows/validate-arcade.yml']
+  pull_request:
+    paths: ['game*', 'games/**', 'index.html', 'windisle/**', 'chronostasis*', 'gomoku*', 'bomber*', 'assault*', 'scripts/test_arcade.mjs', 'scripts/test_2048.mjs', 'scripts/test_gomoku.mjs', 'scripts/test_bomber.mjs', 'scripts/test_assault.mjs', 'scripts/test_windisle.mjs', 'scripts/test_chronostasis.mjs', '.github/workflows/validate-arcade.yml']
+permissions:
+  contents: read
+jobs:
+  rules:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        game: ['2048', 'gomoku', 'bomber', 'assault', 'windisle', 'chronostasis']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/test_${{ matrix.game }}.mjs
+  catalog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --check games.js && node --check game-history.js && node --check chronostasis.js
+      - run: node scripts/test_arcade.mjs
+      - run: npm ci --ignore-scripts
+        working-directory: windisle
+      - run: npm run build
+        working-directory: windisle
+      - run: git diff --exit-code -- windisle/dist

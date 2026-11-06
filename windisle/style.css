@@ -160,3 +160,6 @@ main, #game-stage { display: block; height: 100%; }
   .loading-bar::after, .menu-copy .live-dot, .hp-track i.low, .energy-track i.full, #touch-actions #touch-burst.ready, #banner { animation: none; }
   .overlay button, .upgrade-card, .isle-header .back { transition: none; }
 }
+/* Keep navigation usable above menus; leave the combat pause control clear of header tools. */
+.isle-header{z-index:55}
+#pause-button{top:156px}

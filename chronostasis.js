@@ -1,4 +1,5 @@
 // 时滞行动 CHRONOSTASIS —— 渲染、输入与界面。只读取引擎状态，不修改规则。
+import {gameStore} from './game-storage.mjs';
 import { ChronoGame, LEVELS, WIDTH, HEIGHT } from './chronostasis-engine.mjs';
 
 const $ = (id) => document.getElementById(id);
@@ -68,7 +69,7 @@ const toWorld = (clientX, clientY) => {
 
 // ---------- 音效（合成，无外部资源） ----------
 let audio = null;
-let soundOn = localStorage.getItem('chronostasis-sound') !== 'off';
+let soundOn = gameStore.get('chronostasis-sound') !== 'off';
 function ensureAudio() {
   if (!audio) {
     const AC = window.AudioContext || window.webkitAudioContext;
@@ -294,7 +295,7 @@ function gatherInput(dt) {
 // ---------- 游戏与流程 ----------
 const game = new ChronoGame();
 let selLevel = 0;
-let unlocked = parseInt(localStorage.getItem('chronostasis-unlocked') || '1', 10) || 1;
+let unlocked = Math.max(1,Math.min(LEVELS.length,parseInt(gameStore.get('chronostasis-unlocked') || '1',10)||1));
 const params = new URLSearchParams(location.search);
 const levelParam = parseInt(params.get('level'), 10);
 const hasLevelParam = levelParam >= 1 && levelParam <= LEVELS.length;
@@ -304,8 +305,8 @@ else selLevel = Math.min(selLevel, Math.max(0, unlocked - 1));
 const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}.${Math.floor((s % 1) * 10)}`;
 const bestKey = (i) => `chronostasis-best-${i}`;
 const bestOf = (i) => {
-  const v = parseFloat(localStorage.getItem(bestKey(i)));
-  return Number.isFinite(v) ? v : null;
+  const v = parseFloat(gameStore.get(bestKey(i)));
+  return Number.isFinite(v) && v >= 0 ? v : null;
 };
 
 function renderLevelGrid() {
@@ -336,7 +337,7 @@ function showOverlay(which) {
 }
 function startGame() {
   unlocked = Math.max(unlocked, selLevel + 1);
-  localStorage.setItem('chronostasis-unlocked', String(unlocked));
+  gameStore.set('chronostasis-unlocked', String(unlocked));
   game.start(selLevel);
   showOverlay(null);
   hideBanner();
@@ -394,7 +395,7 @@ els.pauseBtn.addEventListener('click', togglePause);
 els.fullscreen.addEventListener('click', toggleFullscreen);
 els.sound.addEventListener('click', () => {
   soundOn = !soundOn;
-  localStorage.setItem('chronostasis-sound', soundOn ? 'on' : 'off');
+  gameStore.set('chronostasis-sound', soundOn ? 'on' : 'off');
   els.sound.textContent = soundOn ? '声音：开' : '声音：关';
 });
 els.sound.textContent = soundOn ? '声音：开' : '声音：关';
@@ -744,10 +745,10 @@ function frame(now) {
       clearTimer = 0.7;
       // 解锁与最佳时间
       unlocked = Math.max(unlocked, Math.min(game.levelIndex + 2, LEVELS.length));
-      localStorage.setItem('chronostasis-unlocked', String(unlocked));
+      gameStore.set('chronostasis-unlocked', String(unlocked));
       const best = bestOf(game.levelIndex);
       if (best == null || game.levelTime < best) {
-        localStorage.setItem(bestKey(game.levelIndex), String(game.levelTime));
+        gameStore.set(bestKey(game.levelIndex), String(game.levelTime));
       }
     }
   } else if (game.state === 'dead') {

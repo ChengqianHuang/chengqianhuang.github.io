@@ -35,7 +35,7 @@ function boot() {
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.0;
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 400);
@@ -74,24 +74,27 @@ function boot() {
   }
 
   window.addEventListener('keydown', (e) => {
-    if (e.repeat) return;
-    keys.add(e.code);
-    if (e.code === 'Space') { edges.dash = true; e.preventDefault(); }
-    if (e.code === 'KeyJ') edges.attack = true;
-    if (e.code === 'KeyU') { heavyHeld = true; }
-    if (e.code === 'KeyK') edges.blade = true;
-    if (e.code === 'KeyL') edges.burst = true;
-    if (e.code === 'KeyP' || e.code === 'Escape') togglePause();
-    if (mode === 'run' && state.phase === 'upgrade' && ['Digit1', 'Digit2', 'Digit3'].includes(e.code)) {
-      const i = Number(e.code.slice(-1)) - 1;
-      if (state.offer[i]) pickUpgrade(state.offer[i]);
+    if(e.repeat||e.ctrlKey||e.metaKey||e.altKey)return;
+    if(e.code==='KeyP'||e.code==='Escape'){if(mode==='run'){e.preventDefault();togglePause();}return;}
+    if(mode!=='run')return;
+    if(state.phase==='upgrade'&&['Digit1','Digit2','Digit3'].includes(e.code)){
+      const offer=state.offer[Number(e.code.slice(-1))-1];if(offer)pickUpgrade(offer);return;
     }
+    if(state.phase!=='playing'||e.target.closest?.('button,select,input,a'))return;
+    const controls=['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','ShiftLeft','ShiftRight','KeyJ','KeyU','KeyK','KeyL'];
+    if(!controls.includes(e.code))return;e.preventDefault();keys.add(e.code);
+    if(e.code==='Space'||e.code.startsWith('Shift'))edges.dash=true;
+    if(e.code==='KeyJ')edges.attack=true;
+    if(e.code==='KeyU')heavyHeld=true;
+    if(e.code==='KeyK')edges.blade=true;
+    if(e.code==='KeyL')edges.burst=true;
   });
   window.addEventListener('keyup', (e) => {
     keys.delete(e.code);
     if (e.code === 'KeyU') heavyHeld = false;
   });
   canvas.addEventListener('pointerdown', (e) => {
+    if(mode!=='run'||state.phase!=='playing')return;
     if (e.pointerType === 'mouse' && e.button === 0) edges.attack = true;
     audio.ensure(); audio.resume();
   });
@@ -99,9 +102,10 @@ function boot() {
   // 触屏摇杆
   const stick = document.getElementById('touch-stick');
   const stickKnob = stick?.querySelector('i');
+  let stickId=null;
   if (stick) {
-    let stickId = null;
     const stickStart = (e) => {
+      if(mode!=='run'||state.phase!=='playing')return;
       stickId = e.pointerId;
       stick.setPointerCapture(stickId);
       stickMove(e);
@@ -126,22 +130,29 @@ function boot() {
     stick.addEventListener('pointermove', stickMove);
     stick.addEventListener('pointerup', stickEnd);
     stick.addEventListener('pointercancel', stickEnd);
+    stick.addEventListener('lostpointercapture',stickEnd);
   }
   const bindTouch = (id, fn) => {
     const el = document.getElementById(id);
     if (!el) return;
-    el.addEventListener('pointerdown', (e) => { e.preventDefault(); fn(); audio.ensure(); audio.resume(); });
+    el.addEventListener('pointerdown', (e) => { e.preventDefault(); if(mode!=='run'||state.phase!=='playing')return;fn(); audio.ensure(); audio.resume(); });
   };
   bindTouch('touch-attack', () => { edges.attack = true; });
   bindTouch('touch-dash', () => { edges.dash = true; });
   bindTouch('touch-blade', () => { edges.blade = true; });
   bindTouch('touch-burst', () => { edges.burst = true; });
 
+  function clearInput(){
+    keys.clear();heavyHeld=false;for(const k of Object.keys(edges))edges[k]=false;
+    const pointer=stickId;stickId=null;touchMove.x=touchMove.z=0;touchMove.active=false;
+    if(stickKnob)stickKnob.style.transform='';
+    if(pointer!==null&&stick?.hasPointerCapture(pointer))stick.releasePointerCapture(pointer);
+  }
   // ---------------- UI 接线
   ui.on.start = () => startRun();
   ui.on.restart = () => startRun();
   ui.on.resume = () => togglePause();
-  ui.on.menu = () => { mode = 'menu'; state = createState(1); rng = mulberry32(1); ui.showMenu(); };
+  ui.on.menu = () => { clearInput();mode = 'menu'; state = createState(1); rng = mulberry32(1); ui.showMenu(); };
   ui.on.pause = () => togglePause();
   ui.on.sound = () => { audio.ensure(); audio.setEnabled(!audio.enabled); ui.setSound(audio.enabled); };
   ui.on.fullscreen = () => {
@@ -154,6 +165,7 @@ function boot() {
   ui.showMenu();
 
   function startRun() {
+    clearInput();acc=0;canvas.focus({preventScroll:true});
     audio.ensure(); audio.resume(); audio.start();
     state = createState((Math.random() * 1e9) | 0);
     rng = mulberry32(state.seed ^ 0xA5F152);
@@ -164,6 +176,7 @@ function boot() {
   }
 
   function pickUpgrade(id) {
+    clearInput();canvas.focus({preventScroll:true});
     applyUpgrade(state, id);
     ui.hideUpgrade();
     audio.upgrade();
@@ -173,10 +186,13 @@ function boot() {
 
   function togglePause() {
     if (mode !== 'run') return;
-    if (state.phase === 'playing') { state.phase = 'paused'; ui.showPause(); }
-    else if (state.phase === 'paused') { state.phase = 'playing'; ui.hidePause(); }
+    clearInput();acc=0;
+    if (state.phase === 'playing') { state.phase = 'paused'; ui.showPause();document.getElementById('resume').focus(); }
+    else if (state.phase === 'paused') { state.phase = 'playing'; ui.hidePause();canvas.focus({preventScroll:true}); }
   }
-  window.addEventListener('blur', () => { if (mode === 'run' && state.phase === 'playing') togglePause(); });
+  function suspend(){clearInput();if(mode==='run'&&state.phase==='playing')togglePause();}
+  window.addEventListener('blur',suspend);
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)suspend();});
 
   // ---------------- 事件 → 音效/界面
   function consumeEvents(events) {
@@ -268,8 +284,9 @@ function boot() {
   const input = { moveX: 0, moveZ: 0, attackPressed: false, heavyDown: false, dashPressed: false, bladePressed: false, burstPressed: false };
 
   function frame(now = performance.now()) {
+    if(document.hidden){last=now;return;}
     frameCount++;
-    const dtReal = Math.min(0.05, (now - last) / 1000);
+    const dtReal = Math.max(0,Math.min(0.05, (now - last) / 1000));
     lastDt = dtReal;
     last = now;
     simTime += dtReal;
@@ -337,10 +354,12 @@ function boot() {
   const watchdogMs = 16 * Math.max(1, Number(pumpParams.get('slow')) || 1);
   let lastLoopAt = performance.now();
   const loopFrame = (now) => { lastLoopAt = performance.now(); frame(now); };
-  requestAnimationFrame(loopFrame);
+  const pumpOnly=pumpParams.get('pump')==='1';
+  const rafLoop=now=>{requestAnimationFrame(rafLoop);if(performance.now()-lastLoopAt>2)loopFrame(now);};
+  if(!pumpOnly)requestAnimationFrame(rafLoop);
   setInterval(() => {
-    if (performance.now() - lastLoopAt > watchdogMs + 24) loopFrame(performance.now());
-  }, watchdogMs);
+    if (!document.hidden && (pumpOnly||performance.now()-lastLoopAt>watchdogMs+24))loopFrame(performance.now());
+  },watchdogMs);
 
   // 调试句柄（供自动化测试读取内部状态）
   window.__windisle = {

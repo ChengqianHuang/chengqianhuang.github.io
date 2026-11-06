@@ -11,7 +11,7 @@
     })();
   </script>
   <link rel="stylesheet" href="/style.css">
-  <link rel="stylesheet" href="/games.css?v=2">
+  <link rel="stylesheet" href="/games.css?v=3">
   
 </head>
 <body class="home games-page">
@@ -31,11 +31,12 @@
   <main class="container games-main">
     <a class="games-back" href="/">← 返回首页</a>
     <div class="games-page-heading"><p class="section-kicker">ARCADE</p><h1>小游戏</h1><p>挑一个，玩一会儿。</p></div>
-    <div class="games-grid" data-game-catalog aria-busy="true"><p class="games-loading">加载中…</p></div>
+    <section id="recent-games" class="recent-games" hidden aria-labelledby="recent-title"><div><h2 id="recent-title">最近打开</h2><button id="clear-recent" type="button">清除记录</button></div><nav id="recent-links" aria-label="最近打开的游戏"></nav></section>
+    <div data-game-catalog="collection" aria-busy="true"><p class="games-loading">加载中…</p></div>
     <noscript><p><a href="/games/breakout.html">玩打砖块 →</a></p></noscript>
   </main>
   <footer class="site-footer"><div class="container"><p>© 2026 Chengqian Huang · <a href="https://github.com/ChengqianHuang/chengqianhuang.github.io" target="_blank" rel="noopener">本站源码</a></p></div></footer>
   <script src="/theme.js"></script>
-  <script src="/games.js?v=1"></script>
+  <script src="/games.js?v=2"></script>
 </body>
 </html>
