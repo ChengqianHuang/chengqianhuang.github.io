@@ -1,0 +1,24 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>Wind Isle input regression</title><style>body{background:#14252a;color:#f5ead3;font:16px system-ui;margin:24px}iframe{width:900px;max-width:100%;height:560px;border:1px solid #708983}pre{white-space:pre-wrap}</style><h1>风屿键盘回归 · 本地开发检查</h1><pre id="result">RUNNING</pre><iframe title="真实风屿输入测试"></iframe><script type="module">
+const frame=document.querySelector('iframe'),out=document.querySelector('pre');let heavy=0;
+window.addEventListener('message',e=>{if(e.source===frame.contentWindow&&e.data==='windisle-heavy')heavy++;});
+const wait=ms=>new Promise(r=>setTimeout(r,ms)),check=(v,msg)=>{if(!v)throw Error(msg);return 'PASS '+msg;};
+try{
+ let html=await(await fetch('/games/windisle.html')).text();
+ html=html.replace('<head>','<head><script type="importmap">{"imports":{"three":"/windisle/node_modules/three/build/three.module.js","three/addons/":"/windisle/node_modules/three/examples/jsm/"}}<\/script>');
+ // Observe a real output of the source entrypoint; do not inspect or alter its private game state.
+ html=html.replace(/<script type="module" src="\/windisle\/dist\/windisle.js[^\"]*"><\/script>/,'<script type="module">import {AudioFX} from "/windisle/src/audio.mjs";AudioFX.prototype.heavy=function(){parent.postMessage("windisle-heavy","*")};await import("/windisle/src/main.mjs");<\/script>');
+ frame.srcdoc=html;
+ for(let n=0;n<100;n++){if(frame.contentDocument?.querySelector('#loading')?.hidden)break;await wait(100);}
+ const doc=frame.contentDocument,w=frame.contentWindow;
+ const key=(type,code)=>w.dispatchEvent(new w.KeyboardEvent(type,{code,bubbles:true}));
+ const click=id=>doc.querySelector('#'+id).click();
+ const logs=[];logs.push(check(doc.querySelector('#loading').hidden,'source entrypoint is ready'));click('start');
+ key('keydown','KeyU');await wait(800);key('keyup','KeyU');await wait(150);logs.push(check(heavy===1,'holding U then releasing performs a charged strike'));
+ key('keydown','KeyU');await wait(80);key('keyup','KeyU');await wait(200);logs.push(check(heavy===1,'a quick tap cancels before the charge threshold'));
+ key('keydown','KeyU');await wait(1600);key('keyup','KeyU');await wait(100);logs.push(check(heavy===2,'full hold automatically strikes once without retriggering'));
+ key('keydown','KeyP');key('keyup','KeyP');key('keydown','KeyU');await wait(100);key('keyup','KeyU');click('resume');await wait(650);logs.push(check(heavy===2,'U pressed while paused does not leak into resumed play'));
+ key('keydown','KeyU');await wait(180);w.dispatchEvent(new w.Event('blur'));key('keyup','KeyU');logs.push(check(!doc.querySelector('#pause').hidden,'focus loss pauses during a charge'));click('resume');await wait(650);logs.push(check(heavy===2,'focus loss cancels the pending charge'));
+ click('pause-button');click('restart');await wait(200);logs.push(check(doc.querySelector('#pause').hidden&&heavy===2,'restart clears the charge and closes the pause panel'));click('pause-button');
+ out.textContent=`${logs.length} CHECKS PASSED\n`+logs.join('\n');
+}catch(e){out.textContent='FAIL '+e.stack;console.error(e);}
+</script></html>

@@ -60,7 +60,7 @@ function boot() {
 
   // ---------------- 输入
   const keys = new Set();
-  const edges = { attack: false, dash: false, blade: false, burst: false };
+  const edges = { attack: false, heavy: false, dash: false, blade: false, burst: false };
   let heavyHeld = false;
   const touchMove = { x: 0, z: 0, active: false };
 
@@ -85,7 +85,7 @@ function boot() {
     if(!controls.includes(e.code))return;e.preventDefault();keys.add(e.code);
     if(e.code==='Space'||e.code.startsWith('Shift'))edges.dash=true;
     if(e.code==='KeyJ')edges.attack=true;
-    if(e.code==='KeyU')heavyHeld=true;
+    if(e.code==='KeyU'){heavyHeld=true;edges.heavy=true;}
     if(e.code==='KeyK')edges.blade=true;
     if(e.code==='KeyL')edges.burst=true;
   });
@@ -283,7 +283,7 @@ function boot() {
   let acc = 0;
   let frameCount = 0;
   let lastDt = 0;
-  const input = { moveX: 0, moveZ: 0, attackPressed: false, heavyDown: false, dashPressed: false, bladePressed: false, burstPressed: false };
+  const input = { moveX: 0, moveZ: 0, attackPressed: false, heavyPressed:false, heavyDown: false, dashPressed: false, bladePressed: false, burstPressed: false };
 
   function frame(now = performance.now()) {
     if(document.hidden){last=now;return;}
@@ -306,6 +306,7 @@ function boot() {
       input.bladePressed = edges.blade;
       input.burstPressed = edges.burst;
       input.heavyDown = heavyHeld;
+      input.heavyPressed = edges.heavy;
 
       // 命中停顿：冻结模拟但保持渲染
       if (fx.hitstop <= 0 && state.phase==='playing') {
@@ -320,8 +321,8 @@ function boot() {
             break;
           }
           state.events.length = 0;
-          edges.attack = edges.dash = edges.blade = edges.burst = false;
-          input.attackPressed = input.dashPressed = input.bladePressed = input.burstPressed = false;
+          edges.attack = edges.heavy = edges.dash = edges.blade = edges.burst = false;
+          input.attackPressed = input.heavyPressed = input.dashPressed = input.bladePressed = input.burstPressed = false;
           acc -= STEP;
           steps++;
           if (state.phase === 'upgrade') {
