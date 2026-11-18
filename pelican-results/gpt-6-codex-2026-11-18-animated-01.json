@@ -1,0 +1,53 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "gpt-6-codex-2026-11-18-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "OpenAI",
+    "name": "GPT-6",
+    "id": null,
+    "identitySource": "system-reported"
+  },
+  "harness": {
+    "name": "Codex",
+    "version": null,
+    "mode": "agent",
+    "context": "fresh",
+    "tools": [
+      "functions.exec",
+      "exec_command",
+      "Python 3",
+      "collaboration.spawn_agent"
+    ]
+  },
+  "run": {
+    "generatedAt": "2026-11-18T21:22:24+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 1,
+    "totalAttempts": 1,
+    "selection": "first",
+    "parameters": {},
+    "postProcessing": "none",
+    "notes": "系统仅报告 GPT-6 模型系列，未提供具体模型 ID 或推理档位。首次绘制在新对话内完成，原图为手绘 SVG，Python 计算双腿踩踏的 CSS 关键帧。子代理协助复核动画方案，Chrome 验证了轮轴、踩踏及减少动态效果时的静态行为。暂停图保留原图初始姿态并移除动画样式，展示用动画 SVG 与首次交付的原图字节一致。"
+  },
+  "artifact": {
+    "path": "pelican-assets/gpt-6-codex-2026-11-18-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 860,
+    "height": 610,
+    "sha256": "7eb765d59fcaa404d0916f3260c42c8c6bd9d3a27a99a34cb633976ebcf0f64b"
+  },
+  "source": null,
+  "animation": {
+    "mechanism": "css",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/gpt-6-codex-2026-11-18-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 860,
+    "height": 610,
+    "sha256": "0ea52c1d3e5ab56ede3273ecc508982dd2d9497f19a783cefc1cfdd8fad21b2c"
+  }
+}
