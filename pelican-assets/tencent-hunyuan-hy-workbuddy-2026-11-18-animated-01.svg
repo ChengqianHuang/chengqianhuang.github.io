@@ -1,0 +1,62 @@
+<svg role="img" viewBox="0 0 680 400" width="100%" xmlns="http://www.w3.org/2000/svg">
+<title>骑自行车的鹈鹕</title>
+<desc>一只鹈鹕踩着蓝色自行车前进，车轮持续转动，双腿交替踩踏脚踏；开启减少动态效果时画面静止在踩踏姿态。</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+<style>
+.spin{transform-box:view-box;animation:spin 1.4s linear infinite}.spin-a{transform-origin:185px 300px}.spin-b{transform-origin:495px 300px}.crank{transform-origin:335px 300px}@keyframes spin{to{transform:rotate(360deg)}}
+.la-u{transform:translate(298px,190px) rotate(24.3deg);animation:la-u 1.4s linear infinite;transform-box:view-box;transform-origin:0 0}.la-l{transform:translate(369.1px,222.1px) rotate(93deg);animation:la-l 1.4s linear infinite;transform-box:view-box;transform-origin:0 0}
+@keyframes la-u{0%{transform:translate(298px,190px) rotate(24.3deg)}12.5%{transform:translate(298px,190px) rotate(43deg)}25%{transform:translate(298px,190px) rotate(53.4deg)}37.5%{transform:translate(298px,190px) rotate(51deg)}50%{transform:translate(298px,190px) rotate(41.3deg)}62.5%{transform:translate(298px,190px) rotate(25.2deg)}75%{transform:translate(298px,190px) rotate(9.6deg)}87.5%{transform:translate(298px,190px) rotate(9.6deg)}100%{transform:translate(298px,190px) rotate(24.3deg)}}
+@keyframes la-l{0%{transform:translate(369.1px,222.1px) rotate(93deg)}12.5%{transform:translate(355px,243.2px) rotate(89.1deg)}25%{transform:translate(344.5px,252.6px) rotate(97deg)}37.5%{transform:translate(347px,250.7px) rotate(115.2deg)}50%{transform:translate(356.6px,241.5px) rotate(131.4deg)}62.5%{transform:translate(368.6px,223.3px) rotate(134.6deg)}75%{transform:translate(374.9px,203px) rotate(120.8deg)}87.5%{transform:translate(374.9px,203.1px) rotate(103.9deg)}100%{transform:translate(369.1px,222.1px) rotate(93deg)}}
+.lb-u{transform:translate(320px,192px) rotate(52.3deg);animation:lb-u 1.4s linear infinite;transform-box:view-box;transform-origin:0 0}.lb-l{transform:translate(367.8px,253.7px) rotate(143.6deg);animation:lb-l 1.4s linear infinite;transform-box:view-box;transform-origin:0 0}
+@keyframes lb-u{0%{transform:translate(320px,192px) rotate(52.3deg)}12.5%{transform:translate(320px,192px) rotate(38deg)}25%{transform:translate(320px,192px) rotate(19.7deg)}37.5%{transform:translate(320px,192px) rotate(14.4deg)}50%{transform:translate(320px,192px) rotate(26deg)}62.5%{transform:translate(320px,192px) rotate(43.7deg)}75%{transform:translate(320px,192px) rotate(56.6deg)}87.5%{transform:translate(320px,192px) rotate(58.8deg)}100%{transform:translate(320px,192px) rotate(52.3deg)}}
+@keyframes lb-l{0%{transform:translate(367.8px,253.7px) rotate(143.6deg)}12.5%{transform:translate(381.5px,240px) rotate(150.2deg)}25%{transform:translate(393.4px,218.3px) rotate(138.5deg)}37.5%{transform:translate(395.5px,211.4px) rotate(120.3deg)}50%{transform:translate(390.1px,226.2px) rotate(108.8deg)}62.5%{transform:translate(376.4px,245.9px) rotate(105deg)}75%{transform:translate(362.9px,257.2px) rotate(110.9deg)}87.5%{transform:translate(360.4px,258.7px) rotate(126.7deg)}100%{transform:translate(367.8px,253.7px) rotate(143.6deg)}}
+.wing{transform-box:view-box;transform-origin:295px 150px;animation:wing .7s ease-in-out infinite}@keyframes wing{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-7deg)}}
+@media (prefers-reduced-motion:reduce){.spin,.la-u,.la-l,.lb-u,.lb-l,.wing{animation:none!important}}
+</style>
+<g fill="#E6F1FB" stroke="#B5D4F4" stroke-width="1.5">
+<path d="M78 92a14 14 0 0 1 14-14 18 18 0 0 1 34 4 12 12 0 0 1 4 23H82a12 12 0 0 1-4-13Z"/>
+<path d="M500 62a12 12 0 0 1 12-12 16 16 0 0 1 30 4 11 11 0 0 1 3 21h-43a11 11 0 0 1-2-13Z"/>
+</g>
+<g fill="#FAEEDA" stroke="#EF9F27" stroke-width="2"><circle cx="580" cy="130" r="18"/></g>
+<g stroke="#EF9F27" stroke-width="2" stroke-linecap="round"><path d="M580 100v-8M580 168v8M550 130h-8M618 130h8M559 109l-6-6M607 157l6 6M601 109l6-6M559 151l-6 6"/></g>
+<g stroke="#B5D4F4" stroke-width="3" stroke-linecap="round" fill="none"><path d="M55 216h62M42 244h74M66 272h54"/></g>
+<path d="M40 361h600" fill="none" stroke="#B4B2A9" stroke-width="2"/>
+<g stroke="#97C459" stroke-width="2" stroke-linecap="round" fill="none"><path d="M74 361l-4-9m4 9 5-7m52 7 3-8m-3 8-5-6m430 6 4-8m-4 8-5-6m60 6 3-9m-3 9-6-6"/></g>
+<ellipse cx="185" cy="365" rx="48" ry="5" fill="#D3D1C7"/><ellipse cx="495" cy="365" rx="48" ry="5" fill="#D3D1C7"/>
+<g class="spin spin-a">
+<circle cx="185" cy="300" r="58" fill="none" stroke="#2C2C2A" stroke-width="7"/>
+<circle cx="185" cy="300" r="46" fill="none" stroke="#888780" stroke-width="2"/>
+<g stroke="#B4B2A9" stroke-width="1.5"><path d="M185 254v92M139 300h92M152.5 267.5l65 65M152.5 332.5l65-65M142.5 282.4l85 35.2M142.5 317.6l85-35.2M167.4 257.5l35.2 85M167.4 342.5l35.2-85"/></g>
+<circle cx="185" cy="254" r="3.5" fill="#D85A30"/><circle cx="185" cy="300" r="7" fill="#5F5E5A"/>
+</g>
+<g class="spin spin-b">
+<circle cx="495" cy="300" r="58" fill="none" stroke="#2C2C2A" stroke-width="7"/>
+<circle cx="495" cy="300" r="46" fill="none" stroke="#888780" stroke-width="2"/>
+<g stroke="#B4B2A9" stroke-width="1.5"><path d="M495 254v92M449 300h92M462.5 267.5l65 65M462.5 332.5l65-65M452.5 282.4l85 35.2M452.5 317.6l85-35.2M477.4 257.5l35.2 85M477.4 342.5l35.2-85"/></g>
+<circle cx="495" cy="254" r="3.5" fill="#D85A30"/><circle cx="495" cy="300" r="7" fill="#5F5E5A"/>
+</g>
+<g fill="none" stroke="#185FA5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+<path d="M185 300 295 206 335 300Z"/><path d="M295 206 440 208 452 256 335 300"/><path d="M452 256 495 300"/>
+<path d="M440 208q8-22 26-20l20 3"/>
+</g>
+<path d="M272 200q24-12 50-2-20 12-50 2Z" fill="#2C2C2A"/>
+<g fill="none" stroke="#888780" stroke-width="2" stroke-dasharray="3 2"><path d="M335 281 185 287M335 319 185 313"/></g>
+<circle cx="185" cy="300" r="13" fill="none" stroke="#5F5E5A" stroke-width="3"/><circle cx="335" cy="300" r="20" fill="none" stroke="#5F5E5A" stroke-width="3"/>
+<g class="spin crank"><path d="M305 300h60" fill="none" stroke="#5F5E5A" stroke-width="5" stroke-linecap="round"/><rect x="357" y="294" width="16" height="6" rx="2" fill="#2C2C2A"/><rect x="302" y="294" width="16" height="6" rx="2" fill="#2C2C2A"/></g>
+<g class="lb-u"><path d="M0 0h78" fill="none" stroke="#EF9F27" stroke-width="10" stroke-linecap="round"/></g>
+<g class="lb-l"><circle r="5" fill="#EF9F27"/><path d="M0 0h78" fill="none" stroke="#EF9F27" stroke-width="9" stroke-linecap="round"/><path d="M74-5q13-1 15 5-11 6-19 2Z" fill="#FAC775" stroke="#993C1D" stroke-width="1.5"/></g>
+<g class="la-u"><path d="M0 0h78" fill="none" stroke="#BA7517" stroke-width="10" stroke-linecap="round"/></g>
+<g class="la-l"><circle r="5" fill="#BA7517"/><path d="M0 0h78" fill="none" stroke="#BA7517" stroke-width="9" stroke-linecap="round"/><path d="M74-5q13-1 15 5-11 6-19 2Z" fill="#EF9F27" stroke="#993C1D" stroke-width="1.5"/></g>
+<path d="M242 155q-25-15-37-5 13 8 27 20Z" fill="#FFFFFF" stroke="#5F5E5A" stroke-width="2"/>
+<ellipse cx="292" cy="158" rx="64" ry="42" fill="#FFFFFF" stroke="#5F5E5A" stroke-width="2.5"/>
+<path d="M250 182q42 18 86-6" fill="none" stroke="#D3D1C7" stroke-width="2"/>
+<path d="M326 138q14-26 48-62l16 16q-20 12-30 58Z" fill="#FFFFFF" stroke="#5F5E5A" stroke-width="2.5"/>
+<g class="wing"><path d="M262 138q38-12 76 14-16 28-62 22-18-16-14-36Z" fill="#F1EFE8" stroke="#888780" stroke-width="2"/><path d="M276 150q22 6 46 16M272 160q20 6 40 14" fill="none" stroke="#B4B2A9" stroke-width="1.5"/></g>
+<path d="M404 72q51-4 101 12-50 4-101 0Z" fill="#EF9F27" stroke="#993C1D" stroke-width="2"/>
+<path d="M404 84q51 4 101 0-25 34-75 24-20-10-26-24Z" fill="#FAC775" stroke="#993C1D" stroke-width="2"/>
+<circle cx="388" cy="78" r="22" fill="#FFFFFF" stroke="#5F5E5A" stroke-width="2.5"/>
+<path d="M378 57q2-10 8-14m0 13q4-9 11-11" fill="none" stroke="#5F5E5A" stroke-width="2" stroke-linecap="round"/>
+<circle cx="394" cy="72" r="3.6" fill="#2C2C2A"/><circle cx="395.2" cy="70.8" r="1.1" fill="#FFFFFF"/>
+</svg>
