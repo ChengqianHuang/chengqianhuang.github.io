@@ -1,0 +1,52 @@
+{
+  "$schema": "../schemas/pelican-result.schema.json",
+  "schemaVersion": "1.1.0",
+  "id": "gpt-6-2-astra-ultra-codex-2026-11-18-animated-01",
+  "testId": "pelican-riding-bicycle-animated-svg-v1",
+  "model": {
+    "provider": "OpenAI",
+    "name": "GPT-6.2 Astra Ultra",
+    "id": "gpt-6.2-astra",
+    "identitySource": "user-reported"
+  },
+  "harness": {
+    "name": "Codex",
+    "version": null,
+    "mode": "agent",
+    "context": "existing-conversation",
+    "tools": [
+      "functions.exec",
+      "exec_command",
+      "Python 3"
+    ]
+  },
+  "run": {
+    "generatedAt": "2026-11-18T08:19:30+08:00",
+    "prompt": "Draw an animated SVG of a pelican riding a bicycle. Make the wheels turn and the pelican pedal. Respect prefers-reduced-motion.",
+    "attempt": 1,
+    "totalAttempts": 1,
+    "selection": "first",
+    "parameters": {},
+    "postProcessing": "none",
+    "notes": "运行环境报告的模型 ID 为 gpt-6.2-astra。展示名中的 Ultra 档位由用户提供，未独立核实。在已有对话中已知固定提示词，从空白文件编写 Python 脚本生成 SVG。作画期间未打开其他参测作品的图片或源码。首次输出即封存并计算哈希，其后的浏览器检查与独立复核均未修改原件。暂停图从原件的初始姿势派生。"
+  },
+  "artifact": {
+    "path": "pelican-assets/gpt-6-2-astra-ultra-codex-2026-11-18-animated-01.svg",
+    "mediaType": "image/svg+xml",
+    "width": 720,
+    "height": 450,
+    "sha256": "5cd0647b3695e0789cd277ba14b7eeed24e8ff43253e712827b306ce89aff6dc"
+  },
+  "source": null,
+  "animation": {
+    "mechanism": "css",
+    "respectsReducedMotion": true
+  },
+  "poster": {
+    "path": "pelican-assets/gpt-6-2-astra-ultra-codex-2026-11-18-animated-01-poster.svg",
+    "mediaType": "image/svg+xml",
+    "width": 720,
+    "height": 450,
+    "sha256": "5c4106bfba004ea97a2acd4f6bb93dc171ab648143c318b546844f2c5e1eab50"
+  }
+}
