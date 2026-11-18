@@ -4,10 +4,10 @@
   "id": "tencent-hunyuan-hy-workbuddy-2026-11-18-animated-01",
   "testId": "pelican-riding-bicycle-animated-svg-v1",
   "model": {
-    "provider": "Tencent",
-    "name": "Tencent Hunyuan Hy",
+    "provider": "unknown",
+    "name": "Hy4-flash",
     "id": null,
-    "identitySource": "system-reported"
+    "identitySource": "user-reported"
   },
   "harness": {
     "name": "WorkBuddy",
@@ -28,7 +28,7 @@
     "selection": "first",
     "parameters": {},
     "postProcessing": "none",
-    "notes": "当前系统身份声明为 Tencent Hunyuan Hy，模型 ID 未提供；用户此前在该博客语境中给出过 DeepSeek-V4.1-Flash-1017 的标注且注明未核实，本次不沿用。在已有对话中按固定提示词生成，首次输出即封存为原图，其后的文件保存与渲染检查未修改原图。车轮旋转与双腿踩踏关键帧由 Python 逆运动学计算，用内联 SVG 渲染。提交前按仓库规范读取了既有记录的字段结构与一份暂停图样例，未复制其图形。暂停图由原图移除 CSS 动画生成，保留初始踩踏姿态；原图字节未改。"
+    "notes": "用户在本轮明确更正模型身份为 Hy4-flash；名称来自用户，未与服务端标识独立核实，故 model.id 为 null、provider 为 unknown。在已有对话中按固定提示词生成，首次输出即封存为原图，其后的文件保存与渲染检查未修改原图。车轮旋转与双腿踩踏关键帧由 Python 逆运动学计算，用内联 SVG 渲染。提交前按仓库规范读取了既有记录的字段结构与一份暂停图样例，未复制其图形。暂停图由原图移除 CSS 动画生成，保留初始踩踏姿态；原图字节未改。提交后仅更正模型元数据，SVG 与 SHA-256 未变。"
   },
   "artifact": {
     "path": "pelican-assets/tencent-hunyuan-hy-workbuddy-2026-11-18-animated-01.svg",
