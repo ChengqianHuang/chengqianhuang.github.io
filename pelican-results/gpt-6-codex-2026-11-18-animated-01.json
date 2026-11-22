@@ -5,9 +5,9 @@
   "testId": "pelican-riding-bicycle-animated-svg-v1",
   "model": {
     "provider": "OpenAI",
-    "name": "GPT-6",
+    "name": "GPT-6.2 Sol Ultra",
     "id": null,
-    "identitySource": "system-reported"
+    "identitySource": "user-reported"
   },
   "harness": {
     "name": "Codex",
@@ -29,7 +29,7 @@
     "selection": "first",
     "parameters": {},
     "postProcessing": "none",
-    "notes": "系统仅报告 GPT-6 模型系列，未提供具体模型 ID 或推理档位。首次绘制在新对话内完成，原图为手绘 SVG，Python 计算双腿踩踏的 CSS 关键帧。子代理协助复核动画方案，Chrome 验证了轮轴、踩踏及减少动态效果时的静态行为。暂停图保留原图初始姿态并移除动画样式，展示用动画 SVG 与首次交付的原图字节一致。"
+    "notes": "用户更正了本次生成的模型名称为 GPT-6.2 Sol Ultra。该名称及 Ultra 档位未通过生成时的服务端元数据独立核实，具体模型 ID 留空。首次绘制在新对话内完成，原图为手绘 SVG，Python 计算双腿踩踏的 CSS 关键帧。子代理协助复核动画方案，Chrome 验证了轮轴、踩踏及减少动态效果时的静态行为。暂停图保留原图初始姿态并移除动画样式，展示用动画 SVG 与首次交付的原图字节一致。"
   },
   "artifact": {
     "path": "pelican-assets/gpt-6-codex-2026-11-18-animated-01.svg",
